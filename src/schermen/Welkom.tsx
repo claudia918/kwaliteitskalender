@@ -1,13 +1,10 @@
 /**
- * Welkomstscherm (zolang setup niet voltooid is). PLACEHOLDER van het fundament: werkt, maar
- * moet nog volgens inventaris §1.7 worden afgemaakt (vier bouwstenen, vormgeving).
- *
- * Moet blijven bestaan: de drie acties hieronder, inclusief "Gedeeld kalenderbestand openen"
- * (zo stapt een collega in op een bestaande kalender).
+ * Welkomstscherm (zolang de setup niet voltooid is), inventaris §1.7.
+ * Drie ingangen: eigen bestuur (wizard), demo, of een gedeeld kalenderbestand van een collega.
  */
-import { FolderOpen, PlayCircle, Sparkles } from 'lucide-react';
-import { AppLogo, Button, Card } from '../componenten';
-import { WELKOM_VOETNOOT } from '../domein/inhoud';
+import { ArrowRight, FolderOpen, Lock, PlayCircle } from 'lucide-react';
+import { AppLogo, Button, IconTile, LvLogo, icoonOpNaam } from '../componenten';
+import { WELKOM_BOUWSTENEN, WELKOM_VOETNOOT } from '../domein/inhoud';
 import { useStore } from '../store';
 import { useSync } from '../sync/SyncProvider';
 import { kiesBestandHandmatig } from '../sync/bestandstoegang';
@@ -31,27 +28,57 @@ export default function Welkom({ onStartWizard }: WelkomProps) {
   };
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-6 px-4 py-10">
-      <AppLogo groot compact={false} />
-      <Card padding="lg">
-        <h1 className="text-h1">Welkom bij de Kwaliteitskalender VO</h1>
-        <p className="mt-2 text-ink-muted">
+    <div className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-4 py-10">
+      <section className="rounded-xl border border-line-subtle bg-surface-card p-6 shadow-md sm:p-10">
+        <AppLogo groot compact={false} />
+
+        <h1 className="mt-8 text-h1 text-ink-strong sm:text-display">Welkom bij de Kwaliteitskalender VO</h1>
+        <p className="mt-3 max-w-2xl text-base text-ink-body">
           Stel als bestuur in een paar stappen je eigen kwaliteitskalender samen, gekoppeld aan het inspectiekader en de
-          seizoensgesprekken.
+          seizoensgesprekken. Eerst even kennismaken met de bouwstenen:
         </p>
-        <div className="mt-6 flex flex-wrap gap-2">
-          <Button variant="primary" icon={Sparkles} onClick={onStartWizard}>
+
+        <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+          {WELKOM_BOUWSTENEN.map((b) => (
+            <li key={b.titel} className="flex items-start gap-3 rounded-lg border border-line-subtle p-4">
+              <IconTile icon={icoonOpNaam(b.icon)} tone="niveau" size="sm" />
+              <div className="min-w-0">
+                <h2 className="text-sm font-semibold text-ink-strong">{b.titel}</h2>
+                <p className="mt-0.5 text-xs leading-relaxed text-ink-muted">{b.tekst}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-8 grid gap-3 sm:grid-cols-2">
+          <Button variant="primary" size="lg" iconRight={ArrowRight} onClick={onStartWizard}>
             Begin met mijn eigen bestuur
           </Button>
-          <Button variant="secondary" icon={PlayCircle} onClick={loadDemo}>
+          <Button variant="secondary" size="lg" icon={PlayCircle} onClick={loadDemo}>
             Verken eerst de demo
           </Button>
-          <Button variant="ghost" icon={FolderOpen} onClick={() => void openGedeeld()}>
+        </div>
+
+        <div className="mt-6 flex flex-col gap-3 rounded-lg bg-surface-sunken p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-ink-strong">Werkt een collega al met een gedeelde kalender?</p>
+            <p className="text-xs text-ink-muted">
+              Open het kalenderbestand (.kwaliteitskalender.json) uit de gedeelde map van je organisatie.
+            </p>
+          </div>
+          <Button variant="secondary" icon={FolderOpen} onClick={() => void openGedeeld()} className="shrink-0">
             Gedeeld kalenderbestand openen
           </Button>
         </div>
-        <p className="mt-4 text-xs text-ink-subtle">{WELKOM_VOETNOOT}</p>
-      </Card>
+
+        <p className="mt-6 flex items-start justify-center gap-1.5 text-center text-xs text-ink-subtle">
+          <Lock className="mt-px h-3.5 w-3.5 shrink-0" aria-hidden />
+          <span>{WELKOM_VOETNOOT}</span>
+        </p>
+      </section>
+      <div className="mt-6 flex justify-center">
+        <LvLogo className="h-9 opacity-80" />
+      </div>
     </div>
   );
 }
