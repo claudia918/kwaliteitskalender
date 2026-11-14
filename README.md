@@ -14,6 +14,9 @@ een kalenderbestand in een map van je eigen organisatie.
 
 ## Openen
 
+Het kant-en-klare bestand staat in deze repository: [`release/kwaliteitskalender.html`](release/kwaliteitskalender.html).
+Download het daar (knop **Download raw file**).
+
 1. Zet `kwaliteitskalender.html` op een vaste plek, bijvoorbeeld in je documenten of in een gedeelde map.
 2. Dubbelklik op het bestand. Het opent in je standaardbrowser.
 3. Kies **Verken eerst de demo** om rond te kijken, of **Begin met mijn eigen bestuur**.

@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -b --pretty",
-    "test:e2e": "node scripts/e2e/basis.cjs && node scripts/e2e/sync.cjs"
+    "test:e2e": "node scripts/e2e/basis.cjs && node scripts/e2e/sync.cjs && node scripts/e2e-start.mjs && node scripts/e2e-kalender.mjs && node scripts/e2e-export.mjs",
+    "release": "npm run build && node -e \"require('fs').mkdirSync('release',{recursive:true});require('fs').copyFileSync('dist/kwaliteitskalender.html','release/kwaliteitskalender.html')\""
   },
   "dependencies": {
     "@fontsource/poppins": "^5.3.0",

@@ -12,6 +12,9 @@ import { X } from 'lucide-react';
 import { Button } from './Button';
 import { cx } from './cx';
 
+/** Stapel van open dialogen: de laatste ligt bovenaan. */
+const openDialogen: object[] = [];
+
 export interface DialogProps {
   open: boolean;
   onClose: () => void;
@@ -55,7 +58,11 @@ export function Dialog({
     // focus op het eerste invoerveld, anders op het paneel
     const eerste = p?.querySelector<HTMLElement>('input:not([disabled]),select:not([disabled]),textarea:not([disabled])');
     (eerste ?? p)?.focus();
+    const mijnToken = {};
+    openDialogen.push(mijnToken);
     const opToets = (e: KeyboardEvent) => {
+      // alleen de bovenste dialoog reageert op toetsen
+      if (openDialogen[openDialogen.length - 1] !== mijnToken) return;
       if (e.key === 'Escape') {
         e.stopPropagation();
         sluitRef.current();
@@ -78,6 +85,8 @@ export function Dialog({
     document.body.style.overflow = 'hidden';
     return () => {
       document.removeEventListener('keydown', opToets);
+      const i = openDialogen.indexOf(mijnToken);
+      if (i >= 0) openDialogen.splice(i, 1);
       document.body.style.overflow = overflow;
       vorige?.focus?.();
     };
