@@ -1,0 +1,174 @@
+@import './fonts.css';
+@import './tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Basis (naar design-system/tokens/base.css)
+   ============================================================ */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    color: var(--text-body);
+    background: var(--surface-page);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, h4 {
+    color: var(--text-strong);
+    margin: 0;
+  }
+  a {
+    color: inherit;
+  }
+  ::selection {
+    background: var(--lv-yellow-soft);
+    color: var(--lv-black);
+  }
+  /* Zichtbare focus: de gele ring van het merk */
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+  input[type='checkbox'], input[type='radio'] {
+    accent-color: var(--lv-yellow-600);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 1ms !important;
+      transition-duration: 1ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Kleine hoofdletterkop boven elke paginatitel ("DASHBOARD") */
+  .eyebrow {
+    font-size: var(--text-2xs);
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-subtle);
+    line-height: 1.2;
+  }
+  .tnum {
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  /* Formulierveld (input, select, textarea). Gebruik bij voorkeur <Input>, <Textarea>, <Select>. */
+  .kk-veld {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 2.5rem;
+    padding: 0 0.75rem;
+    font: inherit;
+    font-size: var(--text-sm);
+    color: var(--text-strong);
+    background: var(--surface-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+  }
+  .kk-veld::placeholder {
+    color: var(--text-subtle);
+  }
+  .kk-veld:hover:not(:disabled) {
+    border-color: var(--border-strong);
+  }
+  .kk-veld:focus,
+  .kk-veld:focus-visible {
+    outline: none;
+    border-color: var(--lv-yellow);
+    box-shadow: var(--focus-ring);
+  }
+  .kk-veld:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  textarea.kk-veld {
+    height: auto;
+    min-height: 5rem;
+    padding: 0.5rem 0.75rem;
+    resize: vertical;
+    line-height: var(--leading-normal);
+  }
+  select.kk-veld {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 2.25rem;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23595952' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.625rem center;
+  }
+  .kk-veld-sm {
+    height: 2.125rem;
+    font-size: var(--text-xs);
+  }
+  /* Linkstijl in de niveaukleur */
+  .kk-link {
+    color: var(--niveau-strong);
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: var(--radius-xs);
+  }
+  .kk-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  /* De S-curve van het merk: een stille gele scheidingslijn. Eén keer per scherm. */
+  .lv-swoosh {
+    height: 40px;
+    width: 100%;
+    background: no-repeat center/100% 100%
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 40' preserveAspectRatio='none'%3E%3Cpath d='M0 38 H360 C400 38 420 30 440 18 C460 6 480 2 520 2 H600' fill='none' stroke='%23EEC21B' stroke-width='2.5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  }
+}
+
+/* ============================================================
+   Print: standaard A3 liggend. Schermen gebruiken .no-print en .print-only.
+   Een printview kan @page zelf overschrijven (bv. het gespreksdossier op A4).
+   ============================================================ */
+.print-only {
+  display: none;
+}
+@media print {
+  @page {
+    size: A3 landscape;
+    margin: 12mm;
+  }
+  html, body {
+    background: #fff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  * {
+    overflow: visible !important;
+  }
+  thead {
+    display: table-header-group;
+  }
+  tr, td, th {
+    break-inside: avoid;
+  }
+}
+
+/* Lucide-iconen: lijndikte 1.75 (design system). Een style-attribuut kan dit per icoon overschrijven. */
+svg.lucide {
+  stroke-width: 1.75;
+  flex-shrink: 0;
+}

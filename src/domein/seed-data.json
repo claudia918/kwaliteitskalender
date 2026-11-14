@@ -1,0 +1,2468 @@
+{
+  "_toelichting": {
+    "bron": "Letterlijk uit assets/index-Capqrnn7.js (via AST-parse, niet uitgevoerd). Sleutelnamen zijn door de analist gekozen; de minified variabelenaam staat in inventaris.md.",
+    "afgeleid": "standaard_gesprekscyclus, icoon_naar_lucide en statussen zijn samengesteld uit losse constanten/functies (cs(), Gg, ss) in de bundle; de waarden zelf zijn letterlijk.",
+    "lucide": "'lucide:Naam' = icoon uit lucide-react v0.453.0",
+    "let_op": "Bij 'standaarden' wordt veld 'kern' in de code overschreven: kern = code in vaste_standaarden (OP0, OP2, OP3, VS1, OR1). De letterlijke bron zet OP0 op kern:false; effectief is OP0 wel kern/vast."
+  },
+  "activiteiten_school": [
+    {
+      "id": "SKA1-05",
+      "naam": "Jaarplan definitief vaststellen",
+      "omschrijving": "Definitief vaststellen jaarplan na MR-advies (100%)",
+      "standaard": "SKA1",
+      "gebied": "SKA",
+      "gesprek": "Herfst",
+      "periode": "jul-aug",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Directie/MR",
+      "verplicht": true,
+      "tags": [
+        "planning"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP0-01",
+      "naam": "Afname genormeerde toetsen Taal (1)",
+      "omschrijving": "Eerste afname genormeerde toetsen Nederlandse taal",
+      "standaard": "OP0",
+      "gebied": "OP",
+      "gesprek": "Herfst",
+      "periode": "sep-okt",
+      "frequentie": "2x per jaar",
+      "verantwoordelijke": "Docenten/Coördinator",
+      "verplicht": true,
+      "tags": [
+        "taal",
+        "toetsing"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP0-04",
+      "naam": "Afname genormeerde toetsen Rekenen (1)",
+      "omschrijving": "Eerste afname genormeerde toetsen rekenen-wiskunde",
+      "standaard": "OP0",
+      "gebied": "OP",
+      "gesprek": "Herfst",
+      "periode": "sep-okt",
+      "frequentie": "2x per jaar",
+      "verantwoordelijke": "Docenten/Coördinator",
+      "verplicht": true,
+      "tags": [
+        "rekenen",
+        "toetsing"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP0-08",
+      "naam": "Stavaza basisvaardigheden rapportage",
+      "omschrijving": "Rapportage voortgang implementatie basisvaardigheden",
+      "standaard": "OP0",
+      "gebied": "OP",
+      "gesprek": "Herfst",
+      "periode": "okt",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Coördinator",
+      "verplicht": true,
+      "tags": [
+        "basisvaardigheden",
+        "rapportage"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OR1-01",
+      "naam": "Analyse onderwijsresultaten R1",
+      "omschrijving": "Analyse resultaten onderbouw (rendement 1)",
+      "standaard": "OR1",
+      "gebied": "OR",
+      "gesprek": "Herfst",
+      "periode": "sep-okt",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Kwaliteitsmedewerker",
+      "verplicht": true,
+      "tags": [
+        "resultaten",
+        "analyse"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OR1-02",
+      "naam": "Analyse onderwijsresultaten R2",
+      "omschrijving": "Analyse resultaten bovenbouw (rendement 2)",
+      "standaard": "OR1",
+      "gebied": "OR",
+      "gesprek": "Herfst",
+      "periode": "sep-okt",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Kwaliteitsmedewerker",
+      "verplicht": true,
+      "tags": [
+        "resultaten",
+        "analyse"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OR1-03",
+      "naam": "Analyse onderwijsresultaten R3",
+      "omschrijving": "Analyse diplomaresultaat (rendement 3)",
+      "standaard": "OR1",
+      "gebied": "OR",
+      "gesprek": "Herfst",
+      "periode": "sep-okt",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Kwaliteitsmedewerker",
+      "verplicht": true,
+      "tags": [
+        "resultaten",
+        "analyse"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OR1-04",
+      "naam": "Analyse eindexamenresultaten",
+      "omschrijving": "Analyse CE- en SE-resultaten en slaagpercentages",
+      "standaard": "OR1",
+      "gebied": "OR",
+      "gesprek": "Herfst",
+      "periode": "jul-sep",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Kwaliteitsmedewerker",
+      "verplicht": true,
+      "tags": [
+        "examen",
+        "resultaten"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "VS1-01",
+      "naam": "Herijking schoolveiligheidsplan",
+      "omschrijving": "Jaarlijkse actualisatie schoolveiligheidsplan",
+      "standaard": "VS1",
+      "gebied": "VS",
+      "gesprek": "Herfst",
+      "periode": "aug-sep",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Veiligheidscoördinator",
+      "verplicht": true,
+      "tags": [
+        "veiligheid"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "VS1-02",
+      "naam": "Herijking anti-pestprotocol",
+      "omschrijving": "Actualisatie anti-pestprotocol",
+      "standaard": "VS1",
+      "gebied": "VS",
+      "gesprek": "Herfst",
+      "periode": "aug-sep",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Zorgcoördinator",
+      "verplicht": false,
+      "tags": [
+        "veiligheid",
+        "pesten"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "VS1-03",
+      "naam": "Analyse veiligheidsincidenten vorig jaar",
+      "omschrijving": "Analyse incidenten, schorsingen, verwijderingen, klachten",
+      "standaard": "VS1",
+      "gebied": "VS",
+      "gesprek": "Herfst",
+      "periode": "sep-okt",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Veiligheidscoördinator",
+      "verplicht": true,
+      "tags": [
+        "veiligheid",
+        "analyse"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP2-01",
+      "naam": "Cijferanalyses periode 1",
+      "omschrijving": "Analyse cijfers en voortgang leerlingen na periode 1",
+      "standaard": "OP2",
+      "gebied": "OP",
+      "gesprek": "Winter",
+      "periode": "nov",
+      "frequentie": "Per periode",
+      "verantwoordelijke": "Teamleiders",
+      "verplicht": true,
+      "tags": [
+        "leerlingvolgsysteem"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP2-02",
+      "naam": "Leerlingbespreking periode 1",
+      "omschrijving": "Bespreking voortgang en zorgleerlingen na periode 1",
+      "standaard": "OP2",
+      "gebied": "OP",
+      "gesprek": "Winter",
+      "periode": "nov-dec",
+      "frequentie": "Per periode",
+      "verantwoordelijke": "Zorgteam/Mentoren",
+      "verplicht": false,
+      "tags": [
+        "leerlingzorg"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP2-07",
+      "naam": "Tussenopbrengsten analyse",
+      "omschrijving": "Analyse tussentijdse leerresultaten",
+      "standaard": "OP2",
+      "gebied": "OP",
+      "gesprek": "Winter",
+      "periode": "dec-jan",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Kwaliteitsmedewerker",
+      "verplicht": true,
+      "tags": [
+        "resultaten",
+        "analyse"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP4-05",
+      "naam": "Analyse lesuitval eerste semester",
+      "omschrijving": "Analyse gerealiseerde onderwijstijd en lesuitval",
+      "standaard": "OP4",
+      "gebied": "OP",
+      "gesprek": "Winter",
+      "periode": "jan",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Roostermaker/Directie",
+      "verplicht": true,
+      "tags": [
+        "onderwijstijd",
+        "lesuitval"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP4-02",
+      "naam": "Analyse verzuim leerlingen (1)",
+      "omschrijving": "Eerste analyse leerlingverzuim met bepalen acties",
+      "standaard": "OP4",
+      "gebied": "OP",
+      "gesprek": "Winter",
+      "periode": "nov-dec",
+      "frequentie": "2x per jaar",
+      "verantwoordelijke": "Verzuimcoördinator",
+      "verplicht": false,
+      "tags": [
+        "verzuim"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "SKA2-01",
+      "naam": "Tussenevaluatie jaarplan",
+      "omschrijving": "Tussentijdse evaluatie voortgang jaarplan",
+      "standaard": "SKA2",
+      "gebied": "SKA",
+      "gesprek": "Winter",
+      "periode": "jan",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Directie",
+      "verplicht": true,
+      "tags": [
+        "evaluatie"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "SKA1-06",
+      "naam": "Speerpunten jaarplan volgend jaar",
+      "omschrijving": "Bepalen speerpunten voor jaarplan volgend schooljaar",
+      "standaard": "SKA1",
+      "gebied": "SKA",
+      "gesprek": "Winter",
+      "periode": "jan-feb",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Directie",
+      "verplicht": false,
+      "tags": [
+        "planning"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP3-01",
+      "naam": "Lesbezoeken ronde 1",
+      "omschrijving": "Eerste ronde lesbezoeken aan de hand van lesobservatieformulier",
+      "standaard": "OP3",
+      "gebied": "OP",
+      "gesprek": "Lente",
+      "periode": "okt-dec",
+      "frequentie": "2x per jaar",
+      "verantwoordelijke": "Teamleiders/Directie",
+      "verplicht": true,
+      "tags": [
+        "leskwaliteit"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP3-02",
+      "naam": "Lesbezoeken ronde 2",
+      "omschrijving": "Tweede ronde lesbezoeken",
+      "standaard": "OP3",
+      "gebied": "OP",
+      "gesprek": "Lente",
+      "periode": "feb-mrt",
+      "frequentie": "2x per jaar",
+      "verantwoordelijke": "Teamleiders/Directie",
+      "verplicht": false,
+      "tags": [
+        "leskwaliteit"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP3-03",
+      "naam": "Analyse leskwaliteit",
+      "omschrijving": "Analyse van lesbezoeken en bepalen verbeteracties",
+      "standaard": "OP3",
+      "gebied": "OP",
+      "gesprek": "Lente",
+      "periode": "mrt",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Directie",
+      "verplicht": true,
+      "tags": [
+        "leskwaliteit",
+        "analyse"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP3-05",
+      "naam": "Jaarlijkse sectiegesprekken",
+      "omschrijving": "Gesprekken met secties over onderwijs en resultaten",
+      "standaard": "OP3",
+      "gebied": "OP",
+      "gesprek": "Lente",
+      "periode": "okt-feb",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Directie",
+      "verplicht": false,
+      "tags": [
+        "secties"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP3-06",
+      "naam": "Reflectie op sectiegesprekken",
+      "omschrijving": "Evaluatie uitkomsten sectiegesprekken",
+      "standaard": "OP3",
+      "gebied": "OP",
+      "gesprek": "Lente",
+      "periode": "mrt",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Directie",
+      "verplicht": false,
+      "tags": [
+        "secties",
+        "evaluatie"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP2-03",
+      "naam": "Cijferanalyses periode 2",
+      "omschrijving": "Analyse cijfers en voortgang leerlingen na periode 2",
+      "standaard": "OP2",
+      "gebied": "OP",
+      "gesprek": "Lente",
+      "periode": "feb",
+      "frequentie": "Per periode",
+      "verantwoordelijke": "Teamleiders",
+      "verplicht": false,
+      "tags": [
+        "leerlingvolgsysteem"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP2-04",
+      "naam": "Leerlingbespreking periode 2",
+      "omschrijving": "Bespreking voortgang en zorgleerlingen na periode 2",
+      "standaard": "OP2",
+      "gebied": "OP",
+      "gesprek": "Lente",
+      "periode": "feb-mrt",
+      "frequentie": "Per periode",
+      "verantwoordelijke": "Zorgteam/Mentoren",
+      "verplicht": false,
+      "tags": [
+        "leerlingzorg"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "VS2-01",
+      "naam": "Tevredenheidsonderzoek leerlingen",
+      "omschrijving": "Afname tevredenheidsonderzoek (Vensters VO) incl. sociale veiligheid",
+      "standaard": "VS2",
+      "gebied": "VS",
+      "gesprek": "Lente",
+      "periode": "feb-mrt",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Kwaliteitsmedewerker",
+      "verplicht": false,
+      "tags": [
+        "tevredenheid"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "VS2-02",
+      "naam": "Tevredenheidsonderzoek ouders",
+      "omschrijving": "Afname tevredenheidsonderzoek ouders (Vensters VO)",
+      "standaard": "VS2",
+      "gebied": "VS",
+      "gesprek": "Lente",
+      "periode": "feb-mrt",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Kwaliteitsmedewerker",
+      "verplicht": false,
+      "tags": [
+        "tevredenheid",
+        "ouders"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "VS2-04",
+      "naam": "Analyse tevredenheidsonderzoeken",
+      "omschrijving": "Analyse resultaten en bepalen verbeteracties",
+      "standaard": "VS2",
+      "gebied": "VS",
+      "gesprek": "Lente",
+      "periode": "mrt-apr",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Directie",
+      "verplicht": false,
+      "tags": [
+        "tevredenheid",
+        "analyse"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "SKA3-01",
+      "naam": "Jaarplan evalueren",
+      "omschrijving": "Evaluatie van het jaarplan en behaalde doelen",
+      "standaard": "SKA3",
+      "gebied": "SKA",
+      "gesprek": "Zomer",
+      "periode": "jun",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Directie",
+      "verplicht": true,
+      "tags": [
+        "evaluatie"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "SKA3-07",
+      "naam": "Zelfevaluatie inspectiestandaarden",
+      "omschrijving": "Zelfevaluatie op alle inspectiestandaarden",
+      "standaard": "SKA3",
+      "gebied": "SKA",
+      "gesprek": "Zomer",
+      "periode": "mei-jun",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Directie/Kwaliteit",
+      "verplicht": true,
+      "tags": [
+        "inspectie",
+        "evaluatie"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "SKA1-04",
+      "naam": "Jaarplan concept opstellen",
+      "omschrijving": "Opstellen conceptversie jaarplan komend schooljaar (80%)",
+      "standaard": "SKA1",
+      "gebied": "SKA",
+      "gesprek": "Zomer",
+      "periode": "mei-jun",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Directie",
+      "verplicht": true,
+      "tags": [
+        "planning"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP2-09",
+      "naam": "Evaluatie uitvoering SOP",
+      "omschrijving": "Evaluatie uitvoering schoolondersteuningsprofiel",
+      "standaard": "OP2",
+      "gebied": "OP",
+      "gesprek": "Zomer",
+      "periode": "mei-jun",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Zorgcoördinator",
+      "verplicht": false,
+      "tags": [
+        "passend onderwijs"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP2-10",
+      "naam": "Herijking SOP",
+      "omschrijving": "Actualiseren schoolondersteuningsprofiel",
+      "standaard": "OP2",
+      "gebied": "OP",
+      "gesprek": "Zomer",
+      "periode": "jun-jul",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Zorgcoördinator",
+      "verplicht": false,
+      "tags": [
+        "passend onderwijs"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP6-08",
+      "naam": "Evaluatieverslag examencommissie",
+      "omschrijving": "Jaarlijks evaluatieverslag van de examencommissie",
+      "standaard": "OP6",
+      "gebied": "OP",
+      "gesprek": "Zomer",
+      "periode": "jun-jul",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Examencommissie",
+      "verplicht": false,
+      "tags": [
+        "examen",
+        "evaluatie"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "SKA1-01",
+      "naam": "Schoolplan opstellen",
+      "omschrijving": "Vierjaarlijks strategisch plan",
+      "standaard": "SKA1",
+      "gebied": "SKA",
+      "gesprek": "Doorlopend",
+      "periode": "apr-jun",
+      "frequentie": "Eens per 4 jaar",
+      "verantwoordelijke": "Directie",
+      "verplicht": false,
+      "tags": [
+        "strategie",
+        "meerjarig"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "SKA1-02",
+      "naam": "Schoolplan evalueren",
+      "omschrijving": "Tussentijdse evaluatie schoolplan",
+      "standaard": "SKA1",
+      "gebied": "SKA",
+      "gesprek": "Doorlopend",
+      "periode": "feb-mrt",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Directie",
+      "verplicht": false,
+      "tags": [
+        "strategie",
+        "evaluatie"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "SKA2-02",
+      "naam": "Kwaliteitskalender evalueren",
+      "omschrijving": "Evaluatie uitvoering kwaliteitskalender",
+      "standaard": "SKA2",
+      "gebied": "SKA",
+      "gesprek": "Doorlopend",
+      "periode": "jun",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Kwaliteitsmedewerker",
+      "verplicht": false,
+      "tags": [
+        "evaluatie",
+        "kwaliteit"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "SKA3-02",
+      "naam": "Schoolgids actualiseren",
+      "omschrijving": "Jaarlijkse actualisatie schoolgids",
+      "standaard": "SKA3",
+      "gebied": "SKA",
+      "gesprek": "Doorlopend",
+      "periode": "mei-jun",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Directie/Communicatie",
+      "verplicht": false,
+      "tags": [
+        "communicatie"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "SKA3-03",
+      "naam": "Scholen op de Kaart actualiseren (1)",
+      "omschrijving": "Eerste actualisatie",
+      "standaard": "SKA3",
+      "gebied": "SKA",
+      "gesprek": "Doorlopend",
+      "periode": "sep-okt",
+      "frequentie": "3x per jaar",
+      "verantwoordelijke": "Kwaliteitsmedewerker",
+      "verplicht": false,
+      "tags": [
+        "verantwoording"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "SKA3-04",
+      "naam": "Scholen op de Kaart actualiseren (2)",
+      "omschrijving": "Tweede actualisatie",
+      "standaard": "SKA3",
+      "gebied": "SKA",
+      "gesprek": "Doorlopend",
+      "periode": "jan-feb",
+      "frequentie": "3x per jaar",
+      "verantwoordelijke": "Kwaliteitsmedewerker",
+      "verplicht": false,
+      "tags": [
+        "verantwoording"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "SKA3-05",
+      "naam": "Scholen op de Kaart actualiseren (3)",
+      "omschrijving": "Derde actualisatie",
+      "standaard": "SKA3",
+      "gebied": "SKA",
+      "gesprek": "Doorlopend",
+      "periode": "mei-jun",
+      "frequentie": "3x per jaar",
+      "verantwoordelijke": "Kwaliteitsmedewerker",
+      "verplicht": false,
+      "tags": [
+        "verantwoording"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP0-02",
+      "naam": "Afname genormeerde toetsen Taal (2)",
+      "omschrijving": "Tweede afname",
+      "standaard": "OP0",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "mrt-apr",
+      "frequentie": "2x per jaar",
+      "verantwoordelijke": "Docenten/Coördinator",
+      "verplicht": false,
+      "tags": [
+        "taal",
+        "toetsing"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP0-05",
+      "naam": "Afname genormeerde toetsen Rekenen (2)",
+      "omschrijving": "Tweede afname",
+      "standaard": "OP0",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "mrt-apr",
+      "frequentie": "2x per jaar",
+      "verantwoordelijke": "Docenten/Coördinator",
+      "verplicht": false,
+      "tags": [
+        "rekenen",
+        "toetsing"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP0-07",
+      "naam": "Evaluatie burgerschapsonderwijs",
+      "omschrijving": "Evaluatie burgerschapscurriculum",
+      "standaard": "OP0",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "mei-jun",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Coördinator burgerschap",
+      "verplicht": false,
+      "tags": [
+        "burgerschap"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP1-01",
+      "naam": "Check kerndoelen en eindtermen",
+      "omschrijving": "Controle dekking curriculum",
+      "standaard": "OP1",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "aug-sep",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Secties/Coördinator",
+      "verplicht": false,
+      "tags": [
+        "curriculum"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP1-02",
+      "naam": "Herijking methodiek",
+      "omschrijving": "Vierjaarlijkse evaluatie methodes",
+      "standaard": "OP1",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "jan-mrt",
+      "frequentie": "Eens per 4 jaar",
+      "verantwoordelijke": "Secties",
+      "verplicht": false,
+      "tags": [
+        "curriculum",
+        "methode"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP2-05",
+      "naam": "Cijferanalyses periode 3",
+      "omschrijving": "Analyse na periode 3",
+      "standaard": "OP2",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "mei",
+      "frequentie": "Per periode",
+      "verantwoordelijke": "Teamleiders",
+      "verplicht": false,
+      "tags": [
+        "leerlingvolgsysteem"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP2-06",
+      "naam": "Leerlingbespreking periode 3",
+      "omschrijving": "Bespreking na periode 3",
+      "standaard": "OP2",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "mei-jun",
+      "frequentie": "Per periode",
+      "verantwoordelijke": "Zorgteam/Mentoren",
+      "verplicht": false,
+      "tags": [
+        "leerlingzorg"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP2-08",
+      "naam": "Evaluatie OPP's met ouders",
+      "omschrijving": "Evaluatiegesprekken OPP's",
+      "standaard": "OP2",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "nov, mrt",
+      "frequentie": "2x per jaar",
+      "verantwoordelijke": "Zorgcoördinator",
+      "verplicht": false,
+      "tags": [
+        "passend onderwijs"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP3-04",
+      "naam": "Herijking docentprofiel",
+      "omschrijving": "Vierjaarlijkse herijking",
+      "standaard": "OP3",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "mrt-apr",
+      "frequentie": "Eens per 4 jaar",
+      "verantwoordelijke": "Directie/HR",
+      "verplicht": false,
+      "tags": [
+        "professionalisering"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP4-01",
+      "naam": "Jaarplanning onderwijstijd",
+      "omschrijving": "Opstellen jaarplanning",
+      "standaard": "OP4",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "jun-jul",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Roostermaker/Directie",
+      "verplicht": false,
+      "tags": [
+        "onderwijstijd"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP4-03",
+      "naam": "Analyse verzuim leerlingen (2)",
+      "omschrijving": "Tweede analyse",
+      "standaard": "OP4",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "mrt-apr",
+      "frequentie": "2x per jaar",
+      "verantwoordelijke": "Verzuimcoördinator",
+      "verplicht": false,
+      "tags": [
+        "verzuim"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP4-04",
+      "naam": "Evaluatie verzuimacties",
+      "omschrijving": "Evaluatie verzuimbeleid",
+      "standaard": "OP4",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "jun",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Verzuimcoördinator",
+      "verplicht": false,
+      "tags": [
+        "verzuim",
+        "evaluatie"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP6-01",
+      "naam": "PTA vaststellen",
+      "omschrijving": "Vaststellen PTA",
+      "standaard": "OP6",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "jun-jul",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Examencommissie",
+      "verplicht": false,
+      "tags": [
+        "examen"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP6-02",
+      "naam": "Examenreglement vaststellen",
+      "omschrijving": "Vaststellen examenreglement",
+      "standaard": "OP6",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "jun-jul",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Examencommissie",
+      "verplicht": false,
+      "tags": [
+        "examen"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP6-03",
+      "naam": "PTA/examenreglement communiceren",
+      "omschrijving": "Communicatie naar leerlingen en ouders",
+      "standaard": "OP6",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "sep-okt",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Examencommissie",
+      "verplicht": false,
+      "tags": [
+        "examen",
+        "communicatie"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP6-04",
+      "naam": "Check voortgang SE periode 1",
+      "omschrijving": "Controle voortgang SE's",
+      "standaard": "OP6",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "dec",
+      "frequentie": "Per periode",
+      "verantwoordelijke": "Examencommissie",
+      "verplicht": false,
+      "tags": [
+        "examen"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP6-05",
+      "naam": "Check voortgang SE periode 2",
+      "omschrijving": "Controle voortgang SE's",
+      "standaard": "OP6",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "mrt",
+      "frequentie": "Per periode",
+      "verantwoordelijke": "Examencommissie",
+      "verplicht": false,
+      "tags": [
+        "examen"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP6-06",
+      "naam": "Check afronding SE voorexamenjaar",
+      "omschrijving": "Controle SE's voorexamenkandidaten",
+      "standaard": "OP6",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "jun",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Examencommissie",
+      "verplicht": false,
+      "tags": [
+        "examen"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP6-07",
+      "naam": "Check afronding SE examenjaar",
+      "omschrijving": "Controle SE's examenkandidaten",
+      "standaard": "OP6",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "apr",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Examencommissie",
+      "verplicht": false,
+      "tags": [
+        "examen"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP6-09",
+      "naam": "Herijking toetsbeleid",
+      "omschrijving": "Actualisatie toetsbeleid",
+      "standaard": "OP6",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "mei-jun",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Examencommissie",
+      "verplicht": false,
+      "tags": [
+        "toetsing"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OP6-11",
+      "naam": "Analyse examenresultaten door secties",
+      "omschrijving": "Analyse per vak",
+      "standaard": "OP6",
+      "gebied": "OP",
+      "gesprek": "Doorlopend",
+      "periode": "jul-sep",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Secties",
+      "verplicht": false,
+      "tags": [
+        "examen",
+        "analyse"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "VS1-04",
+      "naam": "BHV-oefening",
+      "omschrijving": "Jaarlijkse ontruimingsoefening",
+      "standaard": "VS1",
+      "gebied": "VS",
+      "gesprek": "Doorlopend",
+      "periode": "variabel",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "BHV-coördinator",
+      "verplicht": false,
+      "tags": [
+        "veiligheid",
+        "BHV"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "VS2-03",
+      "naam": "Tevredenheidsonderzoek personeel",
+      "omschrijving": "Tweejaarlijks MTO",
+      "standaard": "VS2",
+      "gebied": "VS",
+      "gesprek": "Doorlopend",
+      "periode": "feb-mrt",
+      "frequentie": "Eens per 2 jaar",
+      "verantwoordelijke": "HR",
+      "verplicht": false,
+      "tags": [
+        "tevredenheid",
+        "personeel"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OR1-05",
+      "naam": "Evaluatie op inspectie-indicatoren",
+      "omschrijving": "Tweejaarlijkse evaluatie",
+      "standaard": "OR1",
+      "gebied": "OR",
+      "gesprek": "Doorlopend",
+      "periode": "mrt-apr",
+      "frequentie": "Eens per 2 jaar",
+      "verantwoordelijke": "Kwaliteitsmedewerker",
+      "verplicht": false,
+      "tags": [
+        "inspectie"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OR2-01",
+      "naam": "Meting sociale competenties",
+      "omschrijving": "Meting sociale competenties leerlingen",
+      "standaard": "OR2",
+      "gebied": "OR",
+      "gesprek": "Doorlopend",
+      "periode": "mrt-apr",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "Mentoren/Zorgteam",
+      "verplicht": false,
+      "tags": [
+        "sociaal"
+      ],
+      "type": "school"
+    },
+    {
+      "id": "OR2-02",
+      "naam": "Evaluatie maatschappelijke stage",
+      "omschrijving": "Evaluatie MaS",
+      "standaard": "OR2",
+      "gebied": "OR",
+      "gesprek": "Doorlopend",
+      "periode": "jun",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "MaS-coördinator",
+      "verplicht": false,
+      "tags": [
+        "MaS"
+      ],
+      "type": "school"
+    }
+  ],
+  "activiteiten_bestuur": [
+    {
+      "id": "CVB-01",
+      "naam": "Herfstgesprek",
+      "omschrijving": "Gesprek CvB-schoolleiding over onderwijsresultaten en veiligheid",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Herfst",
+      "periode": "okt-nov",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/Schoolleiders",
+      "verplicht": true,
+      "tags": [
+        "gesprekscyclus"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "CVB-02",
+      "naam": "Wintergesprek",
+      "omschrijving": "Gesprek CvB-schoolleiding over personeel en tussenevaluatie",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Winter",
+      "periode": "jan-feb",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/Schoolleiders",
+      "verplicht": true,
+      "tags": [
+        "gesprekscyclus"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "CVB-03",
+      "naam": "Lentegesprek",
+      "omschrijving": "Gesprek CvB-schoolleiding over financiën, formatie en leskwaliteit",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Lente",
+      "periode": "mrt-apr",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/Schoolleiders",
+      "verplicht": true,
+      "tags": [
+        "gesprekscyclus"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "CVB-04",
+      "naam": "Zomergesprek",
+      "omschrijving": "Gesprek CvB-schoolleiding over plannen en evalueren",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Zomer",
+      "periode": "jun-jul",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/Schoolleiders",
+      "verplicht": true,
+      "tags": [
+        "gesprekscyclus"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "BKA1-01",
+      "naam": "Concept Jaarplan SBK + BB",
+      "omschrijving": "Opstellen conceptversie jaarplan en begroting",
+      "standaard": "BKA1",
+      "gebied": "BKA",
+      "gesprek": "Zomer",
+      "periode": "mei-jun",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB",
+      "verplicht": false,
+      "tags": [
+        "strategie"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "BKA1-02",
+      "naam": "Jaarplan SBK + BB vaststellen",
+      "omschrijving": "Definitief vaststellen jaarplan",
+      "standaard": "BKA1",
+      "gebied": "BKA",
+      "gesprek": "Zomer",
+      "periode": "jul-aug",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/RvT",
+      "verplicht": false,
+      "tags": [
+        "strategie"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "BKA1-03",
+      "naam": "Schooljaarplannen vaststellen",
+      "omschrijving": "Vaststellen schooljaarplannen",
+      "standaard": "BKA1",
+      "gebied": "BKA",
+      "gesprek": "Herfst",
+      "periode": "aug-sep",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB",
+      "verplicht": false,
+      "tags": [
+        "planning"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "BKA1-04",
+      "naam": "SBK-jaarfocusdocument",
+      "omschrijving": "Focus en prioriteiten komend jaar",
+      "standaard": "BKA1",
+      "gebied": "BKA",
+      "gesprek": "Zomer",
+      "periode": "jun-jul",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB",
+      "verplicht": false,
+      "tags": [
+        "strategie"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "BKA2-01",
+      "naam": "Tussenevaluatie Jaarplan SBK + BB",
+      "omschrijving": "Tussentijdse evaluatie jaarplan",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Winter",
+      "periode": "jan-feb",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB",
+      "verplicht": false,
+      "tags": [
+        "evaluatie"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "BKA2-02",
+      "naam": "Overzicht onbevoegd personeel",
+      "omschrijving": "Actueel overzicht per school",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Winter",
+      "periode": "feb",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/HR",
+      "verplicht": false,
+      "tags": [
+        "personeel"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "BKA2-03",
+      "naam": "Vlootschouw HR",
+      "omschrijving": "Strategische personeelsplanning",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Lente",
+      "periode": "mrt-apr",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/HR",
+      "verplicht": false,
+      "tags": [
+        "personeel"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "BKA2-04",
+      "naam": "Formatieproces",
+      "omschrijving": "Jaarlijks formatieproces",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Lente",
+      "periode": "mrt-mei",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/HR",
+      "verplicht": false,
+      "tags": [
+        "formatie"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "BKA2-05",
+      "naam": "Financiële onderbouwing jaarplan",
+      "omschrijving": "Financiële doorvertaling",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Zomer",
+      "periode": "mei-jun",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/Financiën",
+      "verplicht": false,
+      "tags": [
+        "financiën"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "BKA3-01",
+      "naam": "Evaluatie Jaarplan SBK + BB",
+      "omschrijving": "Eindevaluatie jaarplan",
+      "standaard": "BKA3",
+      "gebied": "BKA",
+      "gesprek": "Zomer",
+      "periode": "jun-jul",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB",
+      "verplicht": false,
+      "tags": [
+        "evaluatie"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "BKA3-02",
+      "naam": "Concept Bestuursverslag",
+      "omschrijving": "Opstellen conceptversie",
+      "standaard": "BKA3",
+      "gebied": "BKA",
+      "gesprek": "Lente",
+      "periode": "mrt-apr",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB",
+      "verplicht": false,
+      "tags": [
+        "verantwoording"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "BKA3-03",
+      "naam": "Bestuursverslag vaststellen",
+      "omschrijving": "Definitief vaststellen",
+      "standaard": "BKA3",
+      "gebied": "BKA",
+      "gesprek": "Zomer",
+      "periode": "mei-jun",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/RvT",
+      "verplicht": false,
+      "tags": [
+        "verantwoording"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "BKA3-04",
+      "naam": "Zelfevaluatie BKA-standaarden",
+      "omschrijving": "Zelfevaluatie bestuurlijk",
+      "standaard": "BKA3",
+      "gebied": "BKA",
+      "gesprek": "Zomer",
+      "periode": "mei-jun",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB",
+      "verplicht": false,
+      "tags": [
+        "inspectie"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "BKA3-05",
+      "naam": "Voorlopige financiële jaarcijfers",
+      "omschrijving": "Analyse jaarcijfers",
+      "standaard": "BKA3",
+      "gebied": "BKA",
+      "gesprek": "Winter",
+      "periode": "feb-mrt",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/Financiën",
+      "verplicht": false,
+      "tags": [
+        "financiën"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "BKA3-06",
+      "naam": "Terugblik financieel kalenderjaar",
+      "omschrijving": "Evaluatie financieel",
+      "standaard": "BKA3",
+      "gebied": "BKA",
+      "gesprek": "Winter",
+      "periode": "jan-feb",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/Financiën",
+      "verplicht": false,
+      "tags": [
+        "financiën"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "BKA3-07",
+      "naam": "Vooruitblik meerjarig financieel",
+      "omschrijving": "Meerjarenbegroting",
+      "standaard": "BKA3",
+      "gebied": "BKA",
+      "gesprek": "Lente",
+      "periode": "mrt-apr",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/Financiën",
+      "verplicht": false,
+      "tags": [
+        "financiën"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "HR-01",
+      "naam": "Medewerkerstevredenheid analyseren",
+      "omschrijving": "Analyse MTO-resultaten",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Winter",
+      "periode": "jan-feb",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/HR",
+      "verplicht": false,
+      "tags": [
+        "HR"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "HR-02",
+      "naam": "Uitstroomcijfers en exitgesprekken",
+      "omschrijving": "Analyse uitstroom personeel",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Winter",
+      "periode": "jan-feb",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/HR",
+      "verplicht": false,
+      "tags": [
+        "HR"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "HR-03",
+      "naam": "Verzuim personeel analyseren",
+      "omschrijving": "Analyse ziekteverzuim",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Winter",
+      "periode": "jan-feb",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/HR",
+      "verplicht": false,
+      "tags": [
+        "HR",
+        "verzuim"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "HR-04",
+      "naam": "Reflectie HR-beleid",
+      "omschrijving": "Jaarlijkse reflectie HR",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Winter",
+      "periode": "feb-mrt",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/HR",
+      "verplicht": false,
+      "tags": [
+        "HR",
+        "beleid"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "MON-01",
+      "naam": "Stavaza OP0 stichtingsniveau",
+      "omschrijving": "Monitoring basisvaardigheden",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Herfst",
+      "periode": "okt-nov",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/Kwaliteit",
+      "verplicht": false,
+      "tags": [
+        "monitoring"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "MON-02",
+      "naam": "Resultaten OP2 stichtingsniveau",
+      "omschrijving": "Monitoring leerresultaten",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Herfst",
+      "periode": "okt-nov",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/Kwaliteit",
+      "verplicht": false,
+      "tags": [
+        "monitoring"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "MON-03",
+      "naam": "Veiligheid VS1 stichtingsniveau",
+      "omschrijving": "Monitoring veiligheid",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Herfst",
+      "periode": "okt-nov",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/Kwaliteit",
+      "verplicht": false,
+      "tags": [
+        "monitoring"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "MON-04",
+      "naam": "Onderwijsresultaten OR1 stichtingsniveau",
+      "omschrijving": "Monitoring resultaten",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Herfst",
+      "periode": "okt-nov",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/Kwaliteit",
+      "verplicht": false,
+      "tags": [
+        "monitoring"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "MON-05",
+      "naam": "Onderwijstijd OP4 stichtingsniveau",
+      "omschrijving": "Monitoring onderwijstijd",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Winter",
+      "periode": "jan-feb",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/Kwaliteit",
+      "verplicht": false,
+      "tags": [
+        "monitoring"
+      ],
+      "type": "bestuur"
+    },
+    {
+      "id": "MON-06",
+      "naam": "Leskwaliteit OP3 stichtingsniveau",
+      "omschrijving": "Monitoring leskwaliteit",
+      "standaard": "BKA2",
+      "gebied": "BKA",
+      "gesprek": "Lente",
+      "periode": "mrt-apr",
+      "frequentie": "Jaarlijks",
+      "verantwoordelijke": "CvB/Kwaliteit",
+      "verplicht": false,
+      "tags": [
+        "monitoring"
+      ],
+      "type": "bestuur"
+    }
+  ],
+  "standaarden": [
+    {
+      "code": "BKA1",
+      "gebied": "BKA",
+      "gebiedNaam": "Besturing, Kwaliteitszorg en Ambitie",
+      "naam": "Visie, ambities en doelen",
+      "niveau": "bestuur",
+      "kern": false
+    },
+    {
+      "code": "BKA2",
+      "gebied": "BKA",
+      "gebiedNaam": "Besturing, Kwaliteitszorg en Ambitie",
+      "naam": "Uitvoering en kwaliteitscultuur",
+      "niveau": "bestuur",
+      "kern": false
+    },
+    {
+      "code": "BKA3",
+      "gebied": "BKA",
+      "gebiedNaam": "Besturing, Kwaliteitszorg en Ambitie",
+      "naam": "Verantwoording en dialoog",
+      "niveau": "bestuur",
+      "kern": false
+    },
+    {
+      "code": "SKA1",
+      "gebied": "SKA",
+      "gebiedNaam": "Sturen, Kwaliteitszorg en Ambitie",
+      "naam": "Visie, ambitie en doelen",
+      "niveau": "school",
+      "kern": false
+    },
+    {
+      "code": "SKA2",
+      "gebied": "SKA",
+      "gebiedNaam": "Sturen, Kwaliteitszorg en Ambitie",
+      "naam": "Uitvoering en kwaliteitscultuur",
+      "niveau": "school",
+      "kern": false
+    },
+    {
+      "code": "SKA3",
+      "gebied": "SKA",
+      "gebiedNaam": "Sturen, Kwaliteitszorg en Ambitie",
+      "naam": "Evaluatie, verantwoording en dialoog",
+      "niveau": "school",
+      "kern": false
+    },
+    {
+      "code": "OP0",
+      "gebied": "OP",
+      "gebiedNaam": "Onderwijsproces",
+      "naam": "Basisvaardigheden",
+      "niveau": "school",
+      "kern": false
+    },
+    {
+      "code": "OP1",
+      "gebied": "OP",
+      "gebiedNaam": "Onderwijsproces",
+      "naam": "Aanbod",
+      "niveau": "school",
+      "kern": false
+    },
+    {
+      "code": "OP2",
+      "gebied": "OP",
+      "gebiedNaam": "Onderwijsproces",
+      "naam": "Zicht op ontwikkeling en begeleiding",
+      "niveau": "school",
+      "kern": true
+    },
+    {
+      "code": "OP3",
+      "gebied": "OP",
+      "gebiedNaam": "Onderwijsproces",
+      "naam": "Pedagogisch-didactisch handelen",
+      "niveau": "school",
+      "kern": true
+    },
+    {
+      "code": "OP4",
+      "gebied": "OP",
+      "gebiedNaam": "Onderwijsproces",
+      "naam": "Onderwijstijd",
+      "niveau": "school",
+      "kern": false
+    },
+    {
+      "code": "OP6",
+      "gebied": "OP",
+      "gebiedNaam": "Onderwijsproces",
+      "naam": "Afsluiting",
+      "niveau": "school",
+      "kern": false
+    },
+    {
+      "code": "VS1",
+      "gebied": "VS",
+      "gebiedNaam": "Veiligheid en Schoolklimaat",
+      "naam": "Veiligheid",
+      "niveau": "school",
+      "kern": true
+    },
+    {
+      "code": "VS2",
+      "gebied": "VS",
+      "gebiedNaam": "Veiligheid en Schoolklimaat",
+      "naam": "Schoolklimaat",
+      "niveau": "school",
+      "kern": false
+    },
+    {
+      "code": "OR1",
+      "gebied": "OR",
+      "gebiedNaam": "Onderwijsresultaten",
+      "naam": "Resultaten",
+      "niveau": "school",
+      "kern": true
+    },
+    {
+      "code": "OR2",
+      "gebied": "OR",
+      "gebiedNaam": "Onderwijsresultaten",
+      "naam": "Sociale en maatschappelijke competenties",
+      "niveau": "school",
+      "kern": false
+    }
+  ],
+  "vaste_standaarden": [
+    "OP0",
+    "OP2",
+    "OP3",
+    "VS1",
+    "OR1"
+  ],
+  "kwaliteitsgebieden": {
+    "BKA": {
+      "naam": "Besturing, Kwaliteitszorg en Ambitie"
+    },
+    "SKA": {
+      "naam": "Sturen, Kwaliteitszorg en Ambitie"
+    },
+    "OP": {
+      "naam": "Onderwijsproces"
+    },
+    "VS": {
+      "naam": "Veiligheid en Schoolklimaat"
+    },
+    "OR": {
+      "naam": "Onderwijsresultaten"
+    }
+  },
+  "seizoensgesprekken": [
+    "Herfst",
+    "Winter",
+    "Lente",
+    "Zomer"
+  ],
+  "standaard_gesprekscyclus": [
+    {
+      "id": "Herfst",
+      "naam": "Herfst",
+      "maand": "Nov",
+      "kleur": "Herfst",
+      "icoon": "blad",
+      "thema": "Onderwijsresultaten & veiligheid",
+      "volgorde": 0
+    },
+    {
+      "id": "Winter",
+      "naam": "Winter",
+      "maand": "Feb",
+      "kleur": "Winter",
+      "icoon": "sneeuw",
+      "thema": "Personeel & tussenevaluatie",
+      "volgorde": 1
+    },
+    {
+      "id": "Lente",
+      "naam": "Lente",
+      "maand": "Apr",
+      "kleur": "Lente",
+      "icoon": "bloem",
+      "thema": "Financiën, formatie & leskwaliteit",
+      "volgorde": 2
+    },
+    {
+      "id": "Zomer",
+      "naam": "Zomer",
+      "maand": "Jul",
+      "kleur": "Zomer",
+      "icoon": "zon",
+      "thema": "Plannen & evalueren",
+      "volgorde": 3
+    }
+  ],
+  "gesprek_doorlopend": {
+    "id": "Doorlopend",
+    "naam": "Doorlopend",
+    "maand": "Sep",
+    "kleur": "Doorlopend",
+    "icoon": "herhaal",
+    "volgorde": 99
+  },
+  "gesprekken_inhoud": [
+    {
+      "key": "Herfst",
+      "naam": "Herfstgesprek",
+      "emoji": "🍂",
+      "periode": "Okt-Nov",
+      "thema": "Onderwijsresultaten & veiligheid",
+      "schoolinput": [
+        "Analyse onderwijsresultaten R1/R2/R3/E",
+        "Stavaza basisvaardigheden",
+        "Herijking veiligheidsplan",
+        "Analyse veiligheidsincidenten",
+        "Jaarplan definitief"
+      ],
+      "standaarden": [
+        "OR1",
+        "OP0",
+        "VS1",
+        "SKA1"
+      ],
+      "bestuursinput": [
+        "Monitoring OR1/OP0/VS1",
+        "Schooljaarplannen vaststellen"
+      ],
+      "output": [
+        "Risicoanalyse per school",
+        "Bijstelling interventies"
+      ],
+      "volgorde": 0
+    },
+    {
+      "key": "Winter",
+      "naam": "Wintergesprek",
+      "emoji": "❄️",
+      "periode": "Jan-Feb",
+      "thema": "Personeel & tussenevaluatie",
+      "schoolinput": [
+        "Cijferanalyses periode 1",
+        "Tussenopbrengsten analyse",
+        "Analyse lesuitval",
+        "Tussenevaluatie jaarplan",
+        "Speerpunten volgend jaar"
+      ],
+      "standaarden": [
+        "OP2",
+        "OP4",
+        "SKA2",
+        "SKA1"
+      ],
+      "bestuursinput": [
+        "MTO analyse",
+        "Uitstroom/verzuim personeel",
+        "Overzicht onbevoegd",
+        "Monitoring OP4"
+      ],
+      "output": [
+        "Bijstelling jaarplan",
+        "Start formatieproces"
+      ],
+      "volgorde": 1
+    },
+    {
+      "key": "Lente",
+      "naam": "Lentegesprek",
+      "emoji": "🌷",
+      "periode": "Mrt-Apr",
+      "thema": "Financiën, formatie & leskwaliteit",
+      "schoolinput": [
+        "Analyse leskwaliteit",
+        "Reflectie sectiegesprekken",
+        "Cijferanalyses periode 2",
+        "Tevredenheidsonderzoeken"
+      ],
+      "standaarden": [
+        "OP3",
+        "OP2",
+        "VS2"
+      ],
+      "bestuursinput": [
+        "Vlootschouw HR",
+        "Formatieproces",
+        "Meerjarenbegroting",
+        "Monitoring OP3"
+      ],
+      "output": [
+        "Formatie definitief",
+        "Begroting volgend jaar"
+      ],
+      "volgorde": 2
+    },
+    {
+      "key": "Zomer",
+      "naam": "Zomergesprek",
+      "emoji": "☀️",
+      "periode": "Jun-Jul",
+      "thema": "Plannen & evalueren",
+      "schoolinput": [
+        "Evaluatie jaarplan",
+        "Zelfevaluatie inspectie",
+        "Concept jaarplan (80%)",
+        "Evaluatie SOP",
+        "Evaluatie examencommissie"
+      ],
+      "standaarden": [
+        "SKA3",
+        "SKA1",
+        "OP2",
+        "OP6"
+      ],
+      "bestuursinput": [
+        "Evaluatie jaarplan SBK",
+        "Zelfevaluatie BKA",
+        "Bestuursverslag",
+        "SBK-jaarfocus"
+      ],
+      "output": [
+        "Vaststelling jaarplannen",
+        "Bestuursverslag definitief"
+      ],
+      "volgorde": 3
+    }
+  ],
+  "gesprek_deadline_maand": {
+    "Herfst": "Nov",
+    "Winter": "Feb",
+    "Lente": "Apr",
+    "Zomer": "Jul"
+  },
+  "gesprek_themas": {
+    "Herfst": "Onderwijsresultaten & veiligheid",
+    "Winter": "Personeel & tussenevaluatie",
+    "Lente": "Financiën, formatie & leskwaliteit",
+    "Zomer": "Plannen & evalueren"
+  },
+  "gesprek_iconen": {
+    "Herfst": "blad",
+    "Winter": "sneeuw",
+    "Lente": "bloem",
+    "Zomer": "zon"
+  },
+  "icoon_opties": [
+    "blad",
+    "sneeuw",
+    "bloem",
+    "zon",
+    "herhaal",
+    "vlag",
+    "cirkel",
+    "ster"
+  ],
+  "icoon_naar_lucide": {
+    "blad": "Leaf",
+    "sneeuw": "Snowflake",
+    "bloem": "Flower2",
+    "zon": "Sun",
+    "herhaal": "Repeat",
+    "vlag": "Flag",
+    "cirkel": "Circle",
+    "ster": "Star"
+  },
+  "kleur_opties": [
+    "Herfst",
+    "Winter",
+    "Lente",
+    "Zomer",
+    "Doorlopend"
+  ],
+  "gesprek_filter_opties": [
+    "Herfst",
+    "Winter",
+    "Lente",
+    "Zomer",
+    "Doorlopend"
+  ],
+  "statussen": {
+    "gepland": {
+      "label": "Gepland",
+      "icoon": "CircleDot",
+      "tint": "status-neutral"
+    },
+    "bezig": {
+      "label": "Bezig",
+      "icoon": "CircleDashed",
+      "tint": "status-info"
+    },
+    "gereed": {
+      "label": "Gereed",
+      "icoon": "Check",
+      "tint": "status-success"
+    },
+    "risico": {
+      "label": "Risico",
+      "icoon": "TriangleAlert",
+      "tint": "status-warning"
+    }
+  },
+  "status_volgorde": [
+    "gepland",
+    "bezig",
+    "gereed",
+    "risico"
+  ],
+  "niveaus": [
+    {
+      "id": "bestuur",
+      "label": "Bestuur"
+    },
+    {
+      "id": "cluster",
+      "label": "Cluster"
+    },
+    {
+      "id": "school",
+      "label": "School"
+    }
+  ],
+  "maanden_kalender": [
+    "Aug",
+    "Sep",
+    "Okt",
+    "Nov",
+    "Dec",
+    "Jan",
+    "Feb",
+    "Mrt",
+    "Apr",
+    "Mei",
+    "Jun",
+    "Jul"
+  ],
+  "kalendermaand_index": {
+    "Jan": 0,
+    "Feb": 1,
+    "Mrt": 2,
+    "Apr": 3,
+    "Mei": 4,
+    "Jun": 5,
+    "Jul": 6,
+    "Aug": 7,
+    "Sep": 8,
+    "Okt": 9,
+    "Nov": 10,
+    "Dec": 11
+  },
+  "maandnamen_voluit": [
+    "januari",
+    "februari",
+    "maart",
+    "april",
+    "mei",
+    "juni",
+    "juli",
+    "augustus",
+    "september",
+    "oktober",
+    "november",
+    "december"
+  ],
+  "periode_prefix_naar_maand": {
+    "jan": "Jan",
+    "feb": "Feb",
+    "mrt": "Mrt",
+    "maa": "Mrt",
+    "apr": "Apr",
+    "mei": "Mei",
+    "jun": "Jun",
+    "jul": "Jul",
+    "aug": "Aug",
+    "sep": "Sep",
+    "okt": "Okt",
+    "nov": "Nov",
+    "dec": "Dec"
+  },
+  "standaard_schooljaar": "2026/2027",
+  "state_versie": 4,
+  "lege_organisatie": {
+    "bestuurNaam": "",
+    "scholen": [],
+    "clusters": [],
+    "gesprekscyclus": "<standaard gesprekscyclus, zie standaard_gesprekscyclus>"
+  },
+  "demo_organisatie": {
+    "bestuurNaam": "Stichting Leren Verbeteren",
+    "scholen": [
+      {
+        "id": 1,
+        "naam": "Lyceum Noord",
+        "cluster": "Noord",
+        "type": "havo/vwo"
+      },
+      {
+        "id": 2,
+        "naam": "College Centrum",
+        "cluster": "Noord",
+        "type": "mavo/havo"
+      },
+      {
+        "id": 3,
+        "naam": "VMBO Zuid",
+        "cluster": "Zuid",
+        "type": "vmbo"
+      },
+      {
+        "id": 4,
+        "naam": "ISK West",
+        "cluster": "Zuid",
+        "type": "isk"
+      },
+      {
+        "id": 5,
+        "naam": "Gymnasium Oost",
+        "cluster": "Zuid",
+        "type": "gymnasium"
+      }
+    ],
+    "clusters": [
+      {
+        "id": "Noord",
+        "naam": "Cluster Noord",
+        "scholen": [
+          1,
+          2
+        ]
+      },
+      {
+        "id": "Zuid",
+        "naam": "Cluster Zuid",
+        "scholen": [
+          3,
+          4,
+          5
+        ]
+      }
+    ],
+    "gesprekscyclus": "<standaard gesprekscyclus, zie standaard_gesprekscyclus>"
+  },
+  "demo_scholen": [
+    {
+      "id": 1,
+      "naam": "Lyceum Noord",
+      "cluster": "Noord",
+      "type": "havo/vwo"
+    },
+    {
+      "id": 2,
+      "naam": "College Centrum",
+      "cluster": "Noord",
+      "type": "mavo/havo"
+    },
+    {
+      "id": 3,
+      "naam": "VMBO Zuid",
+      "cluster": "Zuid",
+      "type": "vmbo"
+    },
+    {
+      "id": 4,
+      "naam": "ISK West",
+      "cluster": "Zuid",
+      "type": "isk"
+    },
+    {
+      "id": 5,
+      "naam": "Gymnasium Oost",
+      "cluster": "Zuid",
+      "type": "gymnasium"
+    }
+  ],
+  "demo_clusters": [
+    {
+      "id": "Noord",
+      "naam": "Cluster Noord",
+      "scholen": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "Zuid",
+      "naam": "Cluster Zuid",
+      "scholen": [
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "demo_voortgang_per_school": {
+    "1": 0.9,
+    "2": 0.75,
+    "3": 0.7,
+    "4": 0.5,
+    "5": 0.8
+  },
+  "demo_afwijkingen": [
+    {
+      "schoolId": 2,
+      "activiteitId": "VS2-01",
+      "gesprek": "Winter",
+      "reden": "Afgestemd op de MTO-cyclus van het bestuur."
+    },
+    {
+      "schoolId": 5,
+      "activiteitId": "OP3-05",
+      "gesprek": "Doorlopend",
+      "reden": "Sectiegesprekken lopen het hele jaar door."
+    }
+  ],
+  "helpteksten_per_scherm": {
+    "/": {
+      "titel": "Start",
+      "tekst": "Voor het bestuur: de startpagina met de Aan-de-slag-stappen en snelkoppelingen. Voor school en cluster: het dashboard. Wissel rechtsboven van niveau."
+    },
+    "/dashboard": {
+      "titel": "Dashboard",
+      "tekst": "Het dashboard toont het komende seizoensgesprek, de voortgang en de aandachtspunten voor het gekozen niveau — op bestuursniveau ook de heatmap van alle scholen."
+    },
+    "/faq": {
+      "titel": "Veelgestelde vragen",
+      "tekst": "Antwoorden op de meest gestelde vragen over inloggen, rollen, de kalender en exports. Staat je vraag er niet bij? Gebruik het contactformulier."
+    },
+    "/contact": {
+      "titel": "Contact",
+      "tekst": "Stel hier je vraag over de Kwaliteitskalender. Je bericht komt rechtstreeks bij het projectteam terecht."
+    },
+    "/gesprekken": {
+      "titel": "Gesprekken",
+      "tekst": "Per seizoensgesprek (Herfst, Winter, Lente, Zomer) zie je de vereiste input, de standaarden en de status. Op bestuur- en clusterniveau zie je de status per school."
+    },
+    "/bibliotheek": {
+      "titel": "Bibliotheek",
+      "tekst": "Blader door alle activiteiten en filter tegelijk op gesprek én kwaliteitsgebied. Voeg een activiteit toe aan je kalender met \"Toevoegen\", of maak een eigen activiteit."
+    },
+    "/kalender": {
+      "titel": "Kalender-editor",
+      "tekst": "De matrix toont standaarden (rijen) × maanden (kolommen). Klik een activiteit aan om te selecteren en klik daarna een maand in dezelfde rij om te verplaatsen. Klik nogmaals voor details."
+    },
+    "/compliance": {
+      "titel": "Compliance",
+      "tekst": "Zie welke standaarden zijn afgedekt en of de vijf vaste standaarden zijn gepland. Afwijkingen van de standaardkoppeling staan onderaan."
+    },
+    "/export": {
+      "titel": "Export",
+      "tekst": "Exporteer de huidige kalender naar Excel, of print naar PDF (A3 liggend). De export volgt het gekozen niveau."
+    },
+    "/organisatie": {
+      "titel": "Organisatie",
+      "tekst": "Beheer je bestuur, scholen en clusters en pas het schooljaar aan. Met het startsjabloon vul je alle scholen in één keer met de aanbevolen activiteiten."
+    }
+  },
+  "navigatie_hoofd": [
+    {
+      "to": "/gesprekken",
+      "label": "Gesprekken",
+      "icon": "lucide:MessagesSquare"
+    },
+    {
+      "to": "/bibliotheek",
+      "label": "Bibliotheek",
+      "icon": "lucide:Library"
+    },
+    {
+      "to": "/kalender",
+      "label": "Kalender",
+      "icon": "lucide:Calendar"
+    },
+    {
+      "to": "/compliance",
+      "label": "Compliance",
+      "icon": "lucide:CircleCheckBig"
+    },
+    {
+      "to": "/export",
+      "label": "Export",
+      "icon": "lucide:Download"
+    }
+  ],
+  "navigatie_hulp": [
+    {
+      "to": "/faq",
+      "label": "Veelgestelde vragen",
+      "icon": "lucide:CircleHelp"
+    },
+    {
+      "to": "/contact",
+      "label": "Contact",
+      "icon": "lucide:Mail"
+    }
+  ],
+  "bestuur_start_tegels": [
+    {
+      "to": "/dashboard",
+      "label": "Dashboard",
+      "tekst": "Voortgang, aandachtspunten en de heatmap van alle scholen.",
+      "icon": "lucide:Gauge"
+    },
+    {
+      "to": "/gesprekken",
+      "label": "Gesprekken",
+      "tekst": "De gesprekscyclus met vereiste input en status per school.",
+      "icon": "lucide:MessagesSquare"
+    },
+    {
+      "to": "/kalender",
+      "label": "Kalender",
+      "tekst": "De jaarkalender: activiteiten per standaard en maand.",
+      "icon": "lucide:Calendar"
+    },
+    {
+      "to": "/bibliotheek",
+      "label": "Bibliotheek",
+      "tekst": "Activiteiten toevoegen uit de bibliotheek of zelf maken.",
+      "icon": "lucide:Library"
+    },
+    {
+      "to": "/compliance",
+      "label": "Compliance",
+      "tekst": "Dekking van de standaarden, met de vijf vaste standaarden uitgelicht.",
+      "icon": "lucide:CircleCheckBig"
+    },
+    {
+      "to": "/export",
+      "label": "Export",
+      "tekst": "Gespreksdossier, Excel, PDF en de JSON-back-up.",
+      "icon": "lucide:Download"
+    },
+    {
+      "to": "/organisatie",
+      "label": "Organisatie",
+      "tekst": "Scholen, clusters, gesprekscyclus en toegang & leden.",
+      "icon": "lucide:Building2"
+    }
+  ],
+  "welkom_bouwstenen": [
+    {
+      "icon": "lucide:Users",
+      "titel": "Drie niveaus",
+      "tekst": "Bestuur, cluster en school — met doorlopende aggregatie naar boven."
+    },
+    {
+      "icon": "lucide:Calendar",
+      "titel": "Seizoensgesprekken",
+      "tekst": "Herfst, Winter, Lente en Zomer geven het ritme door het schooljaar."
+    },
+    {
+      "icon": "lucide:GitBranch",
+      "titel": "Zachte koppeling",
+      "tekst": "Een standaardkoppeling in het sjabloon; scholen mogen afwijken, met reden."
+    },
+    {
+      "icon": "lucide:ShieldCheck",
+      "titel": "Inspectiekader",
+      "tekst": "Elke activiteit gekoppeld aan een standaard van het Onderzoekskader (versie 1 augustus 2026)."
+    }
+  ],
+  "wizard_stappen": [
+    "Bestuur",
+    "Scholen",
+    "Startpunt"
+  ],
+  "schooltype_suggesties": [
+    "vmbo",
+    "mavo/havo",
+    "havo/vwo",
+    "vwo/gymnasium",
+    "gymnasium",
+    "isk",
+    "praktijkonderwijs"
+  ],
+  "faq": [
+    {
+      "titel": "Inloggen en account",
+      "vragen": [
+        {
+          "v": "Ik krijg geen inlogmail. Wat nu?",
+          "a": "Controleer eerst je spamfolder; de mail komt van \"Kwaliteitskalender\" (kwaliteitskalender@vbent.org). Niets ontvangen? Wacht een minuut en vraag een nieuwe code aan. Let op: elke nieuwe aanvraag maakt eerdere codes ongeldig — gebruik altijd de code uit de nieuwste mail."
+        },
+        {
+          "v": "Mijn inlogcode wordt niet geaccepteerd.",
+          "a": "Een code is één uur geldig en eenmalig te gebruiken, en alleen de meest recente code werkt. Vraag een nieuwe code aan en typ die direct over uit de nieuwste mail."
+        },
+        {
+          "v": "Kan ik op meerdere apparaten tegelijk werken?",
+          "a": "Ja. Log op elk apparaat in met je e-mailadres en een inlogcode. Wijzigingen verschijnen vanzelf op je andere apparaten."
+        },
+        {
+          "v": "Hoe log ik uit?",
+          "a": "Rechtsboven in de balk staat de knop Uitloggen, naast je e-mailadres."
+        }
+      ]
+    },
+    {
+      "titel": "Voor besturen",
+      "vragen": [
+        {
+          "v": "Hoe geef ik scholen of collega’s toegang?",
+          "a": "Ga naar Organisatie → Toegang & leden. Nodig iemand uit met een e-mailadres en kies een rol: Bestuur (alles beheren) of School (alleen de eigen schoolkalender bewerken). Zodra diegene inlogt met dat adres, is de koppeling automatisch gemaakt."
+        },
+        {
+          "v": "Wat is het verschil tussen de rollen Bestuur en School?",
+          "a": "Een bestuurslid beheert de organisatie, ziet alle scholen en kan alles bewerken. Een school-lid zit vast aan één school en kan alleen die kalender bewerken; de rest is alleen-lezen. Dit wordt ook in de database afgedwongen, niet alleen in de schermen."
+        },
+        {
+          "v": "Wat zijn de \"vaste standaarden\"?",
+          "a": "De vijf standaarden (OP0, OP2, OP3, VS1 en OR1) die de inspectie bij elk onderzoek beoordeelt. De Kwaliteitskalender licht ze overal uit en waarschuwt wanneer een school ze nog niet heeft afgedekt."
+        },
+        {
+          "v": "Kan ik de gesprekscyclus aanpassen?",
+          "a": "Ja. Standaard staan er vier seizoensgesprekken, maar via Organisatie → Gesprekscyclus bepaal je zelf het aantal gesprekken, hun namen, maanden en kleuren. De hele app volgt automatisch."
+        },
+        {
+          "v": "Een school heeft een activiteit aan een ander gesprek gekoppeld. Hoe zie ik dat?",
+          "a": "Dat heet een afwijking van de standaardkoppeling. Scholen mogen afwijken, maar moeten een reden opgeven. Alle afwijkingen zijn zichtbaar op de Compliance-pagina en in het gespreksdossier."
+        }
+      ]
+    },
+    {
+      "titel": "Voor scholen",
+      "vragen": [
+        {
+          "v": "Hoe werk ik een activiteit bij?",
+          "a": "Klik in de Kalender een activiteit aan (in de matrix: twee keer) en pas in het venster de status, eigenaar, deadline, notitie of bewijsstukken aan. Alles wordt automatisch opgeslagen — je ziet kort \"Opgeslagen\" bovenin."
+        },
+        {
+          "v": "Hoe verplaats ik een activiteit naar een andere maand?",
+          "a": "Selecteer de activiteit in de matrix en klik een andere maand in dezelfde rij (of gebruik de pijltjestoetsen). Het kan ook via het detailvenster met het veld Maand."
+        },
+        {
+          "v": "Wat betekent \"bewijs\" bij een activiteit?",
+          "a": "Een verwijzing naar het document dat aantoont dat de activiteit is uitgevoerd, bijvoorbeeld een verslag of analyse — handig richting bestuur en inspectie. Je koppelt een documentnaam en eventueel een link naar je eigen omgeving (SharePoint, Drive); het document zelf wordt niet geüpload."
+        },
+        {
+          "v": "Kan ik een activiteit onze eigen naam geven?",
+          "a": "Ja. Open de activiteit en vul \"Eigen naam\" in. De koppeling met de bibliotheek en de standaard blijft bestaan, dus de tellingen blijven kloppen."
+        }
+      ]
+    },
+    {
+      "titel": "Exporteren en gegevens",
+      "vragen": [
+        {
+          "v": "Hoe maak ik een gespreksdossier?",
+          "a": "Ga naar Export en kies bij Gespreksdossier de school en het gesprek. Je krijgt een printklaar A4-document met alle activiteiten, statussen, bewijzen en afwijkingen — de voorbereiding voor het gesprek tussen bestuur en school."
+        },
+        {
+          "v": "Waar staan mijn gegevens en wie kan erbij?",
+          "a": "In een Europese databaseomgeving (Frankfurt). Alleen leden van jouw bestuur kunnen bij de gegevens van jouw bestuur; besturen zijn strikt van elkaar gescheiden. Elke wijziging wordt gelogd (wie, wat, wanneer)."
+        },
+        {
+          "v": "Mag ik leerling- of persoonsgegevens in de kalender zetten?",
+          "a": "Nee, en het is ook nergens nodig. De Kwaliteitskalender gaat over activiteiten, planningen en statussen — niet over individuele leerlingen of medewerkers. Zet geen leerlinggegevens in notities of omschrijvingen; verwijs met een bewijslink naar het document in je eigen beveiligde omgeving."
+        },
+        {
+          "v": "Kan ik een back-up maken?",
+          "a": "Ja, via Export → Back-up (JSON) download je alle gegevens van het bestuur in één leesbaar bestand. Datzelfde bestand kun je ook weer importeren."
+        },
+        {
+          "v": "Wat doet de knop \"Samenvatting (AI)\"?",
+          "a": "Die maakt met AI een korte samenvatting van de kwaliteitsstand. Hiervoor koppel je eenmalig een eigen Anthropic API-sleutel (via AI-instellingen in dat venster); de sleutel blijft op je eigen apparaat. Zonder sleutel werkt de rest van de app gewoon volledig."
+        }
+      ]
+    }
+  ],
+  "ai_systeemprompt": "Je bent een kwaliteitszorg-assistent voor besturen en scholen in het Nederlandse voortgezet onderwijs.\nJe werkt binnen de \"Kwaliteitskalender VO\": een jaarkalender waarin kwaliteitsactiviteiten zijn gekoppeld aan de standaarden van het Onderzoekskader van de inspectie en aan periodieke (seizoens)gesprekken tussen bestuur en scholen.\nSchrijf in helder, professioneel Nederlands voor een schoolleider of bestuurder. Wees concreet en to-the-point; noem aantallen en namen uit de aangeleverde gegevens. Verzin niets dat niet in de gegevens staat.",
+  "ai_model": "claude-opus-4-8",
+  "localstorage_state": "kwaliteitskalender:state:v1",
+  "localstorage_ai_sleutel": "kwaliteitskalender:ai-sleutel",
+  "toast_duur_ms": 2400
+}

@@ -1,0 +1,303 @@
+# Architectuur Kwaliteitskalender VO (versie 5)
+
+Dit document is, samen met `CLAUDE.md` en de analyse van de oude app (`inventaris.md`, `design.md`,
+`seed-data.json`), de basis voor het bouwen van de schermen. Functionaliteit en teksten komen uit de
+inventaris; vormgeving uit het design system; alle code-afspraken staan hier.
+
+## 1. Overzicht
+
+```
+main.tsx → schil/App.tsx
+  Foutgrens → StoreProvider → ToastProvider → BevestigProvider → SyncProvider → HashRouter → Poort
+  Poort: setupVoltooid === false → Opstart (schermen/Welkom.tsx of schermen/Wizard.tsx)
+         anders → Layout (Topbar, Sidebar/Lade, Scopebalk, <Outlet/>, Footer, ConflictDialoog)
+```
+
+| Laag | Map | Afhankelijk van |
+|---|---|---|
+| Domein (puur, getest) | `src/domein` | niets |
+| Store | `src/store` | domein |
+| Sync | `src/sync` | domein, store, componenten (toast) |
+| Componenten | `src/componenten` | domein (types/seed), geen store |
+| Schil | `src/schil` | alles |
+| Schermen | `src/schermen` | componenten, store, domein, (sync) |
+
+Importeer vanuit schermen bij voorkeur via de barrels: `../componenten`, `../store`, `../domein`.
+
+## 2. Routes en schermbestanden
+
+| Pad | Bestand | Opmerking |
+|---|---|---|
+| `/` | bestuur: `schermen/Start.tsx`, anders `schermen/Dashboard.tsx` | keuze in `schil/App.tsx` |
+| `/dashboard` | `schermen/Dashboard.tsx` | |
+| `/gesprekken` | `schermen/Gesprekken.tsx` | |
+| `/bibliotheek` | `schermen/Bibliotheek.tsx` | |
+| `/kalender` | `schermen/Kalender.tsx` | matrix, lijst, detailvenster |
+| `/compliance` | `schermen/Compliance.tsx` | |
+| `/export` | `schermen/Export.tsx` | gespreksdossier, Excel, print, back-up |
+| `/organisatie` | `schermen/Organisatie.tsx` | alleen niveau bestuur, anders melding "Alleen voor het bestuur" |
+| `/faq` | `schermen/Faq.tsx` | teksten: `FAQ` uit `domein/inhoud.ts` |
+| `/contact` | `schermen/Contact.tsx` | alleen contactgegevens (`CONTACT`), mailto/tel; geen formulier |
+| `/gegevens` | `schil/GegevensDelen.tsx` | af (fundament) |
+| `/stijlgids` | `schil/Stijlgids.tsx` | alle componenten; niet in het menu |
+| `*` | redirect naar `/` | |
+| (geen route) | `schermen/Welkom.tsx`, `schermen/Wizard.tsx` | zolang `state.setupVoltooid === false` |
+
+### Conventies voor schermen
+- Elk scherm is een **default export** zonder props (Welkom: `{ onStartWizard }`, Wizard: `{ onTerug }`).
+  Houd bestandsnaam en export aan; maak extra subcomponenten in hetzelfde bestand of in
+  `src/schermen/<scherm>/...` (bv. `src/schermen/kalender/DetailVenster.tsx`). Wijzig geen bestanden van
+  andere schermen. Iets dat meerdere schermen nodig hebben: voeg het toe aan `src/componenten` of
+  `src/domein` zonder bestaande signaturen te breken, en documenteer het hier.
+- Opbouw: `<div className="space-y-6">` met eerst `<PageHeader eyebrow="Dashboard" title={scopeLabel} subtitle=... actions=... />`.
+  De schil levert de paginabreedte (max 1440px) en padding; voeg zelf geen buitenmarge toe.
+- Grids: `grid gap-4 lg:grid-cols-3`, KPI-rij `grid grid-cols-2 gap-4 lg:grid-cols-4`. Kaarten met `Card`.
+- Data: `useStore()` voor state en acties, `useScope()` voor de scope van het niveau, berekeningen uit
+  `domein/berekeningen.ts`. Zet geen rekenlogica in componenten die ook in het domein hoort; nieuwe pure
+  functies in het domein krijgen een test.
+- Clusterniveau is alleen-lezen: `useScope().editScope === null`. Toon dan de info-balk uit de inventaris
+  (`<InfoBalk>`), en geen bewerkknoppen.
+- Teksten letterlijk uit de inventaris, maar zonder em dash, emoji en verwijzingen naar inloggen, leden,
+  database, AI of het contactformulier. Gesprekken: "Onderwijsresultaten & veiligheid" mag (&).
+- Na elke mutatie die de gebruiker uitvoert de toast uit de inventaris (`useToast()`), bv.
+  `toast(\`${naam} toegevoegd aan de kalender\`)`, `toast('Activiteit verwijderd', 'danger')`.
+- Bevestigen met `useBevestig()`, niet met `window.confirm` (werkt wel, maar past niet in de huisstijl).
+- Vrije tekstvelden (notitie, eigenaar, bewijs, reden): hint `PRIVACY_REGEL` / `BEWIJS_HINT` uit `domein/inhoud`.
+- Gesprek-id's kunnen onbekend zijn (een collega verwijderde het gesprek): gebruik altijd
+  `vindGesprek(cyclus, id)` (valt terug op Doorlopend). Clusters idem: `clusterNaamVan()`.
+- Print: gebruik `.no-print` en `.print-only`. Standaard `@page` is A3 liggend; een printview mag een eigen
+  `<style>{'@media print { @page { size: A4 portrait; margin: 14mm } }'}</style>` renderen.
+- Excel: `xlsx` (SheetJS 0.18.5) is geïnstalleerd. Statisch of dynamisch importeren mag (de singlefile-build
+  bundelt dynamische imports in het ene bestand). Downloaden met `downloadTekst()` of een Blob + `a.download`.
+- Back-up: `naarBackupTekst(state)` en `leesKalenderJson(tekst)` (accepteert oude back-ups v2-v4,
+  v5-back-ups en kalenderbestanden). Importeren: `store.importeerState(resultaat.state)`; dat verbreekt een
+  eventuele bestandskoppeling (zie §6). Bestandsnaam `kwaliteitskalender-backup-JJJJ-MM-DD.json`.
+- Organisatie, blok "Gegevens": "Demodata laden" = `loadDemo()`, "Alles leegmaken" = `beginLeeg()`.
+  Voeg daar een link naar `/gegevens` toe ("Gegevens & delen").
+
+## 3. Datamodel (`src/domein/types.ts`)
+
+Gelijk aan inventaris §2.1 (versie 4), met deze verschillen:
+- `versie: 5`.
+- `School.id` is een **string**. Oude id's (1, 2) worden "1", "2"; nieuwe zijn `sch-` + 12 hex.
+  `schoolKalenders` is `Record<string, KalenderItem[]>`.
+- Nieuwe clusters krijgen id `cl-` + 12 hex (oude slug-id's blijven geldig); nieuwe gesprekken `g-` + 12 hex.
+- Entiteiten hebben `gewijzigd?: number` (ms). Ontbreekt bij oude gegevens (= 0).
+- `tijden: { bestuurNaam?, schooljaar? }`: tijdstempels van die twee instellingen.
+- `verwijderd: Record<sleutel, ms>`: tombstones (sleutels in `domein/sleutels.ts`).
+- Lokaal (niet gedeeld): `modus`, `setupVoltooid`, `onboardingVerborgen`.
+- Niet in de state: gekozen niveau/school/cluster (in `localStorage['kwaliteitskalender:ui:v1']`).
+
+localStorage-sleutels: `kwaliteitskalender:state:v5` (state), `kwaliteitskalender:ui:v1`,
+`kwaliteitskalender:sync:v1` (syncmeta). IndexedDB `kwaliteitskalender` / `koppeling` (bestandshandle).
+
+## 4. Store-API (`useStore()` uit `src/store`)
+
+Alle acties werken direct (autosave, tijdstempels, tombstones). `EditScope = { kind: 'bestuur' } | { kind: 'school', schoolId }`.
+
+**State en keuze**
+| Veld | Type |
+|---|---|
+| `state` | `State` |
+| `niveau`, `setNiveau(n)` | `'bestuur' \| 'cluster' \| 'school'` |
+| `clusterId`, `setClusterId(id)` | `string` |
+| `schoolId`, `setSchoolId(id)` | `string` |
+| `laatstOpgeslagen` | `number \| null` (voor "Opgeslagen") |
+| `opslagWerkt` | `boolean` |
+| `generatie` | `number`, telt op bij volledige vervanging |
+
+**Kalenderitems**
+| Actie | Signatuur | Gedrag |
+|---|---|---|
+| `moveItem` | `(scope, uid, maand: Maand) => void` | |
+| `setItemStatus` | `(scope, uid, status: Status) => void` | voegt historie toe `{status, datum}`; zelfde status = niets |
+| `addActiviteit` | `(scope, activiteitId) => string \| null` | nieuw item (uuid), maand uit periode, standaardgesprek, gepland; geeft uid |
+| `addEigenActiviteit` | `(scope, { naam, standaard, gesprek, periode?, omschrijving? }) => string` | id `EIGEN-xxxxxxxx`, `custom` in het item |
+| `removeItem` | `(scope, uid) => void` | tombstone |
+| `setKoppeling` | `(scope, uid, gesprek, reden) => void` | afwijking als gesprek ≠ standaardgesprek; lege reden → "Aangepast door school" |
+| `setNotitie` / `setEigenNaam` / `setEigenaar` | `(scope, uid, tekst) => void` | trim; leeg wist |
+| `setDeadline` | `(scope, uid, 'JJJJ-MM-DD' \| '') => void` | |
+| `slaItemOp` | `(scope, uid, { gesprek?, reden?, notitie?, eigenNaam?, eigenaar?, deadline?, maand? }) => void` | **"Opslaan" in het detailvenster**: één wijziging, één tijdstempel |
+| `addBewijs` | `(scope, uid, { label, url? }) => void` | |
+| `removeBewijs` | `(scope, uid, bewijsId) => void` | |
+
+**Organisatie en cyclus**
+| Actie | Signatuur |
+|---|---|
+| `setBestuurNaam` | `(naam) => void` |
+| `setSchooljaar` | `(jaar) => void` |
+| `addSchool` | `({ naam, type?, cluster? }) => schoolId` (lege naam → "School n", leeg type → "vo") |
+| `updateSchool` | `(id, Partial<{ naam, type, cluster }>) => void` |
+| `removeSchool` | `(id) => void` (ook haar kalender) |
+| `addCluster` | `(naam) => clusterId` |
+| `updateCluster` | `(id, { naam }) => void` |
+| `removeCluster` | `(id) => void` (scholen krijgen cluster "") |
+| `addGesprek` | `() => gesprekId` ("Gesprek n", Nov, Doorlopend, vlag) |
+| `updateGesprek` | `(id, Partial<{ naam, maand, kleur, icoon, thema, volgorde }>) => void` |
+| `removeGesprek` | `(id) => void` (items → Doorlopend, afwijking gewist) |
+| `moveGesprek` | `(id, -1 \| 1) => void` |
+| `resetCyclus` | `() => void` (vier seizoenen; items van verdwenen gesprekken → Doorlopend) |
+
+**Setup, onboarding, demo**
+| Actie | Gedrag |
+|---|---|
+| `voltooiWizard({ bestuurNaam, schooljaar, scholen: [{naam, type?}], sjabloon })` | alles in één keer, niveau bestuur |
+| `completeSetup()` | setup voltooid, modus eigen, niveau bestuur |
+| `pasSjabloonToe()` | 19 verplichte schoolactiviteiten per school + 30 bestuursactiviteiten, zonder dubbele |
+| `verbergOnboarding()` | |
+| `loadDemo()` | demo, niveau school, eerste school/cluster |
+| `beginLeeg()` / `reset()` | lege state, welkomstscherm |
+| `importeerState(state)` | vervangt alles (na `leesKalenderJson`) |
+
+Intern (alleen `src/sync`): `haalState()`, `voegGedeeldSamen(g)`, `neemGedeeldOver(g)`.
+Pure varianten van alle acties: `mutaties.*` in `src/domein/mutaties.ts` (met `nu`-parameter; voor tests).
+
+## 5. Selectors en berekeningen
+
+**Hooks** (`src/store/selectors.ts`)
+- `useScope(): { niveau, scope: { items, isBestuur, standaarden }, editScope, editable, isBestuur, library, scopeLabel }`
+  (zoals `vr()` in het origineel; `library` = 30 bestuurs- of 67 schoolactiviteiten).
+- `useKomendGesprek(): KomendGesprek | null` (`{ gesprek, datum, dagenTot, verstreken }`).
+
+**Pure functies** (`src/domein/berekeningen.ts`, `hulp.ts`)
+| Functie | Uitleg |
+|---|---|
+| `scopeVoor(state, niveau, clusterId, schoolId)` | scope per niveau |
+| `editScopeVoor(niveau, schoolId)` | null op clusterniveau |
+| `scopeLabel(state, niveau, clusterId, schoolId)` | school-/cluster-/bestuursnaam |
+| `schoolIdsVoorNiveau(org, niveau, clusterId)` | scholen bij bestuur/cluster |
+| `voortgang(items)` | `{ totaal, gereed, bezig, gepland, risico, pct }` |
+| `itemsVoorGesprek(items, id)`, `voortgangVoorGesprek(items, id)` | |
+| `komendGesprek(cyclus, schooljaar, vandaag)`, `deadlineVanGesprek(g, startjaar)`, `startjaar()` | §2.3 |
+| `verstrekenDeadlines(items, vandaag)` | deadline < vandaag en niet gereed |
+| `dekkingPerStandaard(items, standaarden)` | `{ standaard, aantal, gereed, afgedekt }[]` |
+| `ontbrekendeVasteStandaarden(items, standaarden)` | kern zonder item |
+| `afwijkingen(items)`, `staatOpKalender(items, activiteitId)` | |
+| `overzichtPerSchool(state, schoolIds)`, `gemiddeldGereed(overzicht)` | KPI's en "Voortgang per school" |
+| `aandachtspunten(items, standaarden, vandaag)` | `{ soort, tekst }[]`, teksten letterlijk |
+| `heatmapCel(itemsVanSchool, gesprekId)` | `{ voortgang, toon: 'leeg'\|'risico'\|'gereed'\|'half'\|'laag', tekst, titel }` |
+| `statusVoorStandaardInGesprek(items, gesprekId, code)` | Gesprekken, status per school |
+| `filterActiviteiten(lijst, { zoek, gesprek, gebied })` | bibliotheek |
+| `vindSchool`, `vindCluster`, `clusterNaamVan`, `scholenInCluster`, `itemsVanSchool`, `itemsVanEditScope` | |
+| `cyclusOpVolgorde(state)`, `sorteerOpNaam(items)`, `heeftActiviteiten(state)` | |
+| `activiteitVan(item)`, `effectieveNaam(item)`, `standaardGesprekVan(item)` | |
+| `vindGesprek(cyclus, id)`, `gesprekOpties(cyclus)` (cyclus + Doorlopend), `gesorteerdeCyclus()` | |
+| `maandUitPeriode()`, `gebiedUitStandaard()`, `bibliotheek(isBestuur)`, `standaardenVoor(isBestuur)` | |
+| `vandaagISO()`, `formatDatumLang(d)` ("1 februari 2027"), `formatDatumKort(iso)` ("1-2-2027"), `formatTijdstip(ms)`, `slug()`, `aantal(n, 'activiteit', 'activiteiten')` | |
+
+**Seed** (`src/domein/seed.ts`): `ACTIVITEITEN_SCHOOL`, `ACTIVITEITEN_BESTUUR`, `ACTIVITEIT_OP_ID`,
+`STANDAARDEN(_SCHOOL|_BESTUUR)`, `STANDAARD_OP_CODE`, `VASTE_STANDAARDEN`, `GEBIEDEN`, `GEBIED_CODES`,
+`MAANDEN`, `STANDAARD_GESPREKSCYCLUS`, `GESPREKKEN_INHOUD`, `STATUSSEN`, `STATUS_VOLGORDE`,
+`ICOON_OPTIES`, `KLEUR_OPTIES`, `GESPREK_FILTER_OPTIES`, `SCHOOLTYPE_SUGGESTIES`, `STANDAARD_SCHOOLJAAR`,
+`SEED` (het hele JSON-bestand). **Teksten voor de lokale versie** (`src/domein/inhoud.ts`): `HELPTEKSTEN`,
+`FAQ`, `CONTACT`, `FOOTER_TEKST`, `PRIVACY_REGEL`, `BEWIJS_HINT`, `WELKOM_BOUWSTENEN`, `WELKOM_VOETNOOT`,
+`BESTUUR_START_TEGELS`.
+
+## 6. Samenwerken: bestandsformaat en samenvoegregels
+
+**Bestand** `<naam>.kwaliteitskalender.json`:
+```json
+{ "formaat": "kwaliteitskalender-vo", "versie": 5, "opgeslagenOp": "2026-11-14T19:00:00.000Z",
+  "schooljaar": "...", "organisatie": { "bestuurNaam", "scholen", "clusters", "gesprekscyclus" },
+  "bestuurItems": [...], "schoolKalenders": { "<schoolId>": [...] },
+  "tijden": { "bestuurNaam": 0, "schooljaar": 0 }, "verwijderd": { "<sleutel>": 0 } }
+```
+Geen lokale velden (modus, setup), geen accounts, apparaatnamen of e-mailadressen.
+
+**Sleutels**: `school:{id}`, `cluster:{id}`, `gesprek:{id}`, `item:b:{uid}`, `item:s:{schoolId}:{uid}`,
+`instelling:bestuurNaam`, `instelling:schooljaar`.
+
+**Regels** (`samenvoegen(lokaal, extern, basis?)` in `src/domein/samenvoegen.ts`, 22 tests):
+1. Per entiteit en per instelling wint de hoogste tijdstempel.
+2. Tombstones doen mee als versie: verwijderen wint van oudere wijzigingen; een latere wijziging of
+   toevoeging (bv. sjabloon opnieuw toepassen) wint van de tombstone.
+3. Gelijke tijd: verwijdering wint; anders de grootste canonieke JSON (deterministisch).
+4. Items van een school die na samenvoegen niet bestaat, vervallen.
+5. Conflict = beide kanten wijzigden dezelfde sleutel sinds `basis` (handtekeningen van de vorige sync)
+   en de inhoud verschilt. Gemeld in een dialoog (`ConflictDialoog`).
+6. Mutaties stempelen met `max(nu, vorige + 1)`, zodat een bewerking altijd wint van de versie waarop
+   ze gebaseerd is, ook bij een scheve klok.
+7. Resultaat is volgorde-onafhankelijk vergeleken (`vingerafdruk`); er wordt alleen geschreven als het
+   externe bestand echt anders is.
+
+**Sync-laag** (`useSync()` uit `src/sync/SyncProvider.tsx`): `ondersteund`, `status`
+(`'geen' | 'verbinden' | 'gekoppeld' | 'toestemming-nodig' | 'fout'`), `bestandsnaam`, `laatsteSync`,
+`bezig`, `fout`, `conflicten`, en acties `koppelBestaand(kies?)`, `maakGedeeldBestand()`,
+`herstelToestemming()`, `synchroniseerNu()`, `ontkoppel()`, `openBestand(file, kies?)`,
+`samenvoegenMetBestand(file)`, `opslaanAlsBestand()`, `sluitConflicten()`.
+Synchroniseren: 1,5 s na elke wijziging, bij vensterfocus/zichtbaar worden en elke 30 s.
+Binnenkomende wijzigingen geven een toast; conflicten een dialoog. `loadDemo`, `beginLeeg`, `reset` en
+`importeerState` **verbreken de koppeling** (het bestand zelf blijft ongewijzigd). In de demo kan geen
+nieuw gedeeld bestand gemaakt worden. Een andere browser-tab: wijzigingen worden via het
+`storage`-event samengevoegd.
+
+## 7. Componenten (`src/componenten`)
+
+Alle waarden komen uit `src/stijl/tokens.css` (design system). Tailwind-kleuren zijn **alleen** tokens:
+`bg-surface-card|page|sunken|hover|subtle`, `text-ink-strong|body|muted|subtle`, `border-line|line-subtle|line-strong`,
+`bg-niveau`, `text-niveau-strong`, `bg-niveau-surface`, `border-niveau-border`, `bg-brand-yellow(-soft)`,
+`text-status-{success,warning,danger,info,neutral}`, `bg-status-*-surface`, `border-status-*-border`,
+`text-kg-op`, `bg-kg-op-surface`, `text-seizoen-herfst`, `bg-seizoen-herfst-surface`, `gray-25..900`.
+Tekst: `text-display|h1|h2|h3|h4|base|sm|xs|2xs`, `.eyebrow`, `.tnum`. Radius `rounded-sm|md|lg|xl|pill`.
+Schaduw `shadow-xs|sm|md|lg|pop`. Geen opacity-modifiers (`bg-niveau/40` werkt niet).
+Voor dynamische kleuren altijd de tabellen in `stijlen.ts` gebruiken (Tailwind ziet geen samengestelde klassen).
+
+| Component | Props (belangrijkste) |
+|---|---|
+| `Button` | `variant: 'primary' \| 'secondary' \| 'ghost' \| 'danger' \| 'danger-zacht' \| 'niveau'`, `size: 'sm' \| 'md' \| 'lg'`, `icon`, `iconRight` (Lucide-component), + button-props |
+| `ButtonLink` | als Button + `to` (react-router) |
+| `IconButton` | `icon`, `label` (verplicht), `size`, `variant: 'ghost' \| 'secondary'` |
+| `knopKlassen(variant, size, className)` | klassen voor een `<a>`/`<label>` als knop |
+| `Badge` | `tone: neutral\|brand\|success\|warning\|danger\|info\|niveau`, `variant: soft\|solid\|outline`, `size`, `icon`, `dot`, `title` |
+| `StandaardBadge` | `code` |
+| `VasteStandaardBadge` | `compact` ("vast") |
+| `VerplichtBadge`, `AfwijkingBadge` | `reden?`, `label?` |
+| `StatusBadge` | `status`, `size: 'sm' \| 'md'` (icoon + label) |
+| `StatusDot` | `status` |
+| `SeizoenBadge` | `gesprek: { naam, kleur, icoon }`, `size`, `showLabel`, `label` |
+| `GesprekIcoonView` | `icoon`, `kleur` |
+| `KwaliteitsgebiedTag` | `gebied`, `showName`, `size` (kleurvlak + code op wit) |
+| `GebiedDot` | `gebied` |
+| `Card` | `title`, `subtitle`, `action`, `padding: none\|sm\|md\|lg`, `elevated`, `divider`, `as`, `className`, `bodyClassName` |
+| `KpiTile` | `label`, `value`, `unit`, `icon`, `tone: neutral\|success\|warning\|danger\|niveau`, `hint` |
+| `ProgressBar` | `value` (0-100), `color` (CSS, bv. `seizoenKlassen(k).var`; standaard niveau), `size`, `label`, `showValue` |
+| `IconTile` | `icon`, `tone: niveau\|brand\|success\|info\|danger\|warning\|neutral`, `size` |
+| `EmptyState` | `icon`, `title`, `body`, `action`, `watermark`, `compact` (binnen een kaart) |
+| `InfoBalk` | `tone: info\|warning\|niveau\|neutral`, `icon` |
+| `PageHeader` | `eyebrow`, `title`, `subtitle`, `actions` |
+| `SectionHeader` | `title`, `subtitle`, `action` |
+| `Swoosh` | (gele S-curve; staat al in de footer, gebruik hooguit één extra) |
+| `Veld` | `label`, `verplicht`, `hint`, `fout`, children: `(id) => <Input id={id} …/>` |
+| `Input`, `Textarea` | + `veldMaat: 'sm' \| 'md'` |
+| `Select` | `options: (string \| { value, label })[]`, `placeholder`, `veldMaat`, + select-props |
+| `SearchField` | `value`, `onChange(string)`, `placeholder`, `label` |
+| `Checkbox` | `checked`, `onChange(bool)`, `label`, `beschrijving` |
+| `FilterChip` | `active`, `onClick`, `dotClassName` (bv. `gebiedKlassen('OP').dot`), `icon`, `count` |
+| `SegmentedControl` | `value`, `onChange`, `options: { value, label, icon?, compact? }[]`, `accent: 'niveau' \| 'neutraal'` |
+| `NiveauSwitcher` | `value`, `onChange`, `toonCluster` |
+| `Dialog` | `open`, `onClose`, `title`, `subtitle`, `footer`, `width: sm\|md\|lg\|xl`, `blokkeerAchtergrond` (Esc, focus-trap, focus terug) |
+| `useBevestig()` | `await bevestig({ titel, tekst, bevestigLabel, annuleerLabel, gevaarlijk }) → boolean` |
+| `useToast()` | `toast(tekst, 'success' \| 'info' \| 'danger' \| 'warning', duurMs?)`; max 3, 2400 ms |
+| `ActivityChip` | `gebied`, `code`, `naam`, `status`, `verplicht`, `afwijking`, `selected`, `compact`, + button-props |
+| `AppLogo`, `LvLogo`, `LvMonogram` | logo's |
+| `stijlen.ts` | `GEBIED_KLASSEN`/`gebiedKlassen()`, `SEIZOEN_KLASSEN`/`seizoenKlassen()` (`{ ink, surface, border, dot, var }`), `STATUS_STIJL` (+ `label`, `icoon`), `GESPREK_ICONEN`/`gesprekIcoon()`, `NIVEAU_ICONEN`, `NIVEAU_LABELS`, `icoonOpNaam('lucide:Gauge')` |
+
+Voorbeelden van alles: `src/schil/Stijlgids.tsx` (`#/stijlgids`).
+
+### Keuzes waar het design system het origineel verving
+- Niveaukleur school is staalblauw `#34607A` (was magenta). Bestuur wijnrood, cluster pruim.
+- Niveaukleur zit alleen in de schil (topbar-streep, wisselaar, menu, scopebalk, filterchips, balken);
+  data-kleuren (gebied, seizoen, status) veranderen niet mee.
+- Kwaliteitsgebied = kleurvlak + code op wit (geen getinte vakken); matrixchips zijn wit met haarlijn.
+- "Verplicht" is oranje met stip (was rood); "Vaste standaard" geel met sleutel.
+- Toasts zijn witte kaarten met getinte icoontegel (was zwarte pil). Dialogen radius 16px.
+- Logo: LV-monogram (geel in zwarte tegel); footer het volledige Leren verbeteren-logo.
+- Niveau-icoon cluster is `Layers` (was `Users`).
+
+## 8. Tests
+- `npm test`: domein (berekeningen, migratie, mutaties, samenvoegen; 82 tests).
+- `npm run test:e2e` (na `npm run build`): opent `dist/kwaliteitskalender.html` via `file://` in headless
+  Chromium; controleert routes, niveaukleur, herladen, netwerkstilte, console, CSP, handmatige
+  bestandsflow en de automatische sync met een nagebootste File System Access API.
+  Pas de e2e-scripts aan als je schermen echte koppen (h1) geven die anders heten; ze controleren nu
+  alleen dat er een h1 is.

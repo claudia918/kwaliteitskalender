@@ -1,0 +1,241 @@
+/* ============================================================
+   Design tokens van het Leren verbeteren design system.
+   Overgenomen uit design-system/tokens/{colors,spacing,typography}.css.
+   Dit is de ENIGE bron van kleuren, maten, radius en schaduw.
+   Tailwind (tailwind.config.ts) verwijst alleen naar deze variabelen.
+   ============================================================ */
+:root {
+  /* ---------- BRAND ---------- */
+  --lv-yellow:        #EEC21B;   /* PMS 7406C — primary brand accent */
+  --lv-yellow-600:    #D4A912;   /* hover / pressed on yellow surfaces */
+  --lv-yellow-700:    #A9850A;   /* yellow text that needs AA on white */
+  --lv-yellow-soft:   #FBF1CC;   /* faint brand wash */
+  --lv-black:         #111111;   /* PMS Black 6C, slightly lifted for screen */
+  --lv-true-black:    #000000;
+
+  /* ---------- BRAND SECONDARY (from the Kwartaalrapportage) ---------- */
+  /* The official quarterly report pairs the gold with a deep magenta and a
+     terracotta. These extend the brand for data, accents and emphasis. */
+  --lv-magenta:        #881F53;   /* deep magenta / wine-purple — the "rood/paars" */
+  --lv-magenta-strong: #6E1843;
+  --lv-magenta-soft:   #F4E2EB;
+  --lv-coral:          #CF7953;   /* terracotta accent */
+  --lv-coral-soft:     #F7E7DC;
+
+  /* ---------- NEUTRALS (warm slate — harmonises with yellow) ---------- */
+  --gray-25:  #FBFBF9;
+  --gray-50:  #F6F6F3;
+  --gray-100: #EDEDE8;
+  --gray-200: #E0E0D9;
+  --gray-300: #CBCBC2;
+  --gray-400: #A6A69C;
+  --gray-500: #7C7C72;
+  --gray-600: #595952;
+  --gray-700: #403F3A;
+  --gray-800: #2A2A26;
+  --gray-900: #1A1A17;
+
+  /* ---------- SEMANTIC STATUS (loudest — icon + badge only) ---------- */
+  /* Slightly warmed/muted so they read with the gold+black brand, while
+     staying unambiguous (danger=red, warning=orange, success=green). */
+  --status-danger:        #C5403A;
+  --status-danger-surface:#FBEAE9;
+  --status-danger-border: #F1C7C4;
+  --status-warning:       #D9790F;   /* clear orange, kept apart from brand gold */
+  --status-warning-surface:#FBEFDD;
+  --status-warning-border:#F2D3A6;
+  --status-success:       #4E8A3D;   /* olive-leaning green, warmer than a neon green */
+  --status-success-surface:#EBF2E4;
+  --status-success-border:#C7DEBB;
+  --status-info:          #3E6B8C;   /* used sparingly; muted slate, not a bright blue */
+  --status-info-surface:  #EBF1F6;
+  --status-info-border:   #C8D8E5;
+  --status-neutral:       #595952;
+  --status-neutral-surface:#EDEDE8;
+
+  /* ---------- NIVEAU IDENTITY (chrome only — desaturated on purpose) ---------- */
+  /* Warm, muted earth-tones so they sit with the gold+black brand and never
+     read as a STATUS colour. */
+  --niveau-bestuur:        #9A3A52;  /* rood-familie → wine/berry (NOT status red) */
+  --niveau-bestuur-strong: #823045;
+  --niveau-bestuur-surface:#F6E9EC;
+  --niveau-bestuur-border: #E5C6CF;
+
+  --niveau-cluster:        #6E4E7A;  /* paars-familie → warm muted plum */
+  --niveau-cluster-strong: #583E62;
+  --niveau-cluster-surface:#F0EAF3;
+  --niveau-cluster-border: #D9CBE0;
+
+  --niveau-school:         #34607A;  /* blauw-familie → warm teal-blue (NOT status info) */
+  --niveau-school-strong:  #284C61;
+  --niveau-school-surface: #E9F0F4;
+  --niveau-school-border:  #C4D6E0;
+
+  /* Active-niveau aliases — the chrome points at these; the app theme
+     swaps the three values below per active level (see niveau-themes). */
+  --niveau:         var(--niveau-school);
+  --niveau-strong:  var(--niveau-school-strong);
+  --niveau-surface: var(--niveau-school-surface);
+  --niveau-border:  var(--niveau-school-border);
+
+  /* ---------- KWALITEITSGEBIEDEN (colour swatch + code on white) ---------- */
+  /* 'ink' = code/text + swatch colour (AA on white). 'surface'/'border' are
+     kept for soft tints in charts/headers but the tag/chip use white + swatch. */
+  /* Warm, muted, editorial set — anchored to the brand's gold/earth feel,
+     with two cools (BKA/SKA) for balance. Each is distinct AND always coded. */
+  --kg-bka-ink:     #43597F;  --kg-bka-surface:#ECF0F6;  --kg-bka-border:#C8D5E4;  /* denim */
+  --kg-ska-ink:     #2D7A6E;  --kg-ska-surface:#E6F1EE;  --kg-ska-border:#BCDBD2;  /* petrol teal */
+  --kg-op-ink:      #97681F;  --kg-op-surface: #F6EEDA;  --kg-op-border: #E5D2A2;  /* bronze/ochre */
+  --kg-vs-ink:      #7C4F73;  --kg-vs-surface: #F1E9F0;  --kg-vs-border: #DBC6D5;  /* aubergine */
+  --kg-or-ink:      #AC5A3D;  --kg-or-surface: #F7EBE4;  --kg-or-border: #EACDBE;  /* clay/terracotta */
+
+  /* ---------- SEIZOENSGESPREKKEN (badge tint — icon + label primary) ---------- */
+  --seizoen-herfst-ink:#AE5E20; --seizoen-herfst-surface:#F7EEE0; --seizoen-herfst-border:#E9D2B4;
+  --seizoen-winter-ink:#4A6A86; --seizoen-winter-surface:#ECF1F6; --seizoen-winter-border:#CAD8E4;
+  --seizoen-lente-ink: #B0577F; --seizoen-lente-surface: #F8EAF0; --seizoen-lente-border: #ECC9DA;
+  --seizoen-zomer-ink: #AD8410; --seizoen-zomer-surface: #FAF1CF; --seizoen-zomer-border: #E9D596;
+  --seizoen-doorlopend-ink:#595952; --seizoen-doorlopend-surface:#EDEDE8; --seizoen-doorlopend-border:#D8D8D0;
+
+  /* ---------- DATA-VISUALISATIE / GRAFIEKEN ----------
+     Categorical series palette, taken 1:1 from the official Kwartaalrapportage.
+     Use in THIS order so a series keeps its colour across every chart, and
+     always pair with a legend/label (never colour alone). chart-1–5 are the
+     report's own five; chart-6/7 extend it from the brand's warm palette. */
+  --chart-1: #EEC21B;   /* gold      — primary series (e.g. risico) */
+  --chart-2: #881F53;   /* magenta   — secondary (e.g. onvoldoende) */
+  --chart-3: #9A9A92;   /* warm grey — tertiary (e.g. zeer zwak) */
+  --chart-4: #CF7953;   /* terracotta— bestuur-serie */
+  --chart-5: #1A1A17;   /* near-black— bestuur-serie */
+  --chart-6: #43597F;   /* denim     — extension */
+  --chart-7: #2D7A6E;   /* petrol    — extension */
+  --chart-grid:  #E0E0D9;  /* thin gridlines (= gray-200) */
+  --chart-axis:  #1A1A17;  /* baseline axis (black) */
+  --chart-label: #403F3A;  /* data labels / axis text (= gray-700) */
+
+  /* ---------- SURFACES & TEXT (semantic aliases) ---------- */
+  --surface-page:    var(--gray-50);
+  --surface-card:    #FFFFFF;
+  --surface-sunken:  var(--gray-100);
+  --surface-hover:   var(--gray-50);
+  --surface-inverse: var(--lv-black);
+
+  --text-strong:   var(--gray-900);
+  --text-body:     var(--gray-800);
+  --text-muted:    var(--gray-600);
+  --text-subtle:   var(--gray-500);
+  --text-on-dark:  #FFFFFF;
+  --text-on-brand: var(--lv-black);   /* black text on yellow = AA */
+
+  --border-subtle: var(--gray-200);
+  --border-default:var(--gray-300);
+  --border-strong: var(--gray-400);
+
+  /* ---------- FOCUS ---------- */
+  --focus-ring: 0 0 0 3px rgba(238, 194, 27, .55);
+  --focus-ring-color: var(--lv-yellow);
+}
+
+/* ============================================================
+   Niveau themes — apply ONE to a scope (e.g. <body data-niveau>)
+   to retint the chrome aliases. The rest of the UI reads
+   var(--niveau*) so nav, active states and primary accents
+   follow the active level automatically.
+   ============================================================ */
+[data-niveau="bestuur"] {
+  --niveau:         var(--niveau-bestuur);
+  --niveau-strong:  var(--niveau-bestuur-strong);
+  --niveau-surface: var(--niveau-bestuur-surface);
+  --niveau-border:  var(--niveau-bestuur-border);
+}
+[data-niveau="cluster"] {
+  --niveau:         var(--niveau-cluster);
+  --niveau-strong:  var(--niveau-cluster-strong);
+  --niveau-surface: var(--niveau-cluster-surface);
+  --niveau-border:  var(--niveau-cluster-border);
+}
+[data-niveau="school"] {
+  --niveau:         var(--niveau-school);
+  --niveau-strong:  var(--niveau-school-strong);
+  --niveau-surface: var(--niveau-school-surface);
+  --niveau-border:  var(--niveau-school-border);
+}
+:root {
+  /* Spacing scale (4px base) */
+  --space-0:  0;
+  --space-1:  0.25rem;  /* 4  */
+  --space-2:  0.5rem;   /* 8  */
+  --space-3:  0.75rem;  /* 12 */
+  --space-4:  1rem;     /* 16 */
+  --space-5:  1.25rem;  /* 20 */
+  --space-6:  1.5rem;   /* 24 */
+  --space-8:  2rem;     /* 32 */
+  --space-10: 2.5rem;   /* 40 */
+  --space-12: 3rem;     /* 48 */
+  --space-16: 4rem;     /* 64 */
+
+  /* Radii — geometric, moderate (echoes Poppins' rounded-geometric forms) */
+  --radius-xs:  3px;
+  --radius-sm:  5px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-pill:999px;
+
+  /* Shadows — soft, cool-neutral; the UI leans on borders more than shadow */
+  --shadow-xs: 0 1px 2px rgba(24,24,21,.06);
+  --shadow-sm: 0 1px 3px rgba(24,24,21,.08), 0 1px 2px rgba(24,24,21,.05);
+  --shadow-md: 0 4px 10px -2px rgba(24,24,21,.10), 0 2px 4px -2px rgba(24,24,21,.06);
+  --shadow-lg: 0 12px 28px -6px rgba(24,24,21,.16), 0 4px 8px -4px rgba(24,24,21,.08);
+  --shadow-pop:0 16px 40px -8px rgba(24,24,21,.22);
+
+  /* Layout */
+  --topbar-h:    56px;
+  --subheader-h: 52px;
+  --sidebar-w:   232px;
+  --content-max: 1440px;
+  --cell-w:      88px;   /* matrix month column */
+  --rowhead-w:   320px;  /* matrix sticky standard column */
+
+  /* Motion */
+  --ease-out:   cubic-bezier(.2,.7,.3,1);   /* @kind other */
+  --ease-inout: cubic-bezier(.5,.05,.2,1);  /* @kind other */
+  --dur-fast:   120ms;  /* @kind other */
+  --dur-base:   180ms;  /* @kind other */
+  --dur-slow:   260ms;  /* @kind other */
+}
+:root {
+  /* Font sizes (rem @ 16px root) */
+  --text-display: 2.5rem;   /* 40px — hero numbers / marketing only */
+  --text-h1:      1.75rem;  /* 28px — screen title */
+  --text-h2:      1.375rem; /* 22px — section title */
+  --text-h3:      1.125rem; /* 18px — card / group header */
+  --text-h4:      1rem;     /* 16px — sub-header */
+  --text-base:    0.9375rem;/* 15px — default body */
+  --text-sm:      0.8125rem;/* 13px — secondary / table body */
+  --text-xs:      0.75rem;  /* 12px — meta, badges */
+  --text-2xs:     0.6875rem;/* 11px — chip codes, dense labels */
+
+  /* Weights */
+  --weight-regular: 400;
+  --weight-medium:  500;
+  --weight-semibold:600;
+  --weight-bold:    700;
+
+  /* Line heights */
+  --leading-tight:  1.15;
+  --leading-snug:   1.3;
+  --leading-normal: 1.5;
+
+  /* Letter spacing */
+  --tracking-tight:  -0.02em;
+  --tracking-normal: 0;
+  --tracking-label:  0.04em;   /* uppercase eyebrow / KPI labels */
+  --tracking-wide:   0.08em;
+}
+
+/* ---------- Aanvullingen voor de app (afgeleid van bovenstaande tokens) ---------- */
+:root {
+  --font-sans: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --scrim: rgba(24, 24, 21, .45);
+  --surface-subtle: var(--gray-25);
+}

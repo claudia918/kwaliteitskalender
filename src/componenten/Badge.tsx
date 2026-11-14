@@ -1,0 +1,281 @@
+/**
+ * Badge-familie naar het design system: Badge, StandaardBadge, VasteStandaardBadge (kernstandaard),
+ * VerplichtBadge, AfwijkingBadge, StatusBadge, StatusDot, SeizoenBadge, GesprekIcoonView en
+ * KwaliteitsgebiedTag. Kleur is nooit de enige drager: er staat altijd een label, code of icoon bij.
+ */
+import type { ReactNode } from 'react';
+import { ArrowLeftRight, KeyRound, type LucideIcon } from 'lucide-react';
+import { GEBIEDEN } from '../domein/seed';
+import type { GebiedCode, Gesprek, GesprekIcoon, GesprekKleur, Status } from '../domein/types';
+import { cx } from './cx';
+import { STATUS_STIJL, gebiedKlassen, gesprekIcoon, seizoenKlassen } from './stijlen';
+
+export type BadgeTone = 'neutral' | 'brand' | 'success' | 'warning' | 'danger' | 'info' | 'niveau';
+
+const TONE: Record<BadgeTone, { soft: string; solid: string; outline: string; dot: string }> = {
+  neutral: {
+    soft: 'bg-status-neutral-surface text-status-neutral border-line-subtle',
+    solid: 'bg-status-neutral text-white border-transparent',
+    outline: 'bg-transparent text-ink-muted border-line',
+    dot: 'bg-status-neutral',
+  },
+  brand: {
+    soft: 'bg-brand-yellow-soft text-brand-yellow-700 border-brand-yellow',
+    solid: 'bg-brand-yellow text-ink-on-brand border-transparent',
+    outline: 'bg-transparent text-brand-yellow-700 border-brand-yellow',
+    dot: 'bg-brand-yellow',
+  },
+  success: {
+    soft: 'bg-status-success-surface text-status-success border-status-success-border',
+    solid: 'bg-status-success text-white border-transparent',
+    outline: 'bg-transparent text-status-success border-status-success-border',
+    dot: 'bg-status-success',
+  },
+  warning: {
+    soft: 'bg-status-warning-surface text-status-warning border-status-warning-border',
+    solid: 'bg-status-warning text-white border-transparent',
+    outline: 'bg-transparent text-status-warning border-status-warning-border',
+    dot: 'bg-status-warning',
+  },
+  danger: {
+    soft: 'bg-status-danger-surface text-status-danger border-status-danger-border',
+    solid: 'bg-status-danger text-white border-transparent',
+    outline: 'bg-transparent text-status-danger border-status-danger-border',
+    dot: 'bg-status-danger',
+  },
+  info: {
+    soft: 'bg-status-info-surface text-status-info border-status-info-border',
+    solid: 'bg-status-info text-white border-transparent',
+    outline: 'bg-transparent text-status-info border-status-info-border',
+    dot: 'bg-status-info',
+  },
+  niveau: {
+    soft: 'bg-niveau-surface text-niveau-strong border-niveau-border',
+    solid: 'bg-niveau text-white border-transparent',
+    outline: 'bg-transparent text-niveau-strong border-niveau-border',
+    dot: 'bg-niveau',
+  },
+};
+
+export interface BadgeProps {
+  children?: ReactNode;
+  tone?: BadgeTone;
+  variant?: 'soft' | 'solid' | 'outline';
+  size?: 'sm' | 'md';
+  icon?: LucideIcon;
+  /** Gekleurde stip voor de tekst */
+  dot?: boolean;
+  title?: string;
+  className?: string;
+}
+
+/** Pil met tint, rand en tekst in één toon. */
+export function Badge({
+  children,
+  tone = 'neutral',
+  variant = 'soft',
+  size = 'md',
+  icon: Icon,
+  dot,
+  title,
+  className,
+}: BadgeProps) {
+  const t = TONE[tone];
+  return (
+    <span
+      title={title}
+      className={cx(
+        'inline-flex shrink-0 items-center whitespace-nowrap rounded-pill border font-semibold leading-none',
+        size === 'sm' ? 'h-[18px] gap-1 px-1.5 text-2xs' : 'h-[22px] gap-1 px-2 text-xs',
+        t[variant],
+        className,
+      )}
+    >
+      {dot && <span className={cx('h-1.5 w-1.5 rounded-full', variant === 'solid' ? 'bg-current' : t.dot)} aria-hidden />}
+      {Icon && <Icon className={size === 'sm' ? 'h-3 w-3' : 'h-3.5 w-3.5'} aria-hidden style={{ strokeWidth: 2.2 }} />}
+      {children}
+    </span>
+  );
+}
+
+/** Code van een standaard ("OP3"), neutraal, tabulair. */
+export function StandaardBadge({ code, className, title }: { code: string; className?: string; title?: string }) {
+  return (
+    <span
+      title={title}
+      className={cx(
+        'tnum inline-flex h-5 items-center rounded-sm border border-line bg-surface-card px-1.5 text-2xs font-bold tracking-label text-ink-strong',
+        className,
+      )}
+    >
+      {code}
+    </span>
+  );
+}
+
+/**
+ * Vaste standaard (kernstandaard: OP0, OP2, OP3, VS1, OR1). Geel, het merkaccent.
+ * `compact` toont "vast" (zoals in de matrix).
+ */
+export function VasteStandaardBadge({ compact, className }: { compact?: boolean; className?: string }) {
+  return (
+    <Badge
+      tone="brand"
+      variant="soft"
+      size="sm"
+      icon={compact ? undefined : KeyRound}
+      title="Deze standaard beoordeelt de inspectie bij elk onderzoek"
+      className={className}
+    >
+      {compact ? 'vast' : 'Vaste standaard'}
+    </Badge>
+  );
+}
+
+/** Verplichte activiteit (design system: oranje tint met stip). */
+export function VerplichtBadge({ className }: { className?: string }) {
+  return (
+    <Badge tone="warning" size="sm" dot className={className}>
+      Verplicht
+    </Badge>
+  );
+}
+
+/** Afwijking van de standaardkoppeling (stippellijn). */
+export function AfwijkingBadge({
+  reden,
+  className,
+  label = 'afwijking',
+}: {
+  reden?: string;
+  className?: string;
+  label?: string;
+}) {
+  return (
+    <Badge
+      tone="warning"
+      variant="outline"
+      size="sm"
+      icon={ArrowLeftRight}
+      title={reden}
+      className={cx('border-dashed', className)}
+    >
+      {label}
+    </Badge>
+  );
+}
+
+/** Status met icoon en label: Gepland, Bezig, Gereed, Risico. */
+export function StatusBadge({ status, size = 'sm', className }: { status: Status; size?: 'sm' | 'md'; className?: string }) {
+  const s = STATUS_STIJL[status] ?? STATUS_STIJL.gepland;
+  const Icoon = s.icoon;
+  return (
+    <span
+      className={cx(
+        'inline-flex shrink-0 items-center whitespace-nowrap rounded-pill border font-semibold leading-none',
+        size === 'sm' ? 'h-5 gap-1 pl-1.5 pr-2 text-2xs' : 'h-6 gap-1.5 pl-2 pr-2.5 text-xs',
+        s.surface,
+        s.ink,
+        s.border,
+        className,
+      )}
+    >
+      <Icoon className={size === 'sm' ? 'h-3 w-3' : 'h-3.5 w-3.5'} aria-hidden style={{ strokeWidth: 2.4 }} />
+      {s.label}
+    </span>
+  );
+}
+
+/** Kleine statusstip (6px), bv. in een matrixchip. Heeft een title voor schermlezers/tooltip. */
+export function StatusDot({ status, className }: { status: Status; className?: string }) {
+  const s = STATUS_STIJL[status] ?? STATUS_STIJL.gepland;
+  return (
+    <span
+      role="img"
+      aria-label={s.label}
+      title={s.label}
+      className={cx('inline-block h-1.5 w-1.5 shrink-0 rounded-full', s.dot, className)}
+    />
+  );
+}
+
+/** Lijnicoon van een gesprek in de inktkleur van het seizoen. */
+export function GesprekIcoonView({
+  icoon,
+  kleur,
+  className,
+}: {
+  icoon: GesprekIcoon | string;
+  kleur?: GesprekKleur | string;
+  className?: string;
+}) {
+  const Icoon = gesprekIcoon(icoon);
+  return <Icoon aria-hidden className={cx('h-4 w-4', kleur && seizoenKlassen(kleur).ink, className)} />;
+}
+
+export interface SeizoenBadgeProps {
+  /** Het gesprek (naam, kleur, icoon). Gebruik vindGesprek() voor een id. */
+  gesprek: Pick<Gesprek, 'naam' | 'kleur' | 'icoon'>;
+  size?: 'sm' | 'md';
+  showLabel?: boolean;
+  /** Andere tekst dan de naam (bv. "Herfst (standaard)") */
+  label?: ReactNode;
+  className?: string;
+}
+
+/** Gesprek/seizoen: lijnicoon + naam in de seizoenstint. */
+export function SeizoenBadge({ gesprek, size = 'sm', showLabel = true, label, className }: SeizoenBadgeProps) {
+  const k = seizoenKlassen(gesprek.kleur);
+  const Icoon = gesprekIcoon(gesprek.icoon);
+  return (
+    <span
+      title={showLabel ? undefined : gesprek.naam}
+      className={cx(
+        'inline-flex shrink-0 items-center whitespace-nowrap rounded-pill border font-semibold leading-none',
+        size === 'sm' ? 'h-5 gap-1 text-2xs' : 'h-[26px] gap-1.5 text-xs',
+        showLabel ? (size === 'sm' ? 'pl-1.5 pr-2' : 'pl-2 pr-3') : size === 'sm' ? 'px-1' : 'px-1.5',
+        k.surface,
+        k.border,
+        k.ink,
+        className,
+      )}
+    >
+      <Icoon className={size === 'sm' ? 'h-3 w-3' : 'h-3.5 w-3.5'} aria-hidden style={{ strokeWidth: 2 }} />
+      {showLabel && (label ?? gesprek.naam)}
+      {!showLabel && <span className="sr-only">{gesprek.naam}</span>}
+    </span>
+  );
+}
+
+/** Kwaliteitsgebied: kleurvlakje + code op wit (geen getint vak), optioneel met naam. */
+export function KwaliteitsgebiedTag({
+  gebied,
+  showName,
+  size = 'md',
+  className,
+}: {
+  gebied: GebiedCode | string;
+  showName?: boolean;
+  size?: 'sm' | 'md';
+  className?: string;
+}) {
+  const k = gebiedKlassen(gebied);
+  const naam = GEBIEDEN[gebied as GebiedCode]?.naam;
+  return (
+    <span
+      className={cx('inline-flex items-center whitespace-nowrap', size === 'sm' ? 'gap-1' : 'gap-1.5', className)}
+      title={showName ? undefined : naam}
+    >
+      <span aria-hidden className={cx('shrink-0 rounded-xs', k.dot, size === 'sm' ? 'h-2 w-2' : 'h-2.5 w-2.5')} />
+      <span className={cx('font-bold tracking-label', k.ink, size === 'sm' ? 'text-2xs' : 'text-xs')}>{gebied}</span>
+      {showName && naam && (
+        <span className={cx('font-medium text-ink-body', size === 'sm' ? 'text-2xs' : 'text-xs')}>{naam}</span>
+      )}
+    </span>
+  );
+}
+
+/** Ronde stip in de kleur van een gebied (filterchips, legenda's). */
+export function GebiedDot({ gebied, className }: { gebied: GebiedCode | string; className?: string }) {
+  return <span aria-hidden className={cx('inline-block h-2 w-2 shrink-0 rounded-full', gebiedKlassen(gebied).dot, className)} />;
+}
