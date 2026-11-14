@@ -1,52 +1,56 @@
 /**
- * Kaart van één bibliotheekactiviteit (inventaris §1.12, `BS`), aangevuld met periode,
- * frequentie en verantwoordelijke rol (stonden in de data van het origineel, maar werden niet getoond).
+ * Kaart van één bibliotheekactiviteit. In één blik: staat hij al op de kalender (en in welke
+ * maand), is hij verplicht, en ontbreekt hij nog. Periode, frequentie en rol staan klein onderaan.
  */
 import { Link } from 'react-router-dom';
 import { CalendarRange, Check, ChevronRight, Plus, Repeat, UserRound } from 'lucide-react';
-import { Badge, Button, SeizoenBadge, VasteStandaardBadge, VerplichtBadge, cx, gebiedKlassen } from '../../componenten';
-import { STANDAARD_OP_CODE } from '../../domein/seed';
-import type { Activiteit, Gesprek } from '../../domein/types';
+import { Badge, Button, SeizoenBadge, VerplichtBadge, cx } from '../../componenten';
+import type { Activiteit, Gesprek, KalenderItem } from '../../domein/types';
+import { maandVoluit } from '../kalender/hulp';
 
 export interface ActiviteitKaartProps {
   activiteit: Activiteit;
   /** Gesprek bij de standaardkoppeling (naam uit de cyclus) */
   gesprek: Pick<Gesprek, 'naam' | 'kleur' | 'icoon'>;
-  /** Bewerkbaar niveau: uid van het item als de activiteit al op de kalender staat */
-  opKalenderUid?: string | null;
+  /** Bewerkbaar niveau: het item als de activiteit al op de kalender staat */
+  opKalender?: KalenderItem | null;
   /** Clusterniveau: op hoeveel scholen staat hij */
   dekking?: { aantal: number; van: number };
   onToevoegen?: () => void;
+  /** Laat de kaart even oplichten (net toegevoegd) */
+  gemarkeerd?: boolean;
 }
 
-export function ActiviteitKaart({ activiteit: a, gesprek, opKalenderUid, dekking, onToevoegen }: ActiviteitKaartProps) {
-  const k = gebiedKlassen(a.gebied);
-  const std = STANDAARD_OP_CODE[a.standaard];
+export function ActiviteitKaart({ activiteit: a, gesprek, opKalender, dekking, onToevoegen, gemarkeerd }: ActiviteitKaartProps) {
+  const ontbreekt = a.verplicht && onToevoegen && !opKalender;
   return (
     <article
       className={cx(
-        'flex flex-col rounded-lg border bg-surface-card shadow-xs transition-shadow duration-fast hover:shadow-sm',
-        'border-line-subtle',
+        'relative flex flex-col overflow-hidden rounded-lg border shadow-xs transition-[box-shadow,background-color] duration-base hover:shadow-sm',
+        opKalender ? 'border-line-subtle bg-surface-subtle' : 'border-line-subtle bg-surface-card',
+        gemarkeerd && 'bg-brand-yellow-soft',
       )}
       aria-labelledby={`act-${a.id}`}
+      data-activiteit={a.id}
     >
-      <div className="flex flex-1 flex-col gap-2 p-4">
+      {ontbreekt && <span aria-hidden className="absolute inset-y-0 left-0 w-1 bg-status-warning" />}
+      <div className="flex flex-1 flex-col gap-2 px-4 pb-3 pt-3.5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="tnum text-2xs font-semibold tracking-label text-ink-subtle">{a.id}</p>
-            <h3 id={`act-${a.id}`} className="mt-0.5 text-[15px] font-semibold leading-snug text-ink-strong">
+            <h3 id={`act-${a.id}`} className={cx('text-[15px] font-semibold leading-snug', opKalender ? 'text-ink-body' : 'text-ink-strong')}>
               {a.naam}
             </h3>
+            <p className="tnum mt-0.5 text-2xs font-semibold tracking-label text-ink-subtle">{a.id}</p>
           </div>
           <div className="shrink-0">
-            {opKalenderUid ? (
+            {opKalender ? (
               <Link
-                to={`/kalender?item=${encodeURIComponent(opKalenderUid)}`}
+                to={`/kalender?item=${encodeURIComponent(opKalender.uid)}`}
                 className="group inline-flex items-center gap-1 rounded-pill"
                 title="Bekijk op de kalender"
               >
                 <Badge tone="success" icon={Check}>
-                  Op kalender
+                  Op kalender, {maandVoluit(opKalender.maand)}
                 </Badge>
                 <ChevronRight className="h-3.5 w-3.5 text-ink-subtle group-hover:text-ink-strong" aria-hidden />
               </Link>
@@ -69,20 +73,13 @@ export function ActiviteitKaart({ activiteit: a, gesprek, opKalenderUid, dekking
         </div>
         {a.omschrijving && <p className="line-clamp-2 text-sm text-ink-muted">{a.omschrijving}</p>}
         <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-1">
-          <span
-            className="inline-flex h-5 items-center gap-1 rounded-sm border border-line-subtle bg-surface-card px-1.5"
-            title={std ? `${std.code}: ${std.naam}` : a.standaard}
-          >
-            <span aria-hidden className={cx('h-2 w-2 rounded-xs', k.dot)} />
-            <span className={cx('text-2xs font-bold tracking-label', k.ink)}>{a.standaard}</span>
-          </span>
           <SeizoenBadge gesprek={gesprek} />
-          {std?.kern && <VasteStandaardBadge />}
           {a.verplicht && <VerplichtBadge />}
+          {ontbreekt && <span className="text-2xs font-semibold text-status-warning">nog niet gepland</span>}
         </div>
       </div>
-      <dl className="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)_minmax(0,1.3fr)] gap-3 border-t border-line-subtle bg-surface-subtle px-4 py-2 text-2xs">
-        <Meta icon={CalendarRange} label="Periode" waarde={a.periode || 'variabel'} />
+      <dl className="flex flex-wrap gap-x-4 gap-y-1 border-t border-line-subtle px-4 py-2 text-xs text-ink-muted">
+        <Meta icon={CalendarRange} label="Aanbevolen periode" waarde={a.periode || 'variabel'} />
         <Meta icon={Repeat} label="Frequentie" waarde={a.frequentie || 'onbekend'} />
         <Meta icon={UserRound} label="Verantwoordelijke" waarde={a.verantwoordelijke || 'niet vastgelegd'} />
       </dl>
@@ -92,14 +89,12 @@ export function ActiviteitKaart({ activiteit: a, gesprek, opKalenderUid, dekking
 
 function Meta({ icon: Icon, label, waarde }: { icon: typeof Repeat; label: string; waarde: string }) {
   return (
-    <div className="min-w-0">
-      <dt className="flex items-center gap-1 font-semibold uppercase tracking-wide text-ink-subtle">
-        <Icon className="h-3 w-3 shrink-0" aria-hidden />
-        <span className="truncate">{label}</span>
+    <div className="flex min-w-0 items-center gap-1" title={`${label}: ${waarde}`}>
+      <dt className="shrink-0">
+        <Icon className="h-3 w-3 text-ink-subtle" aria-hidden />
+        <span className="sr-only">{label}</span>
       </dt>
-      <dd className="mt-0.5 truncate text-xs font-medium text-ink-body" title={waarde}>
-        {waarde}
-      </dd>
+      <dd className="truncate">{waarde}</dd>
     </div>
   );
 }

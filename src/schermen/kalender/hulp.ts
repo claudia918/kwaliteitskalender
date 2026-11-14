@@ -4,7 +4,7 @@
  */
 import { activiteitVan, effectieveNaam } from '../../domein/hulp';
 import { GEBIEDEN, KALENDERMAAND_INDEX, MAANDEN, MAANDNAMEN_VOLUIT } from '../../domein/seed';
-import type { GebiedCode, Gesprek, KalenderItem, Maand, SchoolId, Standaard, State } from '../../domein/types';
+import type { Activiteit, GebiedCode, Gesprek, KalenderItem, Maand, SchoolId, Standaard, State } from '../../domein/types';
 
 /* ------------------------------------------------------------------ */
 /* Maanden en periodes                                                  */
@@ -212,4 +212,107 @@ export function isBruikbareLink(url: string): boolean {
   if (/^(\\\\|[a-z]:[\\/])/i.test(t)) return true;
   if (/\s/.test(t)) return false;
   return /^(https?:\/\/|file:\/\/)/i.test(t) || /^[\w.-]+\.[a-z]{2,}(\/|$)/i.test(t);
+}
+
+/* ------------------------------------------------------------------ */
+/* Filter "Toon alleen"                                                 */
+/* ------------------------------------------------------------------ */
+
+/** Wat de kalender toont: alles, nog te doen (niet gereed), het komende gesprek of alleen risico. */
+export type KalenderFilter = 'alles' | 'te-doen' | 'gesprek' | 'risico';
+
+export function pastBijFilter(item: KalenderItem, filter: KalenderFilter, gesprekId: string | null): boolean {
+  switch (filter) {
+    case 'te-doen':
+      return item.status !== 'gereed';
+    case 'gesprek':
+      return gesprekId !== null && item.gesprek === gesprekId;
+    case 'risico':
+      return item.status === 'risico';
+    default:
+      return true;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Toevoegen: periodes en suggesties                                    */
+/* ------------------------------------------------------------------ */
+
+const MAAND_OP_INDEX = Object.fromEntries(Object.entries(KALENDERMAAND_INDEX).map(([m, i]) => [i, m])) as Record<number, Maand>;
+
+function naarMaand(tekst: string): Maand | null {
+  const p = tekst.trim().toLowerCase().slice(0, 3);
+  if (p === 'maa') return 'Mrt';
+  return MAANDEN.find((m) => m.toLowerCase() === p) ?? null;
+}
+
+/**
+ * Maanden die een periodetekst beslaat: "sep-okt" → Sep, Okt; "okt-feb" → Okt t/m Feb;
+ * "jul-aug" → Jul, Aug (over de jaargrens); "nov, mrt" → Nov, Mrt; "variabel" → [].
+ */
+export function periodeMaanden(periode: string | undefined): Maand[] {
+  const uit: Maand[] = [];
+  const voeg = (m: Maand) => {
+    if (!uit.includes(m)) uit.push(m);
+  };
+  for (const deel of (periode ?? '').split(/[,;/]/)) {
+    const [van, tot] = deel.split(/[-–]/).map(naarMaand);
+    if (!van) continue;
+    if (!tot) {
+      voeg(van);
+      continue;
+    }
+    let i = KALENDERMAAND_INDEX[van];
+    const eind = KALENDERMAAND_INDEX[tot];
+    for (let n = 0; n < 12; n++) {
+      voeg(MAAND_OP_INDEX[i]);
+      if (i === eind) break;
+      i = (i + 1) % 12;
+    }
+  }
+  return uit;
+}
+
+export interface Suggestie {
+  activiteit: Activiteit;
+  /** Het item als de activiteit al op de kalender staat. */
+  opKalender: KalenderItem | null;
+  /** De aanbevolen periode omvat de gekozen maand. */
+  pastInMaand: boolean;
+}
+
+/**
+ * Activiteiten voor het keuzepaneel "Activiteit toevoegen": gefilterd op standaard en zoektekst,
+ * gesorteerd op wat het meest voor de hand ligt: nog niet op de kalender, past in de maand,
+ * verplicht, dan op naam.
+ */
+export function toevoegSuggesties(
+  bibliotheek: Activiteit[],
+  items: KalenderItem[],
+  f: { zoek?: string; standaard?: string | null; maand?: Maand | null },
+): Suggestie[] {
+  const q = (f.zoek ?? '').trim().toLowerCase();
+  const opId = new Map<string, KalenderItem>();
+  for (const i of items) if (!opId.has(i.activiteitId)) opId.set(i.activiteitId, i);
+  return bibliotheek
+    .filter((a) => !f.standaard || a.standaard === f.standaard)
+    .filter((a) => !q || `${a.id} ${a.naam} ${a.omschrijving} ${a.standaard}`.toLowerCase().includes(q))
+    .map((a) => ({
+      activiteit: a,
+      opKalender: opId.get(a.id) ?? null,
+      pastInMaand: !!f.maand && periodeMaanden(a.periode).includes(f.maand),
+    }))
+    .sort(
+      (x, y) =>
+        Number(!!x.opKalender) - Number(!!y.opKalender) ||
+        Number(y.pastInMaand) - Number(x.pastInMaand) ||
+        Number(y.activiteit.verplicht) - Number(x.activiteit.verplicht) ||
+        x.activiteit.naam.localeCompare(y.activiteit.naam, 'nl'),
+    );
+}
+
+/** Verplichte activiteiten uit de bibliotheek die nog niet op de kalender staan (optioneel voor één gesprek). */
+export function ontbrekendeVerplichte(bibliotheek: Activiteit[], items: KalenderItem[], gesprekId?: string | null): Activiteit[] {
+  const aanwezig = new Set(items.map((i) => i.activiteitId));
+  return bibliotheek.filter((a) => a.verplicht && !aanwezig.has(a.id) && (!gesprekId || a.gesprek === gesprekId));
 }

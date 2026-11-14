@@ -19,6 +19,7 @@ import type {
   GedeeldeGegevens,
   Gesprek,
   ItemWijziging,
+  KalenderItem,
   Maand,
   Niveau,
   School,
@@ -54,6 +55,8 @@ export interface Store {
   addActiviteit: (scope: EditScope, activiteitId: string) => string | null;
   addEigenActiviteit: (scope: EditScope, invoer: EigenActiviteitInvoer) => string;
   removeItem: (scope: EditScope, uid: string) => void;
+  /** Ongedaan maken: zet een eerder bewaarde versie van een item terug (ook na verwijderen). */
+  herstelItem: (scope: EditScope, item: KalenderItem) => void;
   setKoppeling: (scope: EditScope, uid: string, gesprek: string, reden: string) => void;
   setNotitie: (scope: EditScope, uid: string, notitie: string) => void;
   setEigenNaam: (scope: EditScope, uid: string, naam: string) => void;
@@ -216,6 +219,7 @@ export function StoreProvider({ children, initieel, zonderOpslag }: StoreProvide
         return uid;
       },
       removeItem: (scope: EditScope, uid: string) => muteer((s, nu) => m.removeItem(s, scope, uid, nu)),
+      herstelItem: (scope: EditScope, item: KalenderItem) => muteer((s, nu) => m.herstelItem(s, scope, item, nu)),
       setKoppeling: (scope: EditScope, uid: string, gesprek: string, reden: string) =>
         muteer((s, nu) => m.setKoppeling(s, scope, uid, gesprek, reden, nu)),
       setNotitie: (scope: EditScope, uid: string, v: string) => muteer((s, nu) => m.setNotitie(s, scope, uid, v, nu)),

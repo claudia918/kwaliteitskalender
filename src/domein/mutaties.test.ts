@@ -55,6 +55,20 @@ describe('kalenderitems', () => {
     expect(s.verwijderd[`item:s:1:${uid}`]).toBe(2000);
   });
 
+  it('herstelItem draait verplaatsen, status en verwijderen terug', () => {
+    const oud = vind(s0, uid);
+    const verplaatst = m.setItemStatus(m.moveItem(s0, school1, uid, 'Mei', 2000), school1, uid, 'risico', 2100);
+    const terug = m.herstelItem(verplaatst, school1, oud, 3000);
+    expect(vind(terug, uid)).toMatchObject({ maand: oud.maand, status: oud.status, gewijzigd: 3000 });
+    expect(vind(terug, uid).historie).toEqual(oud.historie);
+    expect(m.herstelItem(terug, school1, oud, 4000)).toBe(terug); // al gelijk: niets
+
+    const weg = m.removeItem(s0, school1, uid, 2000);
+    const weer = m.herstelItem(weg, school1, oud, 2500);
+    expect(vind(weer, uid)).toMatchObject({ activiteitId: oud.activiteitId, gewijzigd: 2500 });
+    expect(weer.verwijderd[`item:s:1:${uid}`]).toBeUndefined();
+  });
+
   it('setKoppeling: afwijking met reden, standaardgesprek wist afwijking', () => {
     const s = m.setKoppeling(s0, school1, uid, 'Lente', '  ', 2000);
     expect(vind(s, uid).afwijking).toEqual({ reden: 'Aangepast door school' });

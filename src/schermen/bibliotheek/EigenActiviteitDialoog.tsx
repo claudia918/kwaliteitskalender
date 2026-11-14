@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Button, Dialog, Input, Select, Textarea, Veld, useToast } from '../../componenten';
 import { gesprekOpties, maandUitPeriode } from '../../domein/hulp';
 import { PRIVACY_REGEL } from '../../domein/inhoud';
-import type { EditScope, Standaard } from '../../domein/types';
+import type { EditScope, Maand, Standaard } from '../../domein/types';
 import { useStore } from '../../store';
 import { maandVoluit } from '../kalender/hulp';
 
@@ -13,11 +13,23 @@ export interface EigenActiviteitDialoogProps {
   editScope: EditScope;
   standaarden: Standaard[];
   scopeLabel: string;
-  /** Na toevoegen, met de uid van het nieuwe item */
-  onToegevoegd?: (uid: string) => void;
+  /** Na toevoegen, met de uid en naam van het nieuwe item (anders een toast) */
+  onToegevoegd?: (uid: string, naam: string) => void;
+  /** Vooraf gekozen standaard en maand (toevoegen vanuit een cel of rij in de kalender) */
+  beginStandaard?: string | null;
+  beginMaand?: Maand | null;
 }
 
-export function EigenActiviteitDialoog({ open, onClose, editScope, standaarden, scopeLabel, onToegevoegd }: EigenActiviteitDialoogProps) {
+export function EigenActiviteitDialoog({
+  open,
+  onClose,
+  editScope,
+  standaarden,
+  scopeLabel,
+  onToegevoegd,
+  beginStandaard,
+  beginMaand,
+}: EigenActiviteitDialoogProps) {
   const { state, addEigenActiviteit } = useStore();
   const toast = useToast();
   const opties = gesprekOpties(state.organisatie.gesprekscyclus);
@@ -32,13 +44,13 @@ export function EigenActiviteitDialoog({ open, onClose, editScope, standaarden, 
   useEffect(() => {
     if (!open) return;
     setNaam('');
-    setStandaard(standaarden[0]?.code ?? '');
+    setStandaard(beginStandaard && standaarden.some((x) => x.code === beginStandaard) ? beginStandaard : (standaarden[0]?.code ?? ''));
     setGesprek(opties[0]?.id ?? 'Doorlopend');
-    setPeriode('');
+    setPeriode(beginMaand ? beginMaand.toLowerCase() : '');
     setOmschrijving('');
     setGeprobeerd(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, standaarden]);
+  }, [open, standaarden, beginStandaard, beginMaand]);
 
   const geldig = naam.trim().length > 1 && !!standaard;
   const ingevuld = !!(naam || periode || omschrijving);
@@ -47,8 +59,8 @@ export function EigenActiviteitDialoog({ open, onClose, editScope, standaarden, 
     setGeprobeerd(true);
     if (!geldig) return;
     const uid = addEigenActiviteit(editScope, { naam, standaard, gesprek, periode, omschrijving });
-    toast(`${naam.trim()} toegevoegd aan de kalender`);
-    onToegevoegd?.(uid);
+    if (onToegevoegd) onToegevoegd(uid, naam.trim());
+    else toast(`${naam.trim()} toegevoegd aan de kalender`);
     onClose();
   }
 
