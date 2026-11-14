@@ -127,6 +127,10 @@ export const FAQ: FaqCategorie[] = [
         a: 'Dan blijft de nieuwste wijziging bewaard. Je krijgt een melding welke activiteiten het betrof, zodat je het even kunt nakijken.',
       },
       {
+        v: 'Heb ik internet nodig?',
+        a: 'Nee. De Kwaliteitskalender is één bestand dat je opent in je browser en werkt helemaal zonder internet. Als het gedeelde kalenderbestand in een SharePoint- of OneDrive-map staat, zorgt OneDrive (niet de kalender) dat collega’s de nieuwste versie krijgen.',
+      },
+      {
         v: 'Kan ik op meerdere computers werken?',
         a: 'Ja, als je op elke computer hetzelfde gedeelde kalenderbestand koppelt. Zonder gekoppeld bestand staan je gegevens alleen in de browser waarin je werkt.',
       },
@@ -140,7 +144,10 @@ export const FAQ: FaqCategorie[] = [
         a: 'Door het kalenderbestand in een map te zetten waar zij bij kunnen. Wie het bestand kan openen, kan de kalender bekijken en bewerken. Toegang regel je dus met de rechten op die map in je eigen omgeving.',
       },
       vraag('Voor besturen', 'Wat zijn de "vaste standaarden"?'),
-      vraag('Voor besturen', 'Kan ik de gesprekscyclus aanpassen?'),
+      {
+        v: 'Kan ik de gesprekscyclus aanpassen?',
+        a: 'Ja. Standaard staan er vier seizoensgesprekken, maar bij Organisatie, onderdeel Gesprekscyclus, bepaal je zelf het aantal gesprekken, hun namen, maanden en kleuren. De hele app volgt automatisch.',
+      },
       vraag('Voor besturen', 'Een school heeft een activiteit aan een ander gesprek gekoppeld. Hoe zie ik dat?'),
     ],
   },
@@ -149,7 +156,7 @@ export const FAQ: FaqCategorie[] = [
     vragen: [
       {
         v: 'Hoe werk ik een activiteit bij?',
-        a: 'Klik in de Kalender een activiteit aan (in de matrix: twee keer) en pas in het venster de status, eigenaar, deadline, notitie of bewijsstukken aan. Wijzigingen worden automatisch bewaard; je ziet kort "Opgeslagen" bovenin.',
+        a: 'Klik in de Kalender een activiteit aan (in de matrix: twee keer) en pas in het venster de status, eigenaar, deadline, notitie of bewijsstukken aan. Wat je bewaart, staat meteen in deze browser en, als je een bestand gekoppeld hebt, even later ook in het gedeelde kalenderbestand.',
       },
       vraag('Voor scholen', 'Hoe verplaats ik een activiteit naar een andere maand?'),
       {
@@ -173,6 +180,14 @@ export const FAQ: FaqCategorie[] = [
       {
         v: 'Kan ik een back-up maken?',
         a: 'Ja, via Export en dan Back-up (JSON) download je alle gegevens in één leesbaar bestand. Datzelfde bestand kun je ook weer importeren. Back-ups uit de vorige (online) versie van de Kwaliteitskalender kun je ook importeren.',
+      },
+      {
+        v: 'Wat is het verschil tussen een back-up en het gedeelde kalenderbestand?',
+        a: 'Een back-up is een momentopname voor jezelf: hij verandert niet meer, en importeren vervangt alles wat in de kalender staat. Het gedeelde kalenderbestand is het bestand waarin je met collega’s samenwerkt: het wordt steeds bijgewerkt en wijzigingen worden samengevoegd. Een back-up maak je bij Export, het gedeelde bestand beheer je bij Gegevens & delen.',
+      },
+      {
+        v: 'Wat staat er in het gedeelde kalenderbestand en wie kan het lezen?',
+        a: 'De naam van je bestuur, scholen en clusters, de activiteiten met planning en status, en wat jullie zelf invullen bij eigenaar, notitie, bewijs en afwijking. Er staan geen accounts, e-mailadressen of apparaatnamen in. Iedereen die de map met het bestand kan openen, kan de kalender lezen en wijzigen; dat regel je met de rechten op die map.',
       },
       {
         v: 'Wat als ik mijn browsergegevens wis?',
