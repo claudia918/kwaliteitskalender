@@ -64,7 +64,9 @@ const NEP = `
   await p.goto(URL);
   await p.click('text=Begin met mijn eigen bestuur');
   await p.fill('input[placeholder="bv. Stichting Onderwijs Regio X"]', 'Stichting Test');
+  await p.click('button:has-text("Volgende")');
   await p.fill('input[placeholder="bv. Lyceum Noord"]', 'School A'); await p.click('button:has-text("Toevoegen")');
+  await p.click('button:has-text("Volgende")');
   await p.click('text=Kalender aanmaken');
   await p.waitForSelector('nav[aria-label="Hoofdmenu"]');
   await p.goto(URL + '#/gegevens');
