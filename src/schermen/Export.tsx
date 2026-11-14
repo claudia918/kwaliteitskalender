@@ -17,6 +17,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import {
+  Begrip,
   Button,
   ButtonLink,
   Card,
@@ -218,9 +219,9 @@ export default function Export() {
     <>
       <div className="no-print space-y-6">
         <PageHeader
-          eyebrow="Export"
-          title="Exporteren"
-          subtitle={`${scopeLabel} · schooljaar ${state.schooljaar} · ${aantal(scope.items.length, 'activiteit', 'activiteiten')}`}
+          eyebrow="Voorbereiden"
+          title="Dossier en export"
+          subtitle={`Print het dossier voor een gesprek, zet de kalender in Excel of PDF, of maak een back-up. Nu: ${scopeLabel}, ${aantal(scope.items.length, 'activiteit', 'activiteiten')}.`}
         />
 
         {/* Gespreksdossier */}
@@ -230,12 +231,12 @@ export default function Export() {
             <div className="min-w-0 flex-1">
               <h2 className="text-h3 text-ink-strong">Gespreksdossier</h2>
               <p className="mt-1 max-w-3xl text-sm text-ink-muted">
-                Printbaar voorbereidingsdossier voor één gesprek: vereiste input, activiteiten met status, eigenaar en
-                bewijs, notities, afwijkingen en signalen. A4, klaar voor het gesprek tussen bestuur en school.
+                Een <Begrip term="gespreksdossier" /> op A4 voor één school en één gesprek: activiteiten met status, eigenaar,{' '}
+                <Begrip term="bewijs" />, notities en afwijkingen. Klaar voor het gesprek tussen bestuur en school.
               </p>
               {cyclus.length === 0 ? (
                 <InfoBalk tone="neutral" className="mt-4">
-                  Er is nog geen gesprekscyclus ingesteld. Het bestuur stelt die in bij Organisatie.
+                  Er is nog geen gesprekscyclus ingesteld. Dat doe je bij Organisatie.
                 </InfoBalk>
               ) : (
                 <>
@@ -288,8 +289,7 @@ export default function Export() {
           subtitle={
             <>
               De kalender van <strong className="font-semibold text-ink-strong">{scopeLabel}</strong> (
-              {NIVEAU_LABELS[niveau].toLowerCase()}). Wissel bovenin van niveau of school om een andere kalender te
-              exporteren.
+              {NIVEAU_LABELS[niveau].toLowerCase()}). Voor een andere kalender kies je bovenin wat je bekijkt.
             </>
           }
         >
@@ -354,7 +354,9 @@ export default function Export() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
               <IconTile icon={ArchiveRestore} tone="info" />
               <div className="min-w-0 flex-1">
-                <h2 className="text-h3 text-ink-strong">Back-up (JSON)</h2>
+                <h2 className="text-h3 text-ink-strong">
+                  <Begrip term="back-up">Back-up</Begrip> (JSON)
+                </h2>
                 <p className="mt-1 text-sm text-ink-muted">
                   Een kopie van al je gegevens in één leesbaar bestand: het bestuur, alle scholen en clusters, alle
                   kalenders en de gesprekscyclus. Handig als reservekopie of om je gegevens mee te nemen (AVG).

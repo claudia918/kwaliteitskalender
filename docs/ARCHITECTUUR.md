@@ -10,7 +10,8 @@ inventaris; vormgeving uit het design system; alle code-afspraken staan hier.
 main.tsx → schil/App.tsx
   Foutgrens → StoreProvider → ToastProvider → BevestigProvider → SyncProvider → HashRouter → Poort
   Poort: setupVoltooid === false → Opstart (schermen/Welkom.tsx of schermen/Wizard.tsx)
-         anders → Layout (Topbar, Sidebar/Lade, Scopebalk, <Outlet/>, Footer, ConflictDialoog)
+         anders → Layout (ZoekProvider, Topbar met WeergaveKiezer en ZoekKnop, Sidebar/Lade, <Outlet/>,
+                  Footer, ConflictDialoog)
 ```
 
 | Laag | Map | Afhankelijk van |
@@ -28,15 +29,16 @@ Importeer vanuit schermen bij voorkeur via de barrels: `../componenten`, `../sto
 
 | Pad | Bestand | Opmerking |
 |---|---|---|
-| `/` | bestuur: `schermen/Start.tsx`, anders `schermen/Dashboard.tsx` | keuze in `schil/App.tsx` |
-| `/dashboard` | `schermen/Dashboard.tsx` | |
+| `/` | `schermen/Start.tsx` (+ `schermen/start/`) | één startscherm voor alle niveaus (was Start + Dashboard) |
+| `/dashboard` | doorverwijzing naar `/` | oude links blijven werken |
 | `/gesprekken` | `schermen/Gesprekken.tsx` | |
 | `/bibliotheek` | `schermen/Bibliotheek.tsx` | |
 | `/kalender` | `schermen/Kalender.tsx` | matrix, lijst, detailvenster |
 | `/compliance` | `schermen/Compliance.tsx` | |
 | `/export` | `schermen/Export.tsx` | gespreksdossier, Excel, print, back-up |
-| `/organisatie` | `schermen/Organisatie.tsx` | alleen niveau bestuur, anders melding "Alleen voor het bestuur" |
-| `/faq` | `schermen/Faq.tsx` | teksten: `FAQ` uit `domein/inhoud.ts` |
+| `/organisatie` | `schermen/Organisatie.tsx` | op elk niveau; de instellingen gelden voor het hele bestuur |
+| `/begrippen` | `schermen/Begrippen.tsx` | `BEGRIPPEN` uit `domein/begrippen.ts`; `?begrip=<sleutel>` springt ernaartoe |
+| `/faq` | `schermen/Faq.tsx` | teksten: `FAQ` uit `domein/inhoud.ts`; `?zoek=` vult het zoekveld |
 | `/contact` | `schermen/Contact.tsx` | alleen contactgegevens (`CONTACT`), mailto/tel; geen formulier |
 | `/gegevens` | `schil/GegevensDelen.tsx` | af (fundament) |
 | `/stijlgids` | `schil/Stijlgids.tsx` | alle componenten; niet in het menu |
@@ -49,7 +51,7 @@ Importeer vanuit schermen bij voorkeur via de barrels: `../componenten`, `../sto
   `src/schermen/<scherm>/...` (bv. `src/schermen/kalender/DetailVenster.tsx`). Wijzig geen bestanden van
   andere schermen. Iets dat meerdere schermen nodig hebben: voeg het toe aan `src/componenten` of
   `src/domein` zonder bestaande signaturen te breken, en documenteer het hier.
-- Opbouw: `<div className="space-y-6">` met eerst `<PageHeader eyebrow="Dashboard" title={scopeLabel} subtitle=... actions=... />`.
+- Opbouw: `<div className="space-y-6">` met eerst `<PageHeader eyebrow="<menugroep>" title="<menulabel>" subtitle="<één regel: wat je hier doet>" actions=... />`. Zet vaktermen in de subtitel met `<Begrip>`.
   De schil levert de paginabreedte (max 1440px) en padding; voeg zelf geen buitenmarge toe.
 - Grids: `grid gap-4 lg:grid-cols-3`, KPI-rij `grid grid-cols-2 gap-4 lg:grid-cols-4`. Kaarten met `Card`.
 - Data: `useStore()` voor state en acties, `useScope()` voor de scope van het niveau, berekeningen uit
@@ -89,7 +91,9 @@ Gelijk aan inventaris §2.1 (versie 4), met deze verschillen:
 - Niet in de state: gekozen niveau/school/cluster (in `localStorage['kwaliteitskalender:ui:v1']`).
 
 localStorage-sleutels: `kwaliteitskalender:state:v5` (state), `kwaliteitskalender:ui:v1`,
-`kwaliteitskalender:sync:v1` (syncmeta). IndexedDB `kwaliteitskalender` / `koppeling` (bestandshandle).
+`kwaliteitskalender:sync:v1` (syncmeta), `kwaliteitskalender:voorkeur:v1` (voorkeuren per browser:
+ingeklapt overzicht, tabblad van de werklijst) en `kwaliteitskalender:bezoek:v1` (laatst actief, voor
+"Sinds je vorige bezoek"). Voorkeuren gaan nooit naar het gedeelde bestand. IndexedDB `kwaliteitskalender` / `koppeling` (bestandshandle).
 
 ## 4. Store-API (`useStore()` uit `src/store`)
 
@@ -141,7 +145,7 @@ Alle acties werken direct (autosave, tijdstempels, tombstones). `EditScope = { k
 **Setup, onboarding, demo**
 | Actie | Gedrag |
 |---|---|
-| `voltooiWizard({ bestuurNaam, schooljaar, scholen: [{naam, type?}], sjabloon })` | alles in één keer, niveau bestuur |
+| `voltooiWizard({ bestuurNaam, schooljaar, scholen: [{naam, type?}], sjabloon })` | alles in één keer; niveau bestuur, of school bij precies één school |
 | `completeSetup()` | setup voltooid, modus eigen, niveau bestuur |
 | `pasSjabloonToe()` | 19 verplichte schoolactiviteiten per school + 30 bestuursactiviteiten, zonder dubbele |
 | `verbergOnboarding()` | |
@@ -158,6 +162,8 @@ Pure varianten van alle acties: `mutaties.*` in `src/domein/mutaties.ts` (met `n
 - `useScope(): { niveau, scope: { items, isBestuur, standaarden }, editScope, editable, isBestuur, library, scopeLabel }`
   (zoals `vr()` in het origineel; `library` = 30 bestuurs- of 67 schoolactiviteiten).
 - `useKomendGesprek(): KomendGesprek | null` (`{ gesprek, datum, dagenTot, verstreken }`).
+- `useVoorkeur(sleutel, standaard)` (`src/store/voorkeuren.ts`): `[waarde, zet]`, per browser in localStorage.
+- `useBezoek(): { vorig, begin }`: einde van het vorige bezoek (of null) en begin van dit bezoek.
 
 **Pure functies** (`src/domein/berekeningen.ts`, `hulp.ts`)
 | Functie | Uitleg |
@@ -184,6 +190,15 @@ Pure varianten van alle acties: `mutaties.*` in `src/domein/mutaties.ts` (met `n
 | `vindGesprek(cyclus, id)`, `gesprekOpties(cyclus)` (cyclus + Doorlopend), `gesorteerdeCyclus()` | |
 | `maandUitPeriode()`, `gebiedUitStandaard()`, `bibliotheek(isBestuur)`, `standaardenVoor(isBestuur)` | |
 | `vandaagISO()`, `formatDatumLang(d)` ("1 februari 2027"), `formatDatumKort(iso)` ("1-2-2027"), `formatTijdstip(ms)`, `slug()`, `aantal(n, 'activiteit', 'activiteiten')` | |
+
+**Startscherm** (`src/domein/thuis.ts`): `volgendeStap(invoer)` geeft de belangrijkste stap
+(`scholen-toevoegen`, `kalender-leeg`, `verstreken`, `risico`, `vaste-standaard`, `school-vaste-standaard`,
+`gesprek-leeg`, `gesprek-open`, `gesprek-klaar`, `geen-cyclus`), `stapTekst(stap, bewerkbaar)` de zin en
+knoptekst. Verder `maandVan(d)`, `maandVoluit(m)`, `werklijstVolgorde`, `itemsInMaand`, `eersteOpenItem`,
+`gewijzigdSinds(items, vorig, begin)`, `lijstTekst`.
+**Zoeken** (`src/domein/zoeken.ts`): `normaliseer`, `zoekScore(vraag, hoofd, rest)`, `zoekIn(lijst, vraag, velden, max)`.
+**Begrippen** (`src/domein/begrippen.ts`): `BEGRIPPEN` (sleutel → `{ term, uitleg, ookGenoemd?, pad? }`),
+`BEGRIPPEN_LIJST`, `begrip(sleutel)`. Nieuwe vaktermen hier toevoegen; component en zoekvenster volgen.
 
 **Seed** (`src/domein/seed.ts`): `ACTIVITEITEN_SCHOOL`, `ACTIVITEITEN_BESTUUR`, `ACTIVITEIT_OP_ID`,
 `STANDAARDEN(_SCHOOL|_BESTUUR)`, `STANDAARD_OP_CODE`, `VASTE_STANDAARDEN`, `GEBIEDEN`, `GEBIED_CODES`,
@@ -274,7 +289,8 @@ Voor dynamische kleuren altijd de tabellen in `stijlen.ts` gebruiken (Tailwind z
 | `Checkbox` | `checked`, `onChange(bool)`, `label`, `beschrijving` |
 | `FilterChip` | `active`, `onClick`, `dotClassName` (bv. `gebiedKlassen('OP').dot`), `icon`, `count` |
 | `SegmentedControl` | `value`, `onChange`, `options: { value, label, icon?, compact? }[]`, `accent: 'niveau' \| 'neutraal'` |
-| `NiveauSwitcher` | `value`, `onChange`, `toonCluster` |
+| `NiveauSwitcher` | `value`, `onChange`, `toonCluster` (niet meer in de schil; zie WeergaveKiezer) |
+| `Begrip` | `term: BegripSleutel`, `children?` (eigen tekst). Stippellijn; uitleg bij hover, focus en tik; Esc sluit. Het is een knop: niet binnen een link of knop zetten |
 | `Dialog` | `open`, `onClose`, `title`, `subtitle`, `footer`, `width: sm\|md\|lg\|xl`, `blokkeerAchtergrond` (Esc, focus-trap, focus terug) |
 | `useBevestig()` | `await bevestig({ titel, tekst, bevestigLabel, annuleerLabel, gevaarlijk }) → boolean` |
 | `useToast()` | `toast(tekst, 'success' \| 'info' \| 'danger' \| 'warning', duurMs?)`; max 3, 2400 ms |
@@ -286,7 +302,7 @@ Voorbeelden van alles: `src/schil/Stijlgids.tsx` (`#/stijlgids`).
 
 ### Keuzes waar het design system het origineel verving
 - Niveaukleur school is staalblauw `#34607A` (was magenta). Bestuur wijnrood, cluster pruim.
-- Niveaukleur zit alleen in de schil (topbar-streep, wisselaar, menu, scopebalk, filterchips, balken);
+- Niveaukleur zit alleen in de schil (topbar-streep, weergaveknop, menu, filterchips, balken);
   data-kleuren (gebied, seizoen, status) veranderen niet mee.
 - Kwaliteitsgebied = kleurvlak + code op wit (geen getinte vakken); matrixchips zijn wit met haarlijn.
 - "Verplicht" is oranje met stip (was rood); "Vaste standaard" geel met sleutel.
@@ -294,10 +310,34 @@ Voorbeelden van alles: `src/schil/Stijlgids.tsx` (`#/stijlgids`).
 - Logo: LV-monogram (geel in zwarte tegel); footer het volledige Leren verbeteren-logo.
 - Niveau-icoon cluster is `Layers` (was `Users`).
 
+## 7a. Navigatie (schil)
+
+- **Wat bekijk ik** (`schil/WeergaveKiezer.tsx`): één knop in de topbar met de niveaukleur, die een lijst
+  opent met "Hele bestuur", de clusters en de scholen (zoekveld vanaf 8 keuzes, pijltjes, Enter, Esc).
+  Vervangt de niveauwisselaar en de scopebalk. `useWeergave()` geeft `{ opties, huidigeSleutel, kies, huidig, eenSchool }`.
+  Bij één school zonder clusters heten de keuzes "Je school" en "Bestuur".
+- **Menu** (`schil/navigatie.ts`): `MENU` in groepen (overzicht, Plannen, Voorbereiden, Controleren, Beheer,
+  Hulp), elk item met `beschrijving` en `zoekwoorden` (ook oude namen, zoals "compliance" en "dashboard").
+- **Zoekvenster** (`schil/Zoekvenster.tsx`): `ZoekProvider` (in Layout) met Ctrl/Cmd+K en `/`; `useZoeken().open()`.
+  Vindt activiteiten op alle kalenders (wat je bekijkt eerst), bibliotheekactiviteiten, scholen en clusters,
+  schermen, begrippen en veelgestelde vragen. Kiezen zet zo nodig de weergave en navigeert:
+  kalenderitem → `/kalender?item=<uid>`; bibliotheek → `/kalender?item=<uid>` als hij al op de kalender
+  staat, anders `/bibliotheek?zoek=<naam>`.
+- **Start** (`schermen/Start.tsx`, `schermen/start/Werklijst.tsx`, `schermen/start/Overzicht.tsx`):
+  volgende stap (één zin, één knop) naast het komende gesprek; "Aan de slag" (eigen kalender, verbergbaar);
+  werklijst "Deze maand" / "Voor <gesprek>" met statusknoppen Bezig en Gereed (nog eens klikken = gepland);
+  "Hoe staat het ervoor" (inklapbaar, onthouden per browser); "Sinds je vorige bezoek" alleen met een gekoppeld bestand.
+- **`data-rondleiding`** (voor de rondleiding): `weergave`, `zoeken`, `volgende-stap`, `deze-maand`,
+  `aan-de-slag`, `sinds-vorig-bezoek`, `menu-overzicht`, `menu-plannen`, `menu-voorbereiden`,
+  `menu-controleren`, `menu-beheer`, `menu-hulp`.
+
 ## 8. Tests
-- `npm test`: domein (berekeningen, migratie, mutaties, samenvoegen; 82 tests).
+- `npm test`: domein (berekeningen, migratie, mutaties, samenvoegen, startscherm, zoeken, begrippen).
 - `npm run test:e2e` (na `npm run build`): opent `dist/kwaliteitskalender.html` via `file://` in headless
   Chromium; controleert routes, niveaukleur, herladen, netwerkstilte, console, CSP, handmatige
   bestandsflow en de automatische sync met een nagebootste File System Access API.
+  `scripts/e2e-navigatie.mjs` test weergavekeuze, menu-groepen, zoekvenster en begrippen met het toetsenbord.
+  Wisselen van weergave in een test: klik `[data-rondleiding="weergave"]` en dan
+  `[role=listbox] [role=option]:has-text("<naam>")`, of zet `kwaliteitskalender:ui:v1` en herlaad.
   Pas de e2e-scripts aan als je schermen echte koppen (h1) geven die anders heten; ze controleren nu
   alleen dat er een h1 is.

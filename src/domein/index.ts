@@ -8,3 +8,6 @@ export * from './sleutels';
 export * as mutaties from './mutaties';
 export * from './samenvoegen';
 export * from './inhoud';
+export * from './begrippen';
+export * from './thuis';
+export * from './zoeken';

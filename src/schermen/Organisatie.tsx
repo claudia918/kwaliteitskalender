@@ -1,12 +1,11 @@
 /**
- * Organisatie (inventaris §1.16, alleen niveau bestuur): bestuur, clusters, scholen, gesprekscyclus,
+ * Organisatie (inventaris §1.16, op elk niveau; de instellingen gelden voor het hele bestuur): bestuur, clusters, scholen, gesprekscyclus,
  * startsjabloon en gegevens, met een ingang naar "Gegevens & delen". "Toegang & leden" en de
  * gevarenzone uit de cloudversie vervallen.
  */
 import { useState } from 'react';
 import {
   ArrowRight,
-  Building2,
   Database,
   Eraser,
   FileJson,
@@ -19,10 +18,10 @@ import {
 } from 'lucide-react';
 import {
   Badge,
+  Begrip,
   Button,
   ButtonLink,
   Card,
-  EmptyState,
   IconButton,
   IconTile,
   Input,
@@ -42,33 +41,19 @@ import { BewerkVeld } from './organisatie/BewerkVeld';
 import { Gesprekscyclus } from './organisatie/Gesprekscyclus';
 
 export default function Organisatie() {
-  const { niveau, setNiveau } = useStore();
-
-  if (niveau !== 'bestuur') {
-    return (
-      <div className="space-y-6">
-        <PageHeader eyebrow="Organisatie" title="Beheer" />
-        <EmptyState
-          icon={Building2}
-          title="Alleen voor het bestuur"
-          body="Organisatiebeheer (scholen, clusters, schooljaar) gebeurt op bestuursniveau. Wissel bovenin naar Bestuur of gebruik de knop hieronder."
-          action={
-            <Button variant="niveau" icon={Building2} onClick={() => setNiveau('bestuur')}>
-              Naar bestuursniveau
-            </Button>
-          }
-          watermark
-        />
-      </div>
-    );
-  }
+  const { niveau } = useStore();
 
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Organisatie"
-        title="Beheer"
-        subtitle="Bestuur, scholen, clusters en startpunt."
+        eyebrow="Beheer"
+        title="Organisatie"
+        subtitle={
+          <>
+            Leg vast wie erbij hoort en wanneer de <Begrip term="seizoensgesprek">gesprekken</Begrip> zijn.
+            {niveau !== 'bestuur' && ' Deze instellingen gelden voor het hele bestuur.'}
+          </>
+        }
         actions={
           <ButtonLink to="/gegevens" icon={Share2}>
             Gegevens & delen
@@ -154,7 +139,11 @@ function ClustersKaart() {
     <Card
       id="clusters"
       title="Clusters"
-      subtitle="Optioneel. Zonder clusters verdwijnt het clusterniveau vanzelf."
+      subtitle={
+        <>
+          Optioneel: groepeer scholen, bijvoorbeeld per regio. Zonder <Begrip term="cluster">clusters</Begrip> zie je die keuze niet.
+        </>
+      }
       action={<Badge size="sm">{aantal(clusters.length, 'cluster', 'clusters')}</Badge>}
     >
       <form
@@ -366,7 +355,14 @@ function SjabloonKaart() {
   const toast = useToast();
   const n = VERPLICHTE_SCHOOLACTIVITEITEN.length;
   return (
-    <Card title="Startsjabloon" subtitle="Vul alle schoolkalenders met de aanbevolen activiteiten">
+    <Card
+      title="Aanbevolen activiteiten"
+      subtitle={
+        <>
+          Vul alle kalenders met het <Begrip term="startsjabloon" />
+        </>
+      }
+    >
       <p className="text-sm text-ink-body">
         Plaatst {n} aanbevolen activiteiten op elke school en de bestuursactiviteiten op de bestuurskalender, zonder bestaande te
         overschrijven.
@@ -402,7 +398,7 @@ function GegevensKaart() {
   const koppelZin =
     sync.status === 'gekoppeld' ? ' De koppeling met het gedeelde kalenderbestand wordt verbroken; het bestand zelf blijft ongewijzigd.' : '';
   return (
-    <Card title="Gegevens" subtitle="Demo verkennen of opnieuw beginnen">
+    <Card title="Demo of opnieuw beginnen" subtitle="Voorbeeldgegevens laden of alles leegmaken">
       <p className="text-xs text-ink-muted">Tip: maak eerst een back-up via Export als je je huidige kalender wilt bewaren.</p>
       <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
         <Button

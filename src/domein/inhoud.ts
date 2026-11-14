@@ -34,27 +34,39 @@ export const HELPTEKSTEN: Record<string, { titel: string; tekst: string }> = {
   '/': {
     titel: 'Start',
     tekst:
-      'Voor het bestuur: de startpagina met de Aan-de-slag-stappen en snelkoppelingen. Voor school en cluster: het dashboard. Wissel bovenin van niveau.',
+      'Bovenaan staat de volgende stap: wat nu het belangrijkst is, met één knop om het te doen. Daaronder zie je wat er deze maand of voor het komende gesprek op de kalender staat; zet een activiteit met één klik op bezig of gereed. Onder "Hoe staat het ervoor" vind je de cijfers, de aandachtspunten en (voor bestuur en cluster) de stand per school. Wat je bekijkt, kies je bovenin.',
   },
-  '/dashboard': {
-    titel: 'Dashboard',
+  '/gesprekken': {
+    titel: 'Seizoensgesprekken',
     tekst:
-      'Het dashboard toont het komende seizoensgesprek, de voortgang en de aandachtspunten voor het gekozen niveau. Op bestuursniveau zie je ook de heatmap van alle scholen.',
+      'Per seizoensgesprek zie je wat er klaar moet zijn: de vereiste input, de standaarden en de activiteiten met hun status. Bekijk je het bestuur of een cluster, dan zie je ook de stand per school.',
   },
-  '/gesprekken': { ...SEED.helpteksten_per_scherm['/gesprekken'] },
   '/bibliotheek': { ...SEED.helpteksten_per_scherm['/bibliotheek'] },
   '/kalender': { ...SEED.helpteksten_per_scherm['/kalender'] },
-  '/compliance': { ...SEED.helpteksten_per_scherm['/compliance'] },
-  '/export': {
-    titel: 'Export',
+  '/compliance': {
+    titel: 'Dekking standaarden',
     tekst:
-      'Maak een gespreksdossier, exporteer de huidige kalender naar Excel of print naar PDF (A3 liggend). De export volgt het gekozen niveau. Hier maak je ook een back-up.',
+      'Zie per standaard of er een activiteit op de kalender staat, en of de vijf vaste standaarden zijn afgedekt. Onderaan staan de activiteiten die een school bij een ander gesprek heeft gezet dan het sjabloon voorstelt.',
   },
-  '/organisatie': { ...SEED.helpteksten_per_scherm['/organisatie'] },
+  '/export': {
+    titel: 'Dossier en export',
+    tekst:
+      'Maak een gespreksdossier om een gesprek voor te bereiden, exporteer de kalender naar Excel of print naar PDF (A3 liggend). De export volgt wat je bovenin bekijkt. Hier maak je ook een back-up.',
+  },
+  '/organisatie': {
+    titel: 'Organisatie',
+    tekst:
+      'Leg je bestuur, scholen en clusters vast, kies het schooljaar en stel de gesprekscyclus in. Deze instellingen gelden voor de hele organisatie. Met de aanbevolen activiteiten vul je alle kalenders in één keer.',
+  },
   '/gegevens': {
     titel: 'Gegevens & delen',
     tekst:
       'Hier zie je waar je gegevens staan en koppel je een gedeeld kalenderbestand, zodat collega’s in je organisatie in dezelfde kalender werken. Er gaat niets via internet.',
+  },
+  '/begrippen': {
+    titel: 'Begrippen',
+    tekst:
+      'De vaktermen uit de kalender in gewone taal. In de app herken je een begrip aan de stippellijn: wijs het aan of tik erop voor de uitleg.',
   },
   '/faq': {
     titel: 'Veelgestelde vragen',
@@ -201,7 +213,11 @@ export const FAQ: FaqCategorie[] = [
 /* Bouwstenen voor schermen                                             */
 /* ------------------------------------------------------------------ */
 
-/** Startpagina-tegels (bestuur), zonder verwijzing naar "toegang & leden". */
+/**
+ * Startpagina-tegels van de oude bestuursstart, zonder verwijzing naar "toegang & leden".
+ * Niet meer in gebruik op Start (het menu en het zoekvenster nemen die rol over); bewaard voor de
+ * inventaris.
+ */
 export const BESTUUR_START_TEGELS = SEED.bestuur_start_tegels.map((t) =>
   t.to === '/organisatie' ? { ...t, tekst: 'Scholen, clusters, gesprekscyclus en schooljaar.' } : { ...t },
 );

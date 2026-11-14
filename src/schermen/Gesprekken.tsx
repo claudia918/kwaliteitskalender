@@ -7,6 +7,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, CircleMinus, MessagesSquare } from 'lucide-react';
 import {
+  Begrip,
   ButtonLink,
   Card,
   EmptyState,
@@ -90,7 +91,9 @@ function GesprekInfo({ gesprek, toonBestuursinput, schooljaar }: { gesprek: Gesp
           <Lijstje titel="Output" items={inhoud.output} />
           {inhoud.standaarden.length > 0 && (
             <div>
-              <p className="eyebrow">Standaarden</p>
+              <p className="eyebrow">
+                <Begrip term="standaard">Standaarden</Begrip>
+              </p>
               <div className="mt-1.5 flex flex-wrap gap-1.5">
                 {inhoud.standaarden.map((code) => {
                   const s = STANDAARD_OP_CODE[code];
@@ -111,7 +114,9 @@ function GesprekInfo({ gesprek, toonBestuursinput, schooljaar }: { gesprek: Gesp
                 })}
               </div>
               {inhoud.standaarden.some((c) => STANDAARD_OP_CODE[c]?.kern) && (
-                <p className="mt-1.5 text-2xs text-ink-subtle">Geel = vaste standaard</p>
+                <p className="mt-1.5 text-2xs text-ink-subtle">
+                  Geel = <Begrip term="vaste-standaard" />
+                </p>
               )}
             </div>
           )}
@@ -144,7 +149,7 @@ function Voorbereiding({ titel, items, gesprekId }: { titel: string; items: Kale
           compact
           icon={MessagesSquare}
           title="Geen gekoppelde activiteiten"
-          body="Koppel activiteiten aan dit gesprek via de bibliotheek of kalender."
+          body="Kies in de bibliotheek wat je voor dit gesprek wilt laten zien, of verplaats een activiteit in de kalender."
           action={
             <ButtonLink to="/bibliotheek" size="sm" variant="secondary">
               Naar de bibliotheek
@@ -211,7 +216,7 @@ function StatusPerSchool({ gesprek, schoolIds }: { gesprek: Gesprek; schoolIds: 
       <h2 className="text-h3 text-ink-strong">Status per school</h2>
       <p className="mt-0.5 text-sm text-ink-muted">
         {standaarden.length > 0
-          ? 'Per standaard van dit gesprek: hoe ver de gekoppelde activiteiten zijn.'
+          ? 'Per standaard van dit gesprek: hoe ver de activiteiten van elke school zijn.'
           : 'Voortgang van de activiteiten die aan dit gesprek gekoppeld zijn.'}
       </p>
       {schoolIds.length === 0 ? (
@@ -294,22 +299,16 @@ export default function Gesprekken() {
   if (!gesprek) {
     return (
       <div className="space-y-6">
-        <PageHeader eyebrow="Gesprekken" title="Gesprekscyclus" subtitle={scopeLabel} />
+        <PageHeader eyebrow="Voorbereiden" title="Seizoensgesprekken" subtitle={scopeLabel} />
         <EmptyState
           watermark
           icon={MessagesSquare}
           title="Geen gesprekken ingesteld"
-          body={
-            niveau === 'bestuur'
-              ? 'Stel je gesprekscyclus in om hier de voorbereiding per gesprek te zien.'
-              : 'Het bestuur stelt de gesprekscyclus in bij Organisatie. Daarna zie je hier de voorbereiding per gesprek.'
-          }
+          body="Leg vast wanneer de gesprekken tussen bestuur en school zijn. Daarna zie je hier per gesprek wat er klaar moet zijn."
           action={
-            niveau === 'bestuur' ? (
-              <ButtonLink to="/organisatie" variant="primary" size="sm">
-                Naar Organisatie
-              </ButtonLink>
-            ) : undefined
+            <ButtonLink to="/organisatie" variant="primary" size="sm">
+              Gesprekken instellen
+            </ButtonLink>
           }
         />
       </div>
@@ -322,12 +321,13 @@ export default function Gesprekken() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Gesprekken"
-        title="Gesprekscyclus"
+        eyebrow="Voorbereiden"
+        title="Seizoensgesprekken"
         subtitle={
-          komend
-            ? `${scopeLabel} · eerstvolgend: ${komend.gesprek.naam}${komend.verstreken ? '' : `, over ${aantal(komend.dagenTot, 'dag', 'dagen')}`}`
-            : scopeLabel
+          <>
+            Per <Begrip term="seizoensgesprek">gesprek</Begrip>: wat er klaar moet zijn en hoe ver {scopeLabel} is.
+            {komend && !komend.verstreken && ` Eerstvolgend: ${komend.gesprek.naam}, over ${aantal(komend.dagenTot, 'dag', 'dagen')}.`}
+          </>
         }
       />
 

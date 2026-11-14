@@ -7,6 +7,12 @@ const URL = "file://" + HTML;
 const SHOTS = require('path').resolve(__dirname, '../../test-resultaten');
 const resultaten = [];
 const ok = (naam, voorwaarde, extra = '') => { resultaten.push(`${voorwaarde ? 'OK  ' : 'FOUT'} ${naam}${extra ? ' :: ' + extra : ''}`); };
+// Wat je bekijkt kies je met de weergaveknop in de topbar (vervangt niveauwisselaar en scopebalk).
+async function kies(page, naam) {
+  await page.click('[data-rondleiding="weergave"]');
+  await page.click(`[role=listbox] [role=option]:has-text("${naam}")`);
+  await page.waitForTimeout(100);
+}
 
 (async () => {
   const browser = await chromium.launch();
@@ -23,12 +29,12 @@ const ok = (naam, voorwaarde, extra = '') => { resultaten.push(`${voorwaarde ? '
   await page.screenshot({ path: `${SHOTS}/01-welkom.png` });
   await page.click('text=Verken eerst de demo');
   await page.waitForSelector('nav[aria-label="Hoofdmenu"]');
-  ok('demo geladen', (await page.textContent('header')).includes('Demo-data'));
+  ok('demo geladen', (await page.textContent('header')).includes('Demo'));
   await page.screenshot({ path: `${SHOTS}/02-demo-school.png` });
 
-  const routes = ['/', '/dashboard', '/gesprekken', '/bibliotheek', '/kalender', '/compliance', '/export', '/organisatie', '/gegevens', '/faq', '/contact'];
+  const routes = ['/', '/dashboard', '/gesprekken', '/bibliotheek', '/kalender', '/compliance', '/export', '/organisatie', '/gegevens', '/begrippen', '/faq', '/contact'];
   for (const niveau of ['school', 'bestuur']) {
-    if (niveau === 'bestuur') await page.click('[role=tablist][aria-label=Niveau] >> text=Bestuur');
+    if (niveau === 'bestuur') await kies(page, 'Hele bestuur');
     for (const r of routes) {
       await page.goto(URL + '#' + r);
       await page.waitForSelector('main h1');
@@ -38,24 +44,25 @@ const ok = (naam, voorwaarde, extra = '') => { resultaten.push(`${voorwaarde ? '
   }
   // niveaukleuren
   const kleuren = {};
-  for (const n of ['Bestuur', 'Cluster', 'School']) {
-    await page.click(`[role=tablist][aria-label=Niveau] >> text=${n}`);
+  for (const [n, optie] of [['Bestuur', 'Hele bestuur'], ['Cluster', 'Cluster Noord'], ['School', 'Lyceum Noord']]) {
+    await kies(page, optie);
     await page.waitForTimeout(100);
     kleuren[n] = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--niveau').trim() + ' / ' + document.documentElement.dataset.niveau);
     await page.goto(URL + '#/');
     await page.screenshot({ path: `${SHOTS}/03-niveau-${n.toLowerCase()}.png` });
   }
   ok('niveauwissel verandert accentkleur', new Set(Object.values(kleuren)).size === 3, JSON.stringify(kleuren));
-  // scopebalk cluster toont naam
-  await page.click('[role=tablist][aria-label=Niveau] >> text=School');
-  const scope = await page.textContent('main');
-  ok('scopebalk toont clusternaam', scope.includes('havo/vwo · Cluster Noord'));
+  // weergavekeuze toont type en clusternaam van een school
+  await page.click('[data-rondleiding="weergave"]');
+  const scope = await page.textContent('[role=listbox]');
+  ok('weergavekeuze toont clusternaam', scope.includes('havo/vwo · Cluster Noord'));
+  await page.keyboard.press('Escape');
 
   // herladen behoudt gegevens en niveau
   await page.goto(URL + '#/gegevens');
   await page.reload();
   await page.waitForSelector('nav[aria-label="Hoofdmenu"]');
-  ok('herladen behoudt demo', (await page.textContent('header')).includes('Demo-data'));
+  ok('herladen behoudt demo', (await page.textContent('header')).includes('Demo'));
   await page.screenshot({ path: `${SHOTS}/04-gegevens.png`, fullPage: true });
 
   // help

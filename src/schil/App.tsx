@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { BevestigProvider, ToastProvider } from '../componenten';
 import Bibliotheek from '../schermen/Bibliotheek';
+import Begrippen from '../schermen/Begrippen';
 import Compliance from '../schermen/Compliance';
 import Contact from '../schermen/Contact';
-import Dashboard from '../schermen/Dashboard';
 import Export from '../schermen/Export';
 import Faq from '../schermen/Faq';
 import Gesprekken from '../schermen/Gesprekken';
@@ -20,12 +20,6 @@ import { Foutgrens } from './Foutgrens';
 import GegevensDelen from './GegevensDelen';
 import { Layout } from './Layout';
 import Stijlgids from './Stijlgids';
-
-/** "/" : bestuur → Start, anders Dashboard. */
-function Index() {
-  const { niveau } = useStore();
-  return niveau === 'bestuur' ? <Start /> : <Dashboard />;
-}
 
 /** Zolang de setup niet voltooid is: welkom of wizard (buiten de router-layout). */
 function Opstart() {
@@ -44,8 +38,9 @@ function Poort() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<Index />} />
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route index element={<Start />} />
+        {/* Start en Dashboard zijn samengevoegd; oude links blijven werken. */}
+        <Route path="dashboard" element={<Navigate to="/" replace />} />
         <Route path="gesprekken" element={<Gesprekken />} />
         <Route path="bibliotheek" element={<Bibliotheek />} />
         <Route path="kalender" element={<Kalender />} />
@@ -53,6 +48,7 @@ function Poort() {
         <Route path="export" element={<Export />} />
         <Route path="organisatie" element={<Organisatie />} />
         <Route path="gegevens" element={<GegevensDelen />} />
+        <Route path="begrippen" element={<Begrippen />} />
         <Route path="faq" element={<Faq />} />
         <Route path="contact" element={<Contact />} />
         <Route path="stijlgids" element={<Stijlgids />} />

@@ -18,7 +18,7 @@ import {
   Unlink,
   type LucideIcon,
 } from 'lucide-react';
-import { Button, ButtonLink, Card, IconTile, InfoBalk, PageHeader, cx } from '../componenten';
+import { Begrip, Button, ButtonLink, Card, IconTile, InfoBalk, PageHeader, cx } from '../componenten';
 import { formatTijdstip } from '../domein/hulp';
 import { BESTAND_EXTENSIE } from '../domein/state';
 import { useStore } from '../store';
@@ -161,9 +161,9 @@ export default function GegevensDelen() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Gegevens & delen"
-        title="Je gegevens en samenwerken"
-        subtitle="Alles blijft binnen je eigen organisatie. De Kwaliteitskalender gebruikt geen internet."
+        eyebrow="Beheer"
+        title="Gegevens & delen"
+        subtitle="Werk met collega’s in één gedeeld kalenderbestand en zie waar je gegevens staan. Er gaat niets via internet."
       />
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
@@ -195,11 +195,18 @@ export default function GegevensDelen() {
             </ul>
           </Card>
 
-          <Card title="Samenwerken met collega’s" subtitle="Eén kalenderbestand in een gedeelde map, iedereen werkt erin.">
+          <Card
+            title="Samenwerken met collega’s"
+            subtitle={
+              <>
+                Eén <Begrip term="kalenderbestand" /> in een gedeelde map; iedereen werkt erin.
+              </>
+            }
+          >
             {!sync.ondersteund && (
               <InfoBalk tone="warning" icon={TriangleAlert} className="mb-5">
                 Deze browser kan een bestand niet blijvend koppelen. Gebruik Microsoft Edge of Google Chrome om automatisch samen
-                te werken, of werk met de knoppen onder <strong>Handmatig</strong>.
+                te werken, of werk met de knoppen onder <strong>Zonder koppeling</strong>.
               </InfoBalk>
             )}
             <ol className="space-y-4">
@@ -236,7 +243,7 @@ export default function GegevensDelen() {
           </Card>
 
           <Card
-            title="Handmatig"
+            title="Zonder koppeling"
             subtitle={
               sync.ondersteund ? 'Voor een losse kopie of een conflictkopie van OneDrive.' : 'Zo werk je samen in deze browser.'
             }

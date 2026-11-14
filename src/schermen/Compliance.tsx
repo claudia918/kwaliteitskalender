@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeftRight, CircleCheck, CircleCheckBig, CircleX, GitBranch, KeyRound, ShieldCheck, School } from 'lucide-react';
 import {
   Badge,
+  Begrip,
   Card,
   KpiTile,
   PageHeader,
@@ -149,7 +150,16 @@ export default function Compliance() {
 
   return (
     <div className="space-y-6">
-      <PageHeader eyebrow="Compliance" title="Dekking standaarden" subtitle={scopeLabel} />
+      <PageHeader
+        eyebrow="Controleren"
+        title="Dekking standaarden"
+        subtitle={
+          <>
+            Heeft elke <Begrip term="standaard" /> van het inspectiekader een activiteit op de kalender van {scopeLabel}? En waar
+            wijkt een school af?
+          </>
+        }
+      />
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KpiTile
@@ -188,7 +198,12 @@ export default function Compliance() {
         <Card padding="lg">
           <SectionHeader
             title="Vaste standaarden"
-            subtitle={`Deze ${VASTE_STANDAARDEN.length} standaarden beoordeelt de inspectie bij elk onderzoek. Dek ze altijd af.`}
+            subtitle={
+              <>
+                Deze {VASTE_STANDAARDEN.length} <Begrip term="vaste-standaard">vaste standaarden</Begrip> beoordeelt de inspectie bij elk
+                onderzoek. Dek ze altijd af.
+              </>
+            }
           />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {vaste.map((d) => (
@@ -199,7 +214,14 @@ export default function Compliance() {
       )}
 
       <Card padding="lg">
-        <SectionHeader title="Alle standaarden" subtitle="Dekking per kwaliteitsgebied" />
+        <SectionHeader
+          title="Alle standaarden"
+          subtitle={
+            <>
+              <Begrip term="dekking">Dekking</Begrip> per <Begrip term="kwaliteitsgebied" />
+            </>
+          }
+        />
         <div className="space-y-5">
           {perGebied(dekking).map(({ gebied, rijen }) => {
             const k = gebiedKlassen(gebied);
@@ -257,7 +279,7 @@ export default function Compliance() {
         <Card padding="lg">
           <SectionHeader
             title="Vaste standaarden per school"
-            subtitle="Snel zien welke school een vaste standaard nog niet heeft afgedekt"
+            subtitle="Welke school een vaste standaard nog niet heeft afgedekt"
           />
           {perSchool.length === 0 ? (
             <p className="flex items-center gap-2 text-sm text-ink-muted">
@@ -316,8 +338,12 @@ export default function Compliance() {
       {aantalGetoond > 0 && (
         <Card padding="lg">
           <SectionHeader
-            title="Afwijkingen van de standaardkoppeling"
-            subtitle="Zachte koppeling: een activiteit staat bij een ander gesprek dan in het sjabloon, met reden."
+            title="Afwijkingen"
+            subtitle={
+              <>
+                Een activiteit staat bij een ander gesprek dan de <Begrip term="standaardkoppeling" /> voorstelt. Dat mag, met een reden.
+              </>
+            }
           />
           <div className="space-y-4">
             {groepen.map((g) => (

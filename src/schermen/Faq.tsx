@@ -3,7 +3,7 @@
  * (`FAQ` uit domein/inhoud.ts). Met een zoekveld; rechts een korte samenvatting over privacy.
  */
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { ChevronDown, FolderSync, Mail, SearchX, ShieldCheck } from 'lucide-react';
 import { ButtonLink, Card, EmptyState, IconTile, PageHeader, SearchField } from '../componenten';
 import { FAQ } from '../domein';
@@ -16,7 +16,9 @@ function normaliseer(t: string) {
 }
 
 export default function Faq() {
-  const [zoek, setZoek] = useState('');
+  // ?zoek=... (vanuit het zoekvenster) vult het zoekveld
+  const [params] = useSearchParams();
+  const [zoek, setZoek] = useState(() => params.get('zoek') ?? '');
   const q = normaliseer(zoek.trim());
   const categorieen = useMemo(
     () =>
@@ -35,7 +37,7 @@ export default function Faq() {
         title="Veelgestelde vragen"
         subtitle={
           <>
-            Staat je vraag er niet bij?{' '}
+            Antwoorden over werken met de kalender, samenwerken en privacy. Staat je vraag er niet bij?{' '}
             <Link to="/contact" className="font-semibold text-niveau-strong hover:underline">
               Neem contact met ons op
             </Link>

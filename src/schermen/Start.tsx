@@ -1,140 +1,476 @@
 /**
- * Startpagina voor het bestuur (inventaris §1.9): komend gesprek, de Aan-de-slag-kaart (alleen eigen
- * kalender) en zeven navigatietegels.
+ * Start: het ene startscherm voor alle niveaus (vervangt Start en Dashboard).
+ * Bovenaan de volgende stap in één zin met één knop, daaronder de werklijst (deze maand of voor het
+ * komende gesprek) waarin je met één klik de status zet. Cijfers en heatmap staan eronder, inklapbaar.
+ * Een lege kalender leidt de gebruiker met "Aan de slag" naar de eerste activiteiten.
  */
-import { Link } from 'react-router-dom';
-import { ArrowRight, Check, Circle, Sparkles, X } from 'lucide-react';
-import { IconButton, IconTile, InfoBalk, PageHeader, SeizoenBadge, cx, icoonOpNaam, useToast } from '../componenten';
-import { heeftActiviteiten } from '../domein/berekeningen';
-import { formatDatumLang } from '../domein/hulp';
-import { BESTUUR_START_TEGELS } from '../domein/inhoud';
-import { useKomendGesprek, useStore } from '../store';
+import { useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight, Check, ChevronDown, Circle, FolderSync, Layers, Sparkles, X } from 'lucide-react';
+import {
+  Begrip,
+  Button,
+  ButtonLink,
+  IconButton,
+  InfoBalk,
+  ProgressBar,
+  cx,
+  gesprekIcoon,
+  seizoenKlassen,
+  useToast,
+} from '../componenten';
+import {
+  heeftActiviteiten,
+  itemsVoorGesprek,
+  ontbrekendeVasteStandaarden,
+  overzichtPerSchool,
+  schoolIdsVoorNiveau,
+  voortgang,
+  type KomendGesprek,
+} from '../domein/berekeningen';
+import { aantal, effectieveNaam, formatDatumLang, formatTijdstip, standaardenVoor } from '../domein/hulp';
+import { gewijzigdSinds, stapTekst, volgendeStap, type VolgendeStap } from '../domein/thuis';
+import { useBezoek, useKomendGesprek, useScope, useStore, useVoorkeur } from '../store';
+import { useSync } from '../sync/SyncProvider';
 import { VERSTREKEN_UITLEG, dagenTekst } from './dashboard/komend';
+import { Overzicht } from './start/Overzicht';
+import { Werklijst } from './start/Werklijst';
+
+function weekNummer(d: Date): number {
+  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dag = t.getUTCDay() || 7;
+  t.setUTCDate(t.getUTCDate() + 4 - dag);
+  const jan1 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  return Math.ceil(((t.getTime() - jan1.getTime()) / 86_400_000 + 1) / 7);
+}
 
 export default function Start() {
-  const { state } = useStore();
+  const { state, niveau, clusterId, setNiveau, setSchoolId } = useStore();
+  const { scope, scopeLabel, editable } = useScope();
   const komend = useKomendGesprek();
+  const navigate = useNavigate();
+  const [overzichtOpen, setOverzichtOpen] = useVoorkeur<boolean>('start.overzicht', true);
+
+  const schoolIds = useMemo(
+    () => (niveau === 'school' ? [] : schoolIdsVoorNiveau(state.organisatie, niveau, clusterId)),
+    [state.organisatie, niveau, clusterId],
+  );
+  const overzicht = useMemo(() => overzichtPerSchool(state, schoolIds), [state, schoolIds]);
+
+  const kiesSchool = (id: string) => {
+    setSchoolId(id);
+    setNiveau('school');
+    navigate('/');
+    window.scrollTo(0, 0);
+  };
+
+  const stap = useMemo(() => {
+    const schoolStandaarden = standaardenVoor(false);
+    return volgendeStap({
+      niveau,
+      items: scope.items,
+      standaarden: scope.standaarden,
+      komend,
+      aantalScholen: state.organisatie.scholen.length,
+      scholenZonderVaste:
+        niveau === 'school'
+          ? undefined
+          : overzicht
+              .filter((o) => o.ontbrekendeKern > 0)
+              .map((o) => ({
+                schoolId: o.schoolId,
+                schoolNaam: o.school?.naam ?? 'School',
+                codes: ontbrekendeVasteStandaarden(state.schoolKalenders[o.schoolId] ?? [], schoolStandaarden).map((s) => s.code),
+              })),
+      elders: heeftActiviteiten(state),
+    });
+  }, [niveau, scope, komend, state, overzicht]);
+
+  const vandaag = new Date();
+  const datum = vandaag.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+  const leeg = stap.soort === 'kalender-leeg' || stap.soort === 'scholen-toevoegen' || (niveau === 'cluster' && scope.items.length === 0);
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        eyebrow="Start"
-        title={state.organisatie.bestuurNaam || 'Welkom'}
-        subtitle={
-          komend ? (
-            <span className="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
-              <span>Komend gesprek:</span>
-              <SeizoenBadge gesprek={komend.gesprek} />
-              <span>
-                deadline {formatDatumLang(komend.datum)} ({dagenTekst(komend)})
-              </span>
+      <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+        <div className="min-w-0">
+          <p className="eyebrow">
+            <span className="tnum">
+              {datum} · week {weekNummer(vandaag)}
             </span>
-          ) : (
-            'Er is nog geen gesprekscyclus ingesteld.'
-          )
-        }
-      />
-      {komend?.verstreken && <InfoBalk tone="warning">{VERSTREKEN_UITLEG}</InfoBalk>}
+          </p>
+          <h1 className="mt-1 text-h1 text-ink-strong">{scopeLabel}</h1>
+          <p className="mt-1 text-sm text-ink-muted">
+            {niveau === 'bestuur' ? (
+              <>
+                De <Begrip term="bestuurskalender" /> en {aantal(state.organisatie.scholen.length, 'school', 'scholen')}
+              </>
+            ) : niveau === 'cluster' ? (
+              <>
+                <Begrip term="cluster">Cluster</Begrip> van {aantal(schoolIds.length, 'school', 'scholen')}, alleen lezen
+              </>
+            ) : (
+              <>
+                {aantal(scope.items.length, 'activiteit', 'activiteiten')} op de <Begrip term="schoolkalender">kalender</Begrip>
+              </>
+            )}
+            {` · schooljaar ${state.schooljaar}`}
+          </p>
+        </div>
+      </header>
 
-      <AanDeSlag />
+      <SindsVorigBezoek />
 
-      <nav aria-label="Snelkoppelingen" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {BESTUUR_START_TEGELS.map((t) => (
-          <Link
-            key={t.to}
-            to={t.to}
-            className="group flex min-w-0 items-start gap-3 rounded-lg border border-line-subtle bg-surface-card p-5 shadow-xs transition-[box-shadow,border-color] duration-fast hover:border-line hover:shadow-md"
+      {niveau === 'cluster' && (
+        <InfoBalk tone="niveau" icon={Layers}>
+          Je bekijkt de scholen van dit cluster samen, alleen om te lezen. Kies bovenin een school om iets bij te werken.
+        </InfoBalk>
+      )}
+
+      <VolgendeStapKaart stap={stap} komend={komend} bewerkbaar={editable} onKiesSchool={kiesSchool} />
+
+      {/* Lege kalender: eerst de stappen; daarna gaat het werk voor en staat Aan de slag eronder. */}
+      {leeg && <AanDeSlag />}
+
+      {!leeg && <Werklijst komend={komend} />}
+
+      {!leeg && <AanDeSlag />}
+
+      {!leeg && (
+        <section aria-labelledby="overzicht-kop" className="space-y-4">
+          <button
+            type="button"
+            onClick={() => setOverzichtOpen(!overzichtOpen)}
+            aria-expanded={overzichtOpen}
+            aria-controls="overzicht-inhoud"
+            className="group flex w-full items-center gap-3 border-b border-line-subtle pb-2 text-left"
           >
-            <IconTile icon={icoonOpNaam(t.icon)} tone="niveau" />
             <span className="min-w-0 flex-1">
-              <span className="flex items-center gap-1 text-base font-semibold text-ink-strong">
-                {t.label}
-                <ArrowRight
-                  aria-hidden
-                  className="h-4 w-4 text-ink-subtle opacity-0 transition-opacity duration-fast group-hover:opacity-100"
-                />
+              <span id="overzicht-kop" className="block text-h3 text-ink-strong">
+                Hoe staat het ervoor
               </span>
-              <span className="mt-1 block text-sm text-ink-muted">{t.tekst}</span>
+              <span className="block text-sm text-ink-muted">
+                {overzichtOpen
+                  ? 'Voortgang, aandachtspunten' + (niveau === 'school' ? '.' : ' en de stand per school.')
+                  : `${voortgang(scope.items).pct}% gereed. Klik om de cijfers te tonen.`}
+              </span>
             </span>
-          </Link>
-        ))}
-      </nav>
+            <ChevronDown
+              className={cx('h-5 w-5 shrink-0 text-ink-subtle transition-transform duration-fast group-hover:text-ink-strong', overzichtOpen && 'rotate-180')}
+              aria-hidden
+            />
+          </button>
+          {overzichtOpen && (
+            <div id="overzicht-inhoud">
+              <Overzicht overzicht={overzicht} onKiesSchool={kiesSchool} />
+            </div>
+          )}
+        </section>
+      )}
     </div>
   );
 }
 
-/** Onboarding-checklist (`_S` in het origineel). */
-function AanDeSlag() {
-  const { state, niveau, pasSjabloonToe, verbergOnboarding } = useStore();
-  const toast = useToast();
-  if (state.modus !== 'eigen' || state.onboardingVerborgen || niveau !== 'bestuur') return null;
-  const org = state.organisatie;
+/* ------------------------------------------------------------------ */
+/* Volgende stap en komend gesprek                                      */
+/* ------------------------------------------------------------------ */
 
-  const stappen = [
-    { klaar: org.bestuurNaam.trim().length > 0, label: 'Bestuur ingesteld', to: '/organisatie' },
-    { klaar: org.scholen.length > 0, label: `Scholen toegevoegd (${org.scholen.length})`, to: '/organisatie' },
-    {
-      klaar: heeftActiviteiten(state),
-      label: 'Eerste activiteiten gepland',
-      to: '/bibliotheek',
-      actie: () => {
+function VolgendeStapKaart({
+  stap,
+  komend,
+  bewerkbaar,
+  onKiesSchool,
+}: {
+  stap: VolgendeStap;
+  komend: KomendGesprek | null;
+  bewerkbaar: boolean;
+  onKiesSchool: (id: string) => void;
+}) {
+  const navigate = useNavigate();
+  const { pasSjabloonToe, state } = useStore();
+  const toast = useToast();
+  const { zin, knop } = stapTekst(stap, bewerkbaar);
+
+  const open = (uid: string) => navigate(`/kalender?item=${encodeURIComponent(uid)}`);
+  let actie: () => void;
+  let tweede: { label: string; to: string } | null = null;
+  switch (stap.soort) {
+    case 'scholen-toevoegen':
+      actie = () => navigate('/organisatie');
+      break;
+    case 'kalender-leeg':
+      actie = () => {
         pasSjabloonToe();
         toast('Aanbevolen activiteiten toegevoegd');
-      },
-      actieLabel: 'Vul met aanbevolen',
+      };
+      tweede = { label: 'Zelf kiezen in de bibliotheek', to: '/bibliotheek' };
+      break;
+    case 'verstreken':
+    case 'risico':
+      actie = () => open(stap.items[0].uid);
+      tweede = { label: 'Naar de kalender', to: '/kalender' };
+      break;
+    case 'vaste-standaard':
+      actie = () => navigate(`/bibliotheek?zoek=${encodeURIComponent(stap.codes[0])}`);
+      tweede = { label: 'Bekijk de dekking', to: '/compliance' };
+      break;
+    case 'school-vaste-standaard':
+      actie = () => onKiesSchool(stap.schoolId);
+      tweede = { label: 'Bekijk de dekking', to: '/compliance' };
+      break;
+    case 'gesprek-open':
+      actie = () => open(stap.eerste.uid);
+      tweede = { label: 'Alles voor dit gesprek', to: '/gesprekken' };
+      break;
+    case 'gesprek-klaar':
+      actie = () => navigate('/export');
+      tweede = { label: 'Naar de gesprekken', to: '/gesprekken' };
+      break;
+    case 'gesprek-leeg':
+      actie = () => navigate('/bibliotheek');
+      tweede = { label: 'Naar de gesprekken', to: '/gesprekken' };
+      break;
+    case 'geen-cyclus':
+      actie = () => navigate('/organisatie');
+      break;
+  }
+
+  return (
+    <section
+      aria-labelledby="volgende-stap"
+      className="grid overflow-hidden rounded-xl border border-line-subtle bg-surface-card shadow-sm lg:grid-cols-[minmax(0,1fr)_340px]"
+    >
+      <div data-rondleiding="volgende-stap" className="relative p-5 sm:p-6">
+        <span aria-hidden className="absolute inset-y-0 left-0 w-1 bg-niveau" />
+        <p id="volgende-stap" className="eyebrow text-niveau-strong">
+          Volgende stap
+        </p>
+        <p className="mt-2 max-w-2xl text-h3 font-semibold leading-snug text-ink-strong">{zin}</p>
+        {stap.soort === 'kalender-leeg' && (
+          <p className="mt-2 max-w-2xl text-sm text-ink-muted">
+            Dat zijn de verplichte activiteiten uit het <Begrip term="startsjabloon" />
+            {state.organisatie.scholen.length > 1 ? ', voor elke school en voor het bestuur' : ''}.
+          </p>
+        )}
+        <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <Button variant="primary" iconRight={ArrowRight} onClick={actie}>
+            {knop}
+          </Button>
+          {tweede && (
+            <Link to={tweede.to} className="text-sm font-semibold text-niveau-strong hover:underline">
+              {tweede.label}
+            </Link>
+          )}
+        </div>
+      </div>
+      <KomendGesprekPaneel komend={komend} />
+    </section>
+  );
+}
+
+function KomendGesprekPaneel({ komend }: { komend: KomendGesprek | null }) {
+  const { scope, scopeLabel } = useScope();
+  if (!komend) {
+    return (
+      <aside className="border-t border-line-subtle bg-surface-subtle p-5 lg:border-l lg:border-t-0">
+        <p className="eyebrow">Komend gesprek</p>
+        <p className="mt-2 text-sm text-ink-muted">Er is nog geen gesprekscyclus ingesteld.</p>
+      </aside>
+    );
+  }
+  const g = komend.gesprek;
+  const k = seizoenKlassen(g.kleur);
+  const Icoon = gesprekIcoon(g.icoon);
+  const v = voortgang(itemsVoorGesprek(scope.items, g.id));
+  return (
+    <aside
+      aria-label="Komend gesprek"
+      className={cx('flex flex-col justify-between gap-4 border-t p-5 lg:border-l lg:border-t-0', k.surface, k.border)}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-start gap-3">
+          <span className={cx('grid h-10 w-10 shrink-0 place-items-center rounded-md border bg-surface-card', k.border)}>
+            <Icoon className={cx('h-5 w-5', k.ink)} aria-hidden />
+          </span>
+          <div className="min-w-0">
+            <p className={cx('eyebrow', k.ink)}>
+              Komend <Begrip term="seizoensgesprek">gesprek</Begrip>
+            </p>
+            <p className="text-h3 text-ink-strong">{g.naam}</p>
+            {g.thema && <p className="text-xs text-ink-body">{g.thema}</p>}
+          </div>
+        </div>
+        <div className="shrink-0 text-right">
+          {komend.verstreken ? (
+            <p className="text-sm font-semibold text-status-warning">Voorbij</p>
+          ) : (
+            <>
+              <p className={cx('tnum text-h1 font-bold leading-none', k.ink)}>{komend.dagenTot}</p>
+              <p className="mt-0.5 text-2xs text-ink-muted">{komend.dagenTot === 1 ? 'dag' : 'dagen'}</p>
+            </>
+          )}
+        </div>
+      </div>
+      {komend.verstreken ? (
+        <p className="text-xs text-ink-body">
+          {VERSTREKEN_UITLEG} ({dagenTekst(komend)})
+        </p>
+      ) : (
+        <div className="rounded-md bg-surface-card p-3">
+          <ProgressBar
+            value={v.pct}
+            color={k.var}
+            size="sm"
+            showValue
+            label={
+              <>
+                {v.totaal === 0 ? 'Nog niets gekoppeld' : `${v.gereed} van ${v.totaal} gereed`}
+                <span className="sr-only"> voor {scopeLabel}</span>
+              </>
+            }
+          />
+          <p className="tnum mt-2 text-2xs text-ink-muted">Deadline {formatDatumLang(komend.datum)}</p>
+        </div>
+      )}
+    </aside>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Aan de slag (eigen kalender)                                         */
+/* ------------------------------------------------------------------ */
+
+function AanDeSlag() {
+  const { state, verbergOnboarding } = useStore();
+  const sync = useSync();
+  if (state.modus !== 'eigen' || state.onboardingVerborgen) return null;
+  const org = state.organisatie;
+  const alleItems = [...state.bestuurItems, ...Object.values(state.schoolKalenders).flat()];
+
+  const stappen: { klaar: boolean; titel: string; tekst: string; knop?: { label: string; to?: string; actie?: () => void } }[] = [
+    {
+      klaar: org.bestuurNaam.trim().length > 0 && org.scholen.length > 0,
+      titel: 'Bestuur en scholen vastleggen',
+      tekst: org.scholen.length > 0 ? `${org.bestuurNaam || 'Bestuur'}, ${aantal(org.scholen.length, 'school', 'scholen')}.` : 'Voeg minstens één school toe.',
+      knop: { label: 'Scholen toevoegen', to: '/organisatie' },
+    },
+    {
+      klaar: heeftActiviteiten(state),
+      titel: 'Activiteiten op de kalender zetten',
+      tekst: 'Gebruik de knop hierboven, of kies zelf uit de bibliotheek.',
+      knop: { label: 'Naar de bibliotheek', to: '/bibliotheek' },
+    },
+    {
+      klaar: alleItems.some((i) => i.status !== 'gepland'),
+      titel: 'Je eerste activiteit bijwerken',
+      tekst: 'Zet bij "Deze maand" een activiteit op bezig of gereed. Zo houd je de voortgang bij.',
+    },
+    {
+      klaar: sync.status === 'gekoppeld',
+      titel: 'Samenwerken met collega’s (als je dat wilt)',
+      tekst: 'Koppel één kalenderbestand in een gedeelde map, dan werken jullie in dezelfde kalender.',
+      knop: { label: 'Kalenderbestand koppelen', to: '/gegevens' },
     },
   ];
   const klaar = stappen.filter((s) => s.klaar).length;
   if (klaar === stappen.length) return null;
+  const volgende = stappen.findIndex((s) => !s.klaar);
 
   return (
-    <section className="rounded-lg border border-niveau-border bg-niveau-surface p-5" aria-labelledby="aan-de-slag">
+    <section
+      data-rondleiding="aan-de-slag"
+      className="rounded-lg border border-niveau-border bg-niveau-surface p-5"
+      aria-labelledby="aan-de-slag"
+    >
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="eyebrow flex items-center gap-1.5 text-niveau-strong">
             <Sparkles className="h-3.5 w-3.5" aria-hidden />
-            Aan de slag · {klaar}/{stappen.length}
+            Aan de slag · {klaar} van {stappen.length}
           </p>
           <h2 id="aan-de-slag" className="mt-1 text-h3 text-ink-strong">
             Zet je kwaliteitskalender op
           </h2>
         </div>
-        <IconButton icon={X} label="Verbergen" size="sm" onClick={verbergOnboarding} />
+        <IconButton icon={X} label="Aan de slag verbergen" size="sm" onClick={verbergOnboarding} />
       </div>
-      <ul className="mt-4 divide-y divide-niveau-border rounded-md border border-niveau-border bg-surface-card">
-        {stappen.map((s) => (
-          <li key={s.to + s.label} className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3">
+      <ol className="mt-4 divide-y divide-niveau-border rounded-md border border-niveau-border bg-surface-card">
+        {stappen.map((s, i) => (
+          <li key={s.titel} className="flex flex-wrap items-start gap-x-3 gap-y-2 px-4 py-3">
             {s.klaar ? (
-              <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-status-success text-white">
+              <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-status-success text-white">
                 <Check className="h-3.5 w-3.5" aria-hidden />
                 <span className="sr-only">Klaar:</span>
               </span>
             ) : (
-              <Circle className="h-5 w-5 shrink-0 text-ink-subtle" aria-hidden />
+              <Circle className={cx('mt-0.5 h-5 w-5 shrink-0', i === volgende ? 'text-niveau' : 'text-ink-subtle')} aria-hidden />
             )}
-            <span
-              className={cx('min-w-0 flex-1 text-sm', s.klaar ? 'text-ink-muted line-through' : 'font-medium text-ink-strong')}
-            >
-              {s.label}
+            <span className="min-w-0 flex-1">
+              <span className={cx('block text-sm', s.klaar ? 'text-ink-muted line-through' : 'font-semibold text-ink-strong')}>{s.titel}</span>
+              {!s.klaar && <span className="mt-0.5 block text-xs text-ink-muted">{s.tekst}</span>}
             </span>
-            {!s.klaar && (
-              <span className="flex w-full items-center gap-4 pl-8 sm:w-auto sm:pl-0">
-                {s.actie && (
-                  <button type="button" onClick={s.actie} className="text-xs font-semibold text-niveau-strong hover:underline">
-                    {s.actieLabel}
-                  </button>
+            {!s.klaar && s.knop && (
+              <span className="w-full pl-8 sm:w-auto sm:pl-0">
+                {s.knop.actie ? (
+                  <Button size="sm" variant={i === volgende ? 'niveau' : 'secondary'} onClick={s.knop.actie}>
+                    {s.knop.label}
+                  </Button>
+                ) : (
+                  <ButtonLink
+                    size="sm"
+                    variant={i === volgende && s.knop.to !== '/bibliotheek' ? 'niveau' : 'secondary'}
+                    to={s.knop.to!}
+                    icon={s.knop.to === '/gegevens' ? FolderSync : undefined}
+                  >
+                    {s.knop.label}
+                  </ButtonLink>
                 )}
-                <Link
-                  to={s.to}
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-niveau-strong hover:underline"
-                >
-                  Openen <ArrowRight className="h-3 w-3" aria-hidden />
-                </Link>
               </span>
             )}
           </li>
         ))}
-      </ul>
+      </ol>
     </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Sinds je vorige bezoek (alleen met een gekoppeld kalenderbestand)    */
+/* ------------------------------------------------------------------ */
+
+function SindsVorigBezoek() {
+  const { vorig, begin } = useBezoek();
+  const { scope } = useScope();
+  const sync = useSync();
+  const [weg, setWeg] = useState(false);
+  const [open, setOpen] = useState(false);
+  const lijst = useMemo(() => (vorig ? gewijzigdSinds(scope.items, vorig, begin) : []), [scope.items, vorig, begin]);
+  if (weg || !vorig || sync.status !== 'gekoppeld' || lijst.length === 0) return null;
+  return (
+    <div data-rondleiding="sinds-vorig-bezoek" className="rounded-lg border border-status-info-border bg-status-info-surface px-4 py-3 text-sm">
+      <div className="flex items-start gap-3">
+        <p className="min-w-0 flex-1 text-ink-body">
+          <strong className="text-ink-strong">Sinds je vorige bezoek</strong> ({formatTijdstip(vorig)}) zijn{' '}
+          {aantal(lijst.length, 'activiteit', 'activiteiten')} gewijzigd in het gedeelde{' '}
+          <Begrip term="kalenderbestand" />.{' '}
+          <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="font-semibold text-status-info hover:underline">
+            {open ? 'Verbergen' : 'Laten zien'}
+          </button>
+        </p>
+        <IconButton icon={X} label="Gezien" size="sm" onClick={() => setWeg(true)} />
+      </div>
+      {open && (
+        <ul className="mt-2 space-y-1 pl-1">
+          {lijst.slice(0, 10).map((i) => (
+            <li key={i.uid}>
+              <Link to={`/kalender?item=${encodeURIComponent(i.uid)}`} className="text-ink-strong hover:underline">
+                {effectieveNaam(i)}
+              </Link>{' '}
+              <span className="text-xs text-ink-muted">· {i.status}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

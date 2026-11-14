@@ -8,6 +8,7 @@ import {
   ActivityChip,
   AfwijkingBadge,
   Badge,
+  Begrip,
   Button,
   Card,
   Checkbox,
@@ -223,6 +224,12 @@ export default function Stijlgids() {
           </div>
         </Card>
 
+        <Card title="Begrip" subtitle="Vakterm met uitleg bij hover, focus en tik (domein/begrippen.ts)">
+          <p className="text-sm text-ink-body">
+            Elke school dekt de <Begrip term="vaste-standaard">vaste standaarden</Begrip> af en bereidt elk{' '}
+            <Begrip term="seizoensgesprek" /> voor met een <Begrip term="gespreksdossier" />.
+          </p>
+        </Card>
         <Card title="Meldingen">
           <div className="flex flex-wrap gap-2">
             <Button size="sm" onClick={() => toast('Lesbezoeken ronde 1 toegevoegd aan de kalender')}>

@@ -1,6 +1,6 @@
 /** Heatmap scholen x gesprekken (bestuur en cluster), inventaris §1.10. */
 import { TriangleAlert } from 'lucide-react';
-import { Card, GesprekIcoonView, cx } from '../../componenten';
+import { Begrip, Card, GesprekIcoonView, cx } from '../../componenten';
 import { heatmapCel, itemsVanSchool, type HeatmapToon, type SchoolOverzicht } from '../../domein/berekeningen';
 import { gesorteerdeCyclus } from '../../domein/hulp';
 import type { State } from '../../domein/types';
@@ -33,8 +33,12 @@ export function Heatmap({
   const cyclus = gesorteerdeCyclus(state.organisatie.gesprekscyclus);
   return (
     <Card
-      title="Heatmap scholen × gesprekken"
-      subtitle="Percentage gereed per school per gesprek · uitroepteken = activiteit met status risico"
+      title="Per school en gesprek"
+      subtitle={
+        <>
+          Percentage gereed in een <Begrip term="heatmap" />. Klik op een school om haar te openen.
+        </>
+      }
       padding="none"
     >
       {cyclus.length === 0 ? (
@@ -67,7 +71,7 @@ export function Heatmap({
                         type="button"
                         onClick={() => onKiesSchool(o.schoolId)}
                         className="text-left text-ink-strong hover:text-niveau-strong hover:underline"
-                        title="Open het dashboard van deze school"
+                        title="Open deze school"
                       >
                         {o.school?.naam ?? 'Onbekende school'}
                       </button>

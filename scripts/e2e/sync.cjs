@@ -39,7 +39,7 @@ const NEP = `
   await fc.setFiles(pad);
   await h.waitForSelector('nav[aria-label="Hoofdmenu"]');
   const kop = await h.textContent('header');
-  ok('bestand openen vanaf welkom: eigen modus (Lokaal)', kop.includes('Lokaal') && !kop.includes('Demo-data'));
+  ok('bestand openen vanaf welkom: eigen modus (Lokaal)', kop.includes('Lokaal') && !kop.includes('Demo verlaten'));
   // collega wijzigt bestuursnaam + verwijdert item; samenvoegen
   const coll = JSON.parse(JSON.stringify(inhoud));
   coll.organisatie.bestuurNaam = 'Stichting Collega'; coll.tijden.bestuurNaam = Date.now() + 1000;
@@ -49,8 +49,9 @@ const NEP = `
   const [fc2] = await Promise.all([h.waitForEvent('filechooser'), h.click('button:has-text("Samenvoegen met bestand")')]);
   await fc2.setFiles(require('path').resolve(__dirname, '../../test-resultaten/collega.json'));
   await h.waitForSelector('text=Samengevoegd: 2 wijzigingen verwerkt');
-  await h.click('[role=tablist][aria-label=Niveau] >> text=Bestuur');
-  ok('samenvoegen: naam collega', (await h.textContent('main')).includes('Stichting Collega'));
+  await h.click('[data-rondleiding="weergave"]');
+  await h.click('[role=listbox] [role=option]:has-text("Bestuur")');
+  ok('samenvoegen: naam collega', (await h.textContent('header')).includes('Stichting Collega'));
   const n1 = await h.evaluate(() => JSON.parse(localStorage.getItem('kwaliteitskalender:state:v5')).schoolKalenders['1'].length);
   ok('samenvoegen: verwijderd item weg', n1 === 66, String(n1));
   await h.screenshot({ path: require('path').resolve(__dirname, '../../test-resultaten') + '/20-handmatig.png' });

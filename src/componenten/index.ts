@@ -57,3 +57,4 @@ export { Toast, ToastProvider, useToast, type ToastToon } from './Toast';
 export { ActivityChip, type ActivityChipProps } from './ActivityChip';
 export { AppLogo, LvLogo, LvMonogram } from './Logo';
 export * from './stijlen';
+export { Begrip, type BegripProps } from './Begrip';

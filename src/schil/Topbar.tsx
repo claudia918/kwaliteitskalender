@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Check, CircleHelp, FolderSync, HardDrive, LogOut, Menu, RefreshCw, TriangleAlert } from 'lucide-react';
-import { AppLogo, Badge, Button, Dialog, IconButton, NiveauSwitcher, cx } from '../componenten';
+import { AppLogo, Badge, Button, ButtonLink, Dialog, IconButton, cx } from '../componenten';
 import { helpVoorPad } from '../domein/inhoud';
 import { formatTijdstip } from '../domein/hulp';
 import { useStore } from '../store';
 import { useSync } from '../sync/SyncProvider';
+import { WeergaveKiezer } from './WeergaveKiezer';
+import { SNELTOETS, ZoekKnop } from './Zoekvenster';
 
 /** "Opgeslagen" verschijnt 1,6 s na elke wijziging. */
 function OpgeslagenIndicator() {
@@ -107,15 +109,23 @@ export function SyncStatus({ compact }: { compact?: boolean }) {
   );
 }
 
-function DemoVerlatenKnop() {
+export function DemoVerlatenKnop({ volledig }: { volledig?: boolean } = {}) {
   const { beginLeeg } = useStore();
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button variant="ghost" size="sm" icon={LogOut} onClick={() => setOpen(true)} className="hidden sm:inline-flex">
-        Demo verlaten
-      </Button>
-      <IconButton icon={LogOut} label="Demo verlaten" onClick={() => setOpen(true)} className="sm:hidden" />
+      {volledig ? (
+        <Button variant="secondary" size="sm" icon={LogOut} onClick={() => setOpen(true)} className="w-full">
+          Demo verlaten
+        </Button>
+      ) : (
+        <>
+          <Button variant="ghost" size="sm" icon={LogOut} onClick={() => setOpen(true)} className="hidden lg:inline-flex">
+            Demo verlaten
+          </Button>
+          <IconButton icon={LogOut} label="Demo verlaten" onClick={() => setOpen(true)} className="lg:hidden" />
+        </>
+      )}
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
@@ -140,57 +150,87 @@ function DemoVerlatenKnop() {
       >
         <p className="text-sm text-ink-body">
           Je verlaat de demo en begint opnieuw met een leeg eigen bestuur. De demodata kun je later altijd opnieuw laden via{' '}
-          <strong>Organisatie, Gegevens</strong>.
+          <strong>Organisatie</strong>.
         </p>
       </Dialog>
     </>
   );
 }
 
-function HelpKnop() {
+export function HelpKnop() {
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   const help = helpVoorPad(pathname);
   return (
     <>
       <IconButton icon={CircleHelp} label="Uitleg bij dit scherm" onClick={() => setOpen(true)} />
-      <Dialog open={open} onClose={() => setOpen(false)} width="sm" title={`Uitleg: ${help.titel}`}>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        width="sm"
+        title={`Uitleg: ${help.titel}`}
+        footer={
+          <>
+            <ButtonLink to="/begrippen" variant="ghost" size="sm" className="mr-auto" onClick={() => setOpen(false)}>
+              Alle begrippen
+            </ButtonLink>
+            <ButtonLink to="/faq" variant="secondary" size="sm" onClick={() => setOpen(false)}>
+              Veelgestelde vragen
+            </ButtonLink>
+          </>
+        }
+      >
         <p className="text-sm leading-relaxed text-ink-body">{help.tekst}</p>
+        <p className="mt-4 text-xs text-ink-muted">
+          Iets zoeken? Druk op <kbd className="font-semibold text-ink-body">{SNELTOETS}</kbd> of gebruik de zoekknop bovenin.
+          Woorden met een stippellijn kun je aanwijzen of aantikken voor uitleg.
+        </p>
       </Dialog>
     </>
   );
 }
 
 export function Topbar({ onMenu }: { onMenu: () => void }) {
-  const { state, niveau, setNiveau } = useStore();
+  const { state } = useStore();
   const isDemo = state.modus === 'demo';
   return (
     <header className="no-print sticky top-0 z-40 border-t-[3px] border-niveau bg-surface-card">
-      <div className="flex h-14 items-center gap-2 border-b border-line-subtle px-3 sm:gap-3 sm:px-4">
-        <IconButton icon={Menu} label="Menu openen" onClick={onMenu} className="md:hidden" />
-        <AppLogo />
-        <span className="hidden md:inline-flex">
-          {isDemo ? (
-            <Badge tone="brand" size="sm">
-              Demo-data
-            </Badge>
-          ) : (
-            <Badge tone="niveau" size="sm" title="Alle gegevens blijven op je eigen computer">
-              Lokaal
-            </Badge>
-          )}
-        </span>
-
-        <div className="flex flex-1 justify-center">
-          <NiveauSwitcher value={niveau} onChange={setNiveau} toonCluster={state.organisatie.clusters.length > 0} />
+      <div className="flex h-14 items-center gap-2 border-b border-line-subtle pl-2 pr-3 sm:gap-3 md:pl-0 md:pr-4">
+        <IconButton icon={Menu} label="Menu openen" onClick={onMenu} className="shrink-0 md:hidden" />
+        <div className="hidden shrink-0 items-center gap-2 md:flex md:w-sidebar md:px-4">
+          <Link to="/" aria-label="Kwaliteitskalender, naar start" className="rounded-md">
+            <AppLogo />
+          </Link>
         </div>
-
-        <div className="flex items-center gap-1 sm:gap-2">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <WeergaveKiezer />
+          {isDemo && (
+            <span className="hidden sm:inline-flex">
+              <Badge tone="brand" size="sm" title="Je werkt in de demo met voorbeeldgegevens">
+                Demo
+              </Badge>
+            </span>
+          )}
+          {!isDemo && (
+            <span className="hidden xl:inline-flex">
+              <Badge tone="neutral" size="sm" title="Alle gegevens blijven op je eigen computer">
+                Lokaal
+              </Badge>
+            </span>
+          )}
+        </div>
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          <ZoekKnop />
           <OpgeslagenIndicator />
-          <SyncStatus compact />
-          <span className="tnum hidden whitespace-nowrap text-sm text-ink-muted xl:inline">Schooljaar {state.schooljaar}</span>
+          <span className="hidden md:inline-flex">
+            <SyncStatus compact />
+          </span>
           <HelpKnop />
-          {isDemo && <DemoVerlatenKnop />}
+          {isDemo && (
+            <span className="hidden md:inline-flex">
+              <DemoVerlatenKnop />
+            </span>
+          )}
         </div>
       </div>
     </header>

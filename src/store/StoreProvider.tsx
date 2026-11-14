@@ -262,7 +262,8 @@ export function StoreProvider({ children, initieel, zonderOpslag }: StoreProvide
 
       voltooiWizard: (invoer: WizardInvoer) => {
         muteer((s, nu) => m.voltooiWizard(s, invoer, nu));
-        setNiveauRuw('bestuur');
+        // Eén school: begin bij de school, dan merk je zo min mogelijk van niveaus.
+        setNiveauRuw(invoer.scholen.length === 1 ? 'school' : 'bestuur');
       },
       completeSetup: () => {
         setState((s) => m.voltooiSetup(s));

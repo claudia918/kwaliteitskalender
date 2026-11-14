@@ -1,4 +1,4 @@
-// E2e-controles voor Welkom, Wizard, Start, Dashboard en Organisatie.
+// E2e-controles voor Welkom, Wizard, Start (volgende stap, werklijst, overzicht) en Organisatie.
 // Gebruik: npm run build && node scripts/e2e-start.mjs
 // Schermafdrukken in test-resultaten/start/.
 import { createRequire } from 'node:module';
@@ -42,9 +42,11 @@ async function geenHorizontaleScroll(page, naam) {
   ok(`geen horizontale scroll: ${naam}`, sw <= iw, `${sw} > ${iw}`);
 }
 
-async function kiesNiveau(page, label) {
-  await page.click(`[role=tablist][aria-label=Niveau] [role=tab][title="${label}"]`);
-  await page.waitForTimeout(80);
+/** Wat je bekijkt: weergaveknop in de topbar, dan de optie met deze naam. */
+async function kies(page, naam) {
+  await page.click('[data-rondleiding="weergave"]');
+  await page.click(`[role=listbox] [role=option]:has-text("${naam}")`);
+  await page.waitForTimeout(100);
 }
 
 async function shot(page, naam) {
@@ -93,21 +95,23 @@ for (const breedte of [1440, 390]) {
     await page.click('button:has-text("Kalender aanmaken")');
     await page.waitForSelector('main h1:has-text("Stichting Proef")');
     ok(`${tag} start: bestuursnaam als titel`, true);
-    ok(`${tag} start: aan de slag 2/3`, (await page.textContent('main')).includes('Aan de slag · 2/3'));
-    ok(`${tag} start: zeven tegels`, (await page.locator('nav[aria-label=Snelkoppelingen] a').count()) === 7);
+    ok(`${tag} start: aan de slag 1 van 4`, (await page.textContent('main')).includes('Aan de slag · 1 van 4'));
+    ok(
+      `${tag} start: volgende stap bij lege kalender`,
+      (await page.textContent('[data-rondleiding="volgende-stap"]')).includes('Je kalender is nog leeg'),
+    );
+    ok(`${tag} start: geen werklijst bij lege kalender`, (await page.locator('[data-rondleiding="deze-maand"]').count()) === 0);
+    ok(`${tag} start: weergaveknop toont bestuur`, (await page.textContent('[data-rondleiding="weergave"]')).includes('Stichting Proef'));
     await geenHorizontaleScroll(page, `${tag} start leeg`);
     await shot(page, `${tag}-05-start-leeg`);
 
     await page.goto(URL + '#/dashboard');
     await page.waitForSelector('main h1:has-text("Stichting Proef")');
-    ok(`${tag} dashboard leeg: hint bibliotheek`, await page.isVisible('text=Er staan nog geen activiteiten op deze kalender.'));
-    ok(`${tag} dashboard leeg: heatmap`, await page.isVisible('text=Heatmap scholen × gesprekken'));
-    await geenHorizontaleScroll(page, `${tag} dashboard leeg`);
-    await shot(page, `${tag}-06-dashboard-bestuur-leeg`);
+    ok(`${tag} /dashboard verwijst naar start`, (await page.evaluate(() => location.hash)) === '#/');
 
     // Organisatie: cluster toevoegen, school koppelen, gesprek aanpassen
     await page.goto(URL + '#/organisatie');
-    await page.waitForSelector('main h1:has-text("Beheer")');
+    await page.waitForSelector('main h1:has-text("Organisatie")');
     ok(`${tag} organisatie: ingang gegevens & delen`, await page.isVisible('main a[href="#/gegevens"] >> nth=0'));
     await page.fill('input[placeholder="bv. Cluster Noord"]', 'Cluster Oost');
     await page.click('#clusters button:has-text("Toevoegen")');
@@ -129,29 +133,71 @@ for (const breedte of [1440, 390]) {
     await geenHorizontaleScroll(page, `${tag} organisatie`);
     await shot(page, `${tag}-07-organisatie-eigen`);
 
-    // Onboarding: vul met aanbevolen
+    // Volgende stap: aanbevolen activiteiten toevoegen
     await page.goto(URL + '#/');
-    await page.click('button:has-text("Vul met aanbevolen")');
-    await page.waitForTimeout(200);
-    ok(`${tag} start: onboarding verdwijnt als alles klaar is`, !(await page.isVisible('text=Zet je kwaliteitskalender op')));
+    await page.click('[data-rondleiding="volgende-stap"] button:has-text("Aanbevolen activiteiten toevoegen")');
+    await page.waitForSelector('[data-rondleiding="deze-maand"]');
+    ok(`${tag} start: werklijst na vullen`, true);
+    ok(`${tag} start: volgende stap verandert`, !(await page.textContent('[data-rondleiding="volgende-stap"]')).includes('nog leeg'));
+    ok(`${tag} start: aan de slag 2 van 4`, (await page.textContent('main')).includes('Aan de slag · 2 van 4'));
+    ok(`${tag} start: heatmap`, await page.isVisible('text=Per school en gesprek'));
 
-    // Schoolniveau en cluster
-    await kiesNiveau(page, 'School');
-    await page.goto(URL + '#/');
-    await page.waitForSelector('main h1');
-    ok(`${tag} school-dashboard: checklist`, await page.isVisible('text=Checklist'));
-    await geenHorizontaleScroll(page, `${tag} dashboard school eigen`);
-    await shot(page, `${tag}-08-dashboard-school-eigen`);
-    await kiesNiveau(page, 'Cluster');
-    await page.goto(URL + '#/dashboard');
+    // Schoolniveau: status met één klik
+    await kies(page, 'Proefcollege');
+    await page.waitForSelector('main h1:has-text("Proefcollege")');
+    const lijst = page.locator('[data-rondleiding="deze-maand"]');
+    if ((await lijst.locator('li[data-uid]').count()) === 0 && (await lijst.locator('[role=tab]').count()) > 1) {
+      await lijst.locator('[role=tab]').nth(1).click();
+    }
+    const uid = await lijst.locator('li[data-uid]').first().getAttribute('data-uid');
+    const regel = lijst.locator(`li[data-uid="${uid}"]`);
+    await regel.locator('button:has-text("Gereed")').click();
+    await page.waitForTimeout(200);
+    ok(`${tag} werklijst: gereed met één klik`, (await regel.locator('button:has-text("Gereed")').getAttribute('aria-pressed')) === 'true');
+    const status = await page.evaluate((u) => {
+      const s = JSON.parse(localStorage.getItem('kwaliteitskalender:state:v5'));
+      return Object.values(s.schoolKalenders).flat().find((i) => i.uid === u)?.status;
+    }, uid);
+    ok(`${tag} werklijst: status bewaard`, status === 'gereed', String(status));
+    ok(`${tag} werklijst: regel blijft staan`, (await regel.count()) === 1);
+    ok(`${tag} start: aan de slag 3 van 4`, (await page.textContent('main')).includes('Aan de slag · 3 van 4'));
+    await regel.locator('button:has-text("Gereed")').click();
+    await page.waitForTimeout(150);
+    ok(`${tag} werklijst: nog eens klikken zet terug`, (await regel.locator('button:has-text("Gereed")').getAttribute('aria-pressed')) === 'false');
+    await geenHorizontaleScroll(page, `${tag} start school eigen`);
+    await shot(page, `${tag}-08-start-school-eigen`);
+
+    await kies(page, 'Cluster Oost');
     await page.waitForSelector('main h1:has-text("Cluster Oost")');
-    ok(`${tag} cluster-dashboard eigen: infobalk`, await page.isVisible('text=Clusterweergave is alleen-lezen'));
-    await shot(page, `${tag}-09-dashboard-cluster-eigen`);
+    ok(`${tag} cluster: alleen lezen`, await page.isVisible('text=alleen om te lezen'));
+    ok(`${tag} cluster: geen statusknoppen`, (await page.locator('[data-rondleiding="deze-maand"] button[aria-pressed]').count()) === 0);
+    await shot(page, `${tag}-09-start-cluster-eigen`);
 
     // Herladen behoudt alles
     await page.reload();
     await page.waitForSelector('main h1:has-text("Cluster Oost")');
     ok(`${tag} herladen behoudt eigen kalender`, true);
+    await ctx.close();
+  }
+
+  /* ---------------- Eén school: zo min mogelijk niveaus ---------------- */
+  {
+    const { ctx, page } = await nieuwePagina(breedte);
+    await page.goto(URL);
+    await page.click('text=Begin met mijn eigen bestuur');
+    await page.fill('input[placeholder="bv. Stichting Onderwijs Regio X"]', 'Stichting Een');
+    await page.keyboard.press('Enter');
+    await page.fill('input[placeholder="bv. Lyceum Noord"]', 'Enige School');
+    await page.keyboard.press('Enter');
+    await page.click('button:has-text("Volgende")');
+    await page.click('button:has-text("Kalender aanmaken")');
+    await page.waitForSelector('main h1:has-text("Enige School")');
+    ok(`${tag} één school: begint op de school`, (await page.textContent('[data-rondleiding="weergave"]')).includes('Je school'));
+    await page.click('[data-rondleiding="weergave"]');
+    ok(`${tag} één school: twee keuzes`, (await page.locator('[role=listbox] [role=option]').count()) === 2);
+    await page.keyboard.press('Escape');
+    await geenHorizontaleScroll(page, `${tag} één school`);
+    await shot(page, `${tag}-09b-een-school`);
     await ctx.close();
   }
 
@@ -161,40 +207,47 @@ for (const breedte of [1440, 390]) {
     await page.goto(URL);
     await page.click('text=Verken eerst de demo');
     await page.waitForSelector('main h1:has-text("Lyceum Noord")');
-    ok(`${tag} demo school-dashboard`, await page.isVisible('text=Voortgang totaal'));
-    ok(`${tag} demo checklist linkt naar kalender`, (await page.locator('a[href^="#/kalender?item="]').count()) > 0);
+    ok(`${tag} demo start school: volgende stap`, await page.isVisible('[data-rondleiding="volgende-stap"]'));
+    ok(`${tag} demo start school: voortgang`, await page.isVisible('text=Hoe staat het ervoor'));
+    ok(`${tag} demo werklijst linkt naar kalender`, (await page.locator('a[href^="#/kalender?item="]').count()) > 0);
     await geenHorizontaleScroll(page, `${tag} demo school`);
-    await shot(page, `${tag}-10-demo-dashboard-school`);
+    await shot(page, `${tag}-10-demo-start-school`);
 
     await page.goto(URL + '#/organisatie');
-    ok(`${tag} organisatie op schoolniveau: alleen bestuur`, await page.isVisible('text=Alleen voor het bestuur'));
+    await page.waitForSelector('main h1:has-text("Organisatie")');
+    ok(`${tag} organisatie ook op schoolniveau`, await page.isVisible('text=gelden voor het hele bestuur'));
     await shot(page, `${tag}-11-organisatie-school`);
 
-    await kiesNiveau(page, 'Cluster');
-    await page.goto(URL + '#/dashboard');
+    // Overzicht inklappen wordt onthouden (per browser)
+    await page.goto(URL + '#/');
+    await page.click('button[aria-controls="overzicht-inhoud"]');
+    await page.reload();
     await page.waitForSelector('main h1');
-    ok(`${tag} demo cluster-dashboard: heatmap`, await page.isVisible('text=Heatmap scholen × gesprekken'));
-    await geenHorizontaleScroll(page, `${tag} demo cluster`);
-    await shot(page, `${tag}-12-demo-dashboard-cluster`);
+    ok(`${tag} ingeklapt overzicht onthouden`, (await page.locator('#overzicht-inhoud').count()) === 0);
+    await page.click('button[aria-controls="overzicht-inhoud"]');
 
-    await kiesNiveau(page, 'Bestuur');
+    await kies(page, 'Cluster Noord');
+    await page.waitForSelector('main h1:has-text("Cluster Noord")');
+    ok(`${tag} demo cluster: heatmap`, await page.isVisible('text=Per school en gesprek'));
+    await geenHorizontaleScroll(page, `${tag} demo cluster`);
+    await shot(page, `${tag}-12-demo-start-cluster`);
+
+    await kies(page, 'Hele bestuur');
     await page.goto(URL + '#/');
     await page.waitForSelector('main h1:has-text("Stichting Leren Verbeteren")');
     ok(`${tag} demo start: geen onboarding`, !(await page.isVisible('text=Zet je kwaliteitskalender op')));
-    await shot(page, `${tag}-13-demo-start`);
-    await page.goto(URL + '#/dashboard');
-    await page.waitForSelector('text=Voortgang per school');
-    ok(`${tag} demo bestuur-dashboard: 5 scholen in heatmap`, (await page.locator('table tbody tr').count()) === 5);
+    ok(`${tag} demo start bestuur: voortgang per school`, await page.isVisible('text=Voortgang per school'));
+    ok(`${tag} demo bestuur: 5 scholen in heatmap`, (await page.locator('table tbody tr').count()) === 5);
     await geenHorizontaleScroll(page, `${tag} demo bestuur`);
-    await shot(page, `${tag}-14-demo-dashboard-bestuur`);
-    // Klik op een school in de heatmap opent het schooldashboard
+    await shot(page, `${tag}-13-demo-start-bestuur`);
+    // Klik op een school in de heatmap opent die school
     await page.click('table tbody tr >> nth=2 >> button');
     await page.waitForSelector('main h1:has-text("VMBO Zuid")');
     ok(`${tag} heatmap: klik opent school`, true);
 
-    await kiesNiveau(page, 'Bestuur');
+    await kies(page, 'Hele bestuur');
     await page.goto(URL + '#/organisatie');
-    await page.waitForSelector('main h1:has-text("Beheer")');
+    await page.waitForSelector('main h1:has-text("Organisatie")');
     await geenHorizontaleScroll(page, `${tag} demo organisatie`);
     await shot(page, `${tag}-15-demo-organisatie`);
     // Alles leegmaken gaat terug naar welkom
