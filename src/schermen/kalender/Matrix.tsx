@@ -1,26 +1,31 @@
 /**
- * Matrix van de kalender-editor: rijen = standaarden (gegroepeerd per kwaliteitsgebied),
- * kolommen = maanden. Kop en eerste kolom zijn sticky.
+ * Matrix van de kalender: rijen = standaarden (gegroepeerd per kwaliteitsgebied), kolommen = maanden.
+ * Kop en eerste kolom zijn sticky.
  *
- * Verplaatsen (alleen binnen dezelfde rij, zoals het origineel):
- * - klik een chip (selecteren), klik daarna een maand in dezelfde rij;
- * - of, met de chip geselecteerd, pijltje links/rechts; Esc deselecteert;
- * - of sleep de chip met de muis naar een maand in dezelfde rij (nieuw).
- * Tweede klik (of Enter) op de geselecteerde chip opent het detailvenster.
+ * Wat je op het scherm ziet, legt de bediening uit:
+ * - een chip heeft links een statusknop (klik: status kiezen) en rechts een greep (slepen);
+ * - klik op de naam selecteert; de actiebalk onderaan toont dan wat kan, en de maanden in dezelfde
+ *   rij lichten op als doel (klik of sleep erheen);
+ * - een lege cel toont bij hover een plusknop; elke rij heeft een plusknop bij de standaard.
+ * Toetsen op een geselecteerde chip: pijl links/rechts verplaatst, 1-4 zet de status, Enter opent
+ * details, Delete verwijdert (met ongedaan maken), Esc deselecteert.
  */
 import { useEffect, useRef, useState, type DragEvent, type KeyboardEvent } from 'react';
-import { ArrowLeftRight } from 'lucide-react';
-import { GesprekIcoonView, STATUS_STIJL, VasteStandaardBadge, cx, gebiedKlassen, seizoenKlassen } from '../../componenten';
-import { activiteitVan, effectieveNaam } from '../../domein/hulp';
-import type { Gesprek, KalenderItem, Maand } from '../../domein/types';
-import { bundel, maandTitel, type MatrixGroep, type MatrixRij } from './hulp';
+import { GripVertical, KeyRound, Plus } from 'lucide-react';
+import { GesprekIcoonView, STATUS_STIJL, cx, gebiedKlassen, seizoenKlassen } from '../../componenten';
+import { activiteitVan, effectieveNaam, formatDatumKort } from '../../domein/hulp';
+import { STATUS_VOLGORDE } from '../../domein/seed';
+import type { Gesprek, KalenderItem, Maand, Status } from '../../domein/types';
+import { bundel, maandTitel, maandVoluit, type MatrixGroep, type MatrixRij } from './hulp';
+import { StatusKeuze } from './StatusKeuze';
+import type { ToevoegBegin } from './ToevoegPaneel';
 
 export interface MatrixProps {
   groepen: MatrixGroep[];
   maanden: Maand[];
   gesprekken: Record<Maand, Gesprek[]>;
   huidigeMaand: Maand;
-  /** false op clusterniveau: geen selectie, slepen of detailvenster vanuit de matrix */
+  /** false op clusterniveau: alleen-lezen */
   editable: boolean;
   geselecteerd: string | null;
   onSelecteer: (uid: string | null) => void;
@@ -28,11 +33,18 @@ export interface MatrixProps {
   onVerplaats: (uid: string, maand: Maand) => void;
   /** Pijltjestoets op de geselecteerde chip: één maand verder (-1/+1) */
   onStap: (uid: string, stap: -1 | 1) => void;
+  onStatus: (uid: string, status: Status) => void;
+  onVerwijder: (uid: string) => void;
+  onToevoegen: (begin: ToevoegBegin) => void;
+  /** Filter "Toon alleen": false = chip verbergen */
+  zichtbaar: (item: KalenderItem) => boolean;
   /** Clusterniveau: schoolnaam per item-uid (voor tooltips) */
   schoolNaamVan?: (uid: string) => string;
-  /** Uid die na een verplaatsing weer focus moet krijgen */
+  /** Uid die (na verplaatsen of toevoegen) focus moet krijgen */
   focusUid: string | null;
   onFocusGedaan: () => void;
+  /** Uid die even oplicht (net toegevoegd of verplaatst) */
+  markeerUid: string | null;
 }
 
 const KOLOM_BREEDTE = { heel: 96, half: 120 };
@@ -60,6 +72,7 @@ export function Matrix(p: MatrixProps) {
   const aantalKolommen = p.maanden.length + 1;
 
   function chipToets(e: KeyboardEvent, item: KalenderItem) {
+    const gekozen = p.geselecteerd === item.uid;
     if (e.key === 'Escape') {
       if (p.geselecteerd) {
         e.preventDefault();
@@ -67,9 +80,16 @@ export function Matrix(p: MatrixProps) {
       }
       return;
     }
-    if (p.geselecteerd === item.uid && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+    if (!gekozen) return;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       e.preventDefault();
       p.onStap(item.uid, e.key === 'ArrowLeft' ? -1 : 1);
+    } else if (/^[1-4]$/.test(e.key)) {
+      e.preventDefault();
+      p.onStatus(item.uid, STATUS_VOLGORDE[Number(e.key) - 1]);
+    } else if (e.key === 'Delete' || e.key === 'Backspace') {
+      e.preventDefault();
+      p.onVerwijder(item.uid);
     }
   }
 
@@ -95,8 +115,11 @@ export function Matrix(p: MatrixProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-line-subtle bg-surface-card shadow-xs [--kk-rijkop:120px] md:[--kk-rijkop:200px] xl:[--kk-rijkop:224px]">
-      <div className="max-h-[max(420px,calc(100vh-260px))] overflow-auto overscroll-contain" data-matrix-scroller>
+    <div
+      className="overflow-hidden rounded-lg border border-line-subtle bg-surface-card shadow-xs [--kk-rijkop:132px] md:[--kk-rijkop:200px] xl:[--kk-rijkop:224px]"
+      data-rondleiding="matrix"
+    >
+      <div className="max-h-[max(420px,calc(100vh-250px))] overflow-auto overscroll-contain" data-matrix-scroller>
         <table
           ref={tabel}
           className="w-full table-fixed border-separate border-spacing-0 text-left"
@@ -179,12 +202,24 @@ export function Matrix(p: MatrixProps) {
                         )}
                       >
                         <span className="flex items-center gap-1.5">
-                          <span aria-hidden className={cx('h-2 w-2 shrink-0 rounded-full', rij.gebied ? gebiedKlassen(rij.gebied).dot : 'bg-gray-400')} />
                           <span className="text-sm font-bold text-ink-strong">{rij.code}</span>
-                          {rij.kern && <VasteStandaardBadge compact />}
-                          <span className="tnum ml-auto text-2xs text-ink-subtle" title={`${rij.aantal} activiteiten`}>
-                            {rij.aantal || ''}
-                          </span>
+                          {rij.kern && (
+                            <span title="Vaste standaard: komt in elk gesprek terug" className="text-ink-subtle">
+                              <KeyRound className="h-3 w-3" aria-label="vaste standaard" />
+                            </span>
+                          )}
+                          {p.editable && rij.gebied && (
+                            <button
+                              type="button"
+                              data-rondleiding="toevoegen-rij"
+                              onClick={() => p.onToevoegen({ standaard: rij.code })}
+                              aria-label={`Activiteit toevoegen bij ${rij.code}`}
+                              title={`Activiteit toevoegen bij ${rij.code}`}
+                              className="ml-auto grid h-6 w-6 place-items-center rounded-sm text-ink-subtle opacity-0 transition-opacity duration-fast hover:bg-niveau-surface hover:text-niveau-strong focus-visible:opacity-100 group-hover/rij:opacity-100"
+                            >
+                              <Plus className="h-4 w-4" aria-hidden />
+                            </button>
+                          )}
                         </span>
                         <span className="mt-0.5 line-clamp-2 block text-xs font-medium leading-snug text-ink-muted" title={rij.naam}>
                           {rij.naam}
@@ -193,11 +228,13 @@ export function Matrix(p: MatrixProps) {
                       {p.maanden.map((m) => {
                         const doel = p.editable && isDoel(rij, m);
                         const sleutel = `${rij.code}|${m}`;
-                        const items = rij.cellen[m];
+                        const items = rij.cellen[m].filter(p.zichtbaar);
+                        const kanToevoegen = p.editable && !actief && !!rij.gebied && items.length === 0;
                         return (
                           <td
                             key={m}
                             data-cel={sleutel}
+                            data-doel={doel || undefined}
                             onClick={doel && !sleep ? () => p.onVerplaats(actief!.uid, m) : undefined}
                             onDragOver={
                               doel && sleep
@@ -218,9 +255,9 @@ export function Matrix(p: MatrixProps) {
                                   }
                                 : undefined
                             }
-                            title={doel ? `Verplaats naar ${maandTitel(m).toLowerCase()}` : undefined}
+                            title={doel ? `Verplaats naar ${maandVoluit(m)}` : undefined}
                             className={cx(
-                              'h-14 border-b border-r border-line-subtle p-1 align-top transition-colors duration-fast',
+                              'group/cel relative h-12 border-b border-r border-line-subtle p-1 align-top transition-colors duration-fast',
                               doel && 'cursor-pointer bg-niveau-surface outline-dashed outline-2 -outline-offset-4 outline-niveau-border hover:outline-niveau',
                               boven === sleutel && 'outline-niveau',
                             )}
@@ -233,15 +270,47 @@ export function Matrix(p: MatrixProps) {
                                       item={item}
                                       geselecteerd={p.geselecteerd === item.uid}
                                       sleept={sleep?.uid === item.uid}
+                                      gemarkeerd={p.markeerUid === item.uid}
                                       onClick={() => chipKlik(item)}
                                       onKeyDown={(e) => chipToets(e, item)}
                                       onDragStart={(e) => dragStart(e, item, rij)}
                                       onDragEnd={dragEinde}
+                                      onStatus={(s) => p.onStatus(item.uid, s)}
                                     />
                                   ))
                                 : bundel(items).map((b) => (
                                     <ClusterChip key={b.sleutel} naam={b.naam} items={b.items} schoolNaamVan={p.schoolNaamVan} />
                                   ))}
+                              {doel && (
+                                <span
+                                  aria-hidden
+                                  className={cx(
+                                    'pointer-events-none py-1 text-center text-2xs font-semibold text-niveau-strong',
+                                    boven === sleutel ? 'block' : 'hidden group-hover/cel:block',
+                                  )}
+                                >
+                                  Hierheen
+                                </span>
+                              )}
+                              {kanToevoegen && (
+                                <button
+                                  type="button"
+                                  tabIndex={-1}
+                                  data-celplus
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    p.onToevoegen({ standaard: rij.code, maand: m });
+                                  }}
+                                  aria-label={`Activiteit toevoegen bij ${rij.code} in ${maandVoluit(m)}`}
+                                  title={`Toevoegen bij ${rij.code} in ${maandVoluit(m)}`}
+                                  className={cx(
+                                    'absolute inset-1 grid place-items-center rounded-sm border border-dashed border-transparent text-ink-subtle opacity-0 transition-opacity duration-fast',
+                                    'hover:border-niveau-border hover:bg-niveau-surface hover:text-niveau-strong group-hover/cel:opacity-100',
+                                  )}
+                                >
+                                  <Plus className="h-3.5 w-3.5" aria-hidden />
+                                </button>
+                              )}
                             </div>
                           </td>
                         );
@@ -276,91 +345,101 @@ function zoekInGroepen(groepen: MatrixGroep[], uid: string): { item: KalenderIte
 /* Chips                                                                */
 /* ------------------------------------------------------------------ */
 
-function StatusIcoon({ status }: { status: KalenderItem['status'] }) {
-  const s = STATUS_STIJL[status] ?? STATUS_STIJL.gepland;
-  const Icoon = s.icoon;
-  return (
-    <span title={s.label} className={cx('mt-px shrink-0', s.ink)}>
-      <Icoon className="h-3 w-3" aria-hidden style={{ strokeWidth: 2.6 }} />
-    </span>
-  );
+/** Tooltiptekst: alles wat niet op de chip zelf staat. */
+export function chipTitel(item: KalenderItem): string {
+  const a = activiteitVan(item);
+  const regels = [effectieveNaam(item), STATUS_STIJL[item.status]?.label ?? item.status];
+  if (a?.verplicht) regels.push('Verplicht');
+  if (item.eigenaar) regels.push(`Eigenaar: ${item.eigenaar}`);
+  if (item.deadline) regels.push(`Deadline: ${formatDatumKort(item.deadline)}`);
+  if (item.afwijking) regels.push(`Ander gesprek: ${item.afwijking.reden}`);
+  return regels.join('\n');
 }
 
 interface MatrixChipProps {
   item: KalenderItem;
   geselecteerd: boolean;
   sleept: boolean;
+  gemarkeerd: boolean;
   onClick: () => void;
   onKeyDown: (e: KeyboardEvent) => void;
   onDragStart: (e: DragEvent) => void;
   onDragEnd: () => void;
+  onStatus: (s: Status) => void;
 }
 
-/** Chip in de matrix: wit vlak, links een balk in de kleur van het kwaliteitsgebied. */
-function MatrixChip({ item, geselecteerd, sleept, onClick, onKeyDown, onDragStart, onDragEnd }: MatrixChipProps) {
+/**
+ * Chip in de matrix: statusknop, naam, greep. Het kwaliteitsgebied staat al bij de rij en hoeft
+ * niet nog eens op de chip. Gereed is stiller (grijze tekst), risico licht op.
+ */
+function MatrixChip({ item, geselecteerd, sleept, gemarkeerd, onClick, onKeyDown, onDragStart, onDragEnd, onStatus }: MatrixChipProps) {
   const a = activiteitVan(item);
-  const k = gebiedKlassen(a?.gebied);
   const naam = effectieveNaam(item);
   const status = STATUS_STIJL[item.status]?.label ?? item.status;
   const uitleg = geselecteerd
-    ? 'Geselecteerd. Pijltje links of rechts verplaatst, Enter opent de details, Escape deselecteert.'
-    : 'Enter om te selecteren en te verplaatsen.';
+    ? 'Geselecteerd. Pijl links of rechts verplaatst, 1 tot 4 zet de status, Enter opent de details, Delete verwijdert, Escape deselecteert.'
+    : 'Enter om te selecteren.';
   return (
-    <button
-      type="button"
-      data-uid={item.uid}
+    <div
+      data-chip
+      data-rondleiding="chip"
       draggable
-      aria-pressed={geselecteerd}
-      aria-label={`${naam}. ${status}${a?.verplicht ? ', verplicht' : ''}${item.afwijking ? ', afwijking' : ''}. ${uitleg}`}
-      title={`${naam}\n${status}${item.eigenaar ? ` · ${item.eigenaar}` : ''}${item.afwijking ? `\nAfwijking: ${item.afwijking.reden}` : ''}`}
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick();
-      }}
-      onKeyDown={onKeyDown}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
+      onClick={(e) => e.stopPropagation()}
       className={cx(
-        'relative flex w-full cursor-grab items-start gap-1 overflow-hidden rounded-sm border bg-surface-card py-1 pl-2.5 pr-1 text-left transition-[box-shadow,border-color,opacity] duration-fast active:cursor-grabbing',
+        'group/chip relative flex w-full items-start gap-0.5 rounded-sm border py-0.5 pl-0.5 pr-1 transition-[box-shadow,border-color,opacity,background-color] duration-base',
+        item.status === 'risico' ? 'border-status-warning-border bg-status-warning-surface' : 'bg-surface-card',
         geselecteerd
           ? 'z-[2] border-transparent shadow-md ring-2 ring-niveau'
-          : 'z-[1] border-line-subtle shadow-xs hover:border-line hover:shadow-sm',
+          : cx('z-[1] shadow-xs hover:shadow-sm', item.status === 'risico' ? '' : 'border-line-subtle hover:border-line'),
+        !geselecteerd && 'has-[[data-uid]:focus-visible]:ring-2 has-[[data-uid]:focus-visible]:ring-niveau-border',
+        gemarkeerd && !geselecteerd && 'bg-brand-yellow-soft',
         sleept && 'opacity-50',
       )}
     >
-      <span aria-hidden className={cx('absolute inset-y-0 left-0 w-[3px]', k.dot)} />
-      <span className="line-clamp-3 min-w-0 flex-1 break-words hyphens-auto text-[11.5px] font-medium leading-tight text-ink-body">{naam}</span>
-      <span className="flex shrink-0 flex-col items-center gap-0.5">
-        <StatusIcoon status={item.status} />
-        {a?.verplicht && (
-          <span
-            title="Verplicht"
-            className="grid h-3 w-3 place-items-center rounded-full bg-status-warning text-[8px] font-bold leading-none text-white"
-          >
-            !
-          </span>
+      <StatusKeuze status={item.status} onKies={onStatus} naam={naam} />
+      <button
+        type="button"
+        data-uid={item.uid}
+        aria-pressed={geselecteerd}
+        aria-label={`${naam}. ${status}${a?.verplicht ? ', verplicht' : ''}${item.afwijking ? ', ander gesprek' : ''}. ${uitleg}`}
+        title={chipTitel(item)}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick();
+        }}
+        onDoubleClick={(e) => e.stopPropagation()}
+        onKeyDown={onKeyDown}
+        className={cx(
+          'min-w-0 flex-1 cursor-grab py-0.5 text-left outline-none active:cursor-grabbing',
+          'line-clamp-3 break-words hyphens-auto text-[11.5px] font-medium leading-tight',
+          item.status === 'gereed' ? 'text-ink-muted' : 'text-ink-body',
         )}
-        {item.afwijking && (
-          <span title={`Afwijking: ${item.afwijking.reden}`} className="text-status-warning">
-            <ArrowLeftRight className="h-3 w-3" aria-hidden />
-          </span>
+      >
+        {naam}
+      </button>
+      <span
+        aria-hidden
+        className={cx(
+          'pointer-events-none absolute right-0 top-0.5 rounded-sm bg-surface-card text-ink-subtle transition-opacity duration-fast',
+          geselecteerd ? 'opacity-100' : 'opacity-0 group-hover/chip:opacity-100',
         )}
+      >
+        <GripVertical className="h-3.5 w-3" />
       </span>
-    </button>
+    </div>
   );
 }
 
 /** Clusterweergave: één chip per activiteit met de status per school (alleen-lezen). */
 function ClusterChip({ naam, items, schoolNaamVan }: { naam: string; items: KalenderItem[]; schoolNaamVan?: (uid: string) => string }) {
-  const a = activiteitVan(items[0]);
-  const k = gebiedKlassen(a?.gebied);
   const regels = items.map((i) => `${schoolNaamVan?.(i.uid) ?? 'School'}: ${STATUS_STIJL[i.status]?.label ?? i.status}`);
   return (
     <div
-      className="relative flex w-full items-start gap-1 overflow-hidden rounded-sm border border-line-subtle bg-surface-card py-1 pl-2.5 pr-1 shadow-xs"
+      className="relative flex w-full items-start gap-1 overflow-hidden rounded-sm border border-line-subtle bg-surface-card px-1.5 py-1 shadow-xs"
       title={`${naam}\n${regels.join('\n')}`}
     >
-      <span aria-hidden className={cx('absolute inset-y-0 left-0 w-[3px]', k.dot)} />
       <span className="min-w-0 flex-1">
         <span className="line-clamp-3 break-words hyphens-auto text-[11.5px] font-medium leading-tight text-ink-body">{naam}</span>
         <span className="mt-0.5 flex flex-wrap items-center gap-0.5" aria-label={regels.join(', ')}>

@@ -165,6 +165,22 @@ export function removeItem(s: State, scope: EditScope, uid: string, nu: Tijdstem
   return { ...na, verwijderd: met(s.verwijderd, itemSleutel(scope, uid), stempel(nu, item.gewijzigd)) };
 }
 
+/**
+ * Ongedaan maken: zet een eerder vastgelegde versie van een item terug (verplaatsen, status,
+ * opslaan in het detailvenster of verwijderen terugdraaien). Bestaat het item nog, dan wordt het
+ * vervangen; anders weer toegevoegd en verdwijnt de tombstone. Het item krijgt een nieuwe
+ * tijdstempel, zodat het terugzetten ook bij collega's doorkomt.
+ */
+export function herstelItem(s: State, scope: EditScope, versie: KalenderItem, nu: Tijdstempel): State {
+  const lijst = scope.kind === 'bestuur' ? s.bestuurItems : (s.schoolKalenders[scope.schoolId] ?? []);
+  const huidig = lijst.find((i) => i.uid === versie.uid);
+  if (!huidig) return voegItemToe(s, scope, versie, nu);
+  if (JSON.stringify({ ...huidig, gewijzigd: 0 }) === JSON.stringify({ ...versie, gewijzigd: 0 })) return s;
+  return wijzigKalender(s, scope, (items) =>
+    items.map((i) => (i.uid === versie.uid ? { ...versie, gewijzigd: stempel(nu, i.gewijzigd, versie.gewijzigd) } : i)),
+  );
+}
+
 /** Gesprek koppelen. Wijkt het af van het standaardgesprek, dan afwijking met reden (leeg → "Aangepast door school"). */
 function koppel(i: KalenderItem, gesprek: string, reden: string): KalenderItem {
   const standaard = activiteitVan(i)?.gesprek;

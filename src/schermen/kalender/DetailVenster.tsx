@@ -1,14 +1,21 @@
 /**
  * Detailvenster van een kalenderitem (route /kalender?item=<uid>).
  *
+ * Twee lagen: eerst wat bijna altijd nodig is (status, maand, deadline, eigenaar, notitie), daaronder
+ * uitklapbaar "Meer" (ander gesprek met reden, eigen naam, bewijs, gegevens van de activiteit,
+ * historie), met een samenvatting van wat erin staat.
+ *
  * Anders dan het origineel werkt alles via "Opslaan": ook de status en de bewijsstukken.
  * "Annuleren" draait dus alles terug (inventaris §9). Sluiten met niet-opgeslagen wijzigingen
- * vraagt eerst wat je wilt. Verwijderen vraagt een bevestiging in het venster zelf.
+ * vraagt eerst wat je wilt. Verwijderen gaat direct als de kalender "Ongedaan maken" aanbiedt
+ * (prop onVerwijderd); anders vraagt het venster eerst een bevestiging.
  */
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeftRight,
   CalendarClock,
+  ChevronRight,
+  Info,
   Copy,
   FileText,
   History,
@@ -89,6 +96,10 @@ export interface DetailVensterProps {
   /** Alleen-lezen: knop om naar de school van dit item te gaan. */
   onOpenSchool?: () => void;
   onClose: () => void;
+  /** Na opslaan, met de versie van voor het opslaan (voor ongedaan maken). Zonder: een toast. */
+  onOpgeslagen?: (vorige: KalenderItem) => void;
+  /** Na verwijderen (voor ongedaan maken). Met deze prop vraagt het venster geen bevestiging meer. */
+  onVerwijderd?: (vorige: KalenderItem) => void;
 }
 
 export function DetailVenster(props: DetailVensterProps) {
@@ -99,13 +110,13 @@ export function DetailVenster(props: DetailVensterProps) {
 /* Kop met de vaste gegevens van de activiteit                          */
 /* ------------------------------------------------------------------ */
 
-function ActiviteitKop({ item }: { item: KalenderItem }) {
+function ActiviteitKop({ item, kort }: { item: KalenderItem; kort?: boolean }) {
   const { state } = useStore();
   const a = activiteitVan(item);
   const std = a ? STANDAARD_OP_CODE[a.standaard] : undefined;
   const standaardGesprek = a ? vindGesprek(state.organisatie.gesprekscyclus, a.gesprek) : null;
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-2">
       <div className="flex flex-wrap items-center gap-1.5">
         {a && <KwaliteitsgebiedTag gebied={a.gebied} size="sm" className="mr-1" />}
         {a && <StandaardBadge code={a.standaard} title={std?.naam} />}
@@ -117,30 +128,52 @@ function ActiviteitKop({ item }: { item: KalenderItem }) {
             Eigen activiteit
           </Badge>
         )}
-        <span className="tnum text-2xs text-ink-subtle">
-          {item.activiteitId} · {a?.periode || 'geen periode'}
-        </span>
+        {!kort && (
+          <span className="tnum text-2xs text-ink-subtle">
+            {item.activiteitId} · {a?.periode || 'geen periode'}
+          </span>
+        )}
       </div>
-      {a?.omschrijving && <p className="text-sm text-ink-body">{a.omschrijving}</p>}
-      {a && (a.frequentie || a.verantwoordelijke) && (
-        <dl className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-ink-muted">
-          {a.frequentie && (
-            <div className="flex items-center gap-1.5">
-              <Repeat className="h-3.5 w-3.5 text-ink-subtle" aria-hidden />
-              <dt className="sr-only">Frequentie</dt>
-              <dd>{a.frequentie}</dd>
-            </div>
-          )}
-          {a.verantwoordelijke && (
-            <div className="flex items-center gap-1.5">
-              <UserRound className="h-3.5 w-3.5 text-ink-subtle" aria-hidden />
-              <dt>Verantwoordelijke rol:</dt>
-              <dd className="font-medium text-ink-body">{a.verantwoordelijke}</dd>
-            </div>
-          )}
-        </dl>
-      )}
+      {a?.omschrijving && <p className={cx('text-sm text-ink-body', kort && 'line-clamp-2')} title={kort ? a.omschrijving : undefined}>{a.omschrijving}</p>}
+      {!kort && <OverActiviteitRegels item={item} />}
     </div>
+  );
+}
+
+function OverActiviteitRegels({ item }: { item: KalenderItem }) {
+  const a = activiteitVan(item);
+  if (!a || !(a.frequentie || a.verantwoordelijke)) return null;
+  return (
+    <dl className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-ink-muted">
+      {a.frequentie && (
+        <div className="flex items-center gap-1.5">
+          <Repeat className="h-3.5 w-3.5 text-ink-subtle" aria-hidden />
+          <dt className="sr-only">Frequentie</dt>
+          <dd>{a.frequentie}</dd>
+        </div>
+      )}
+      {a.verantwoordelijke && (
+        <div className="flex items-center gap-1.5">
+          <UserRound className="h-3.5 w-3.5 text-ink-subtle" aria-hidden />
+          <dt>Verantwoordelijke rol:</dt>
+          <dd className="font-medium text-ink-body">{a.verantwoordelijke}</dd>
+        </div>
+      )}
+    </dl>
+  );
+}
+
+/** Tweede laag van het detailvenster: de vaste gegevens uit de bibliotheek. */
+function OverActiviteit({ item }: { item: KalenderItem }) {
+  const a = activiteitVan(item);
+  return (
+    <section>
+      <Sectiekop icon={Info}>Over deze activiteit</Sectiekop>
+      <p className="tnum mb-1 text-xs text-ink-muted">
+        {item.activiteitId} · aanbevolen periode {a?.periode || 'niet vastgelegd'}
+      </p>
+      <OverActiviteitRegels item={item} />
+    </section>
   );
 }
 
@@ -238,7 +271,7 @@ function BewijsRegel({ b, onVerwijder, nieuw }: { b: Bewijs; onVerwijder?: () =>
 /* Bewerken                                                             */
 /* ------------------------------------------------------------------ */
 
-function BewerkVenster({ item, editScope, kalenderNaam, onClose }: DetailVensterProps & { editScope: EditScope }) {
+function BewerkVenster({ item, editScope, kalenderNaam, onClose, onOpgeslagen, onVerwijderd }: DetailVensterProps & { editScope: EditScope }) {
   const store = useStore();
   const toast = useToast();
   const cyclus = store.state.organisatie.gesprekscyclus;
@@ -255,6 +288,8 @@ function BewerkVenster({ item, editScope, kalenderNaam, onClose }: DetailVenster
   const [bewijsFout, setBewijsFout] = useState('');
   const [verwijderVraag, setVerwijderVraag] = useState(false);
   const [sluitVraag, setSluitVraag] = useState(false);
+  // Tweede laag open als er al iets in staat dat aandacht vraagt (een ander gesprek).
+  const [meerOpen, setMeerOpen] = useState(() => !!item.afwijking);
 
   // Ander item geopend: concept opnieuw vullen.
   useEffect(() => {
@@ -263,6 +298,7 @@ function BewerkVenster({ item, editScope, kalenderNaam, onClose }: DetailVenster
     setC(b);
     setVerwijderVraag(false);
     setSluitVraag(false);
+    setMeerOpen(!!item.afwijking);
     // alleen bij een ander item; wijzigingen van collega's overschrijven je concept niet
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item.uid]);
@@ -300,6 +336,7 @@ function BewerkVenster({ item, editScope, kalenderNaam, onClose }: DetailVenster
 
   function opslaan() {
     if (redenFout) return;
+    const vorige = item;
     if (c.status !== begin.status) store.setItemStatus(editScope, item.uid, c.status);
     const eigenNaam = c.eigenNaam.trim() === bibliotheekNaam ? '' : c.eigenNaam;
     store.slaItemOp(editScope, item.uid, {
@@ -314,35 +351,33 @@ function BewerkVenster({ item, editScope, kalenderNaam, onClose }: DetailVenster
     const blijft = new Set(c.bewijs.map((b) => b.id));
     for (const b of begin.bewijs) if (!blijft.has(b.id)) store.removeBewijs(editScope, item.uid, b.id);
     for (const b of c.bewijs) if (b.id.startsWith('nieuw-')) store.addBewijs(editScope, item.uid, { label: b.label, url: b.url });
-    toast('Wijzigingen opgeslagen');
+    if (onOpgeslagen) onOpgeslagen(vorige);
+    else toast('Wijzigingen opgeslagen');
     onClose();
   }
 
   function verwijder() {
+    const vorige = item;
     onClose();
     store.removeItem(editScope, item.uid);
-    toast('Activiteit verwijderd', 'danger');
+    if (onVerwijderd) onVerwijderd(vorige);
+    else toast('Activiteit verwijderd', 'danger');
   }
 
   const naamHint =
     c.eigenNaam.trim() && c.eigenNaam.trim() !== bibliotheekNaam
-      ? `Bibliotheeknaam: ${bibliotheekNaam} · koppeling met ${a?.standaard ?? 'de standaard'} blijft behouden.`
-      : 'Pas de naam aan naar je eigen terminologie. De koppeling met de bibliotheek en standaard blijft ongewijzigd.';
+      ? `Bibliotheeknaam: ${bibliotheekNaam}. De koppeling met ${a?.standaard ?? 'de standaard'} blijft behouden.`
+      : 'Gebruik je eigen woorden. De koppeling met de bibliotheek en de standaard blijft ongewijzigd.';
 
-  const footer = verwijderVraag ? (
-    <div className="flex w-full flex-wrap items-center justify-end gap-2">
-      <p className="mr-auto flex items-center gap-2 text-sm font-medium text-status-danger">
-        <TriangleAlert className="h-4 w-4" aria-hidden />
-        Deze activiteit van de kalender verwijderen?
-      </p>
-      <Button variant="secondary" onClick={() => setVerwijderVraag(false)}>
-        Nee, behouden
-      </Button>
-      <Button variant="danger" icon={Trash2} onClick={verwijder} autoFocus>
-        Ja, verwijderen
-      </Button>
-    </div>
-  ) : sluitVraag ? (
+  // Samenvatting van de tweede laag, zodat je ziet wat erin staat zonder hem te openen.
+  const meerSamenvatting = [
+    afwijkend ? `gesprek ${vindGesprek(cyclus, c.gesprek).naam}` : null,
+    c.eigenNaam.trim() && c.eigenNaam.trim() !== bibliotheekNaam ? 'eigen naam' : null,
+    c.bewijs.length ? (c.bewijs.length === 1 ? '1 bewijsstuk' : `${c.bewijs.length} bewijsstukken`) : null,
+    item.historie?.length ? 'historie' : null,
+  ].filter(Boolean);
+
+  const footer = sluitVraag ? (
     <div className="flex w-full flex-wrap items-center justify-end gap-2">
       <p className="mr-auto text-sm font-medium text-ink-strong">Je wijzigingen zijn nog niet opgeslagen.</p>
       <Button variant="ghost" onClick={onClose}>
@@ -355,16 +390,35 @@ function BewerkVenster({ item, editScope, kalenderNaam, onClose }: DetailVenster
         Opslaan
       </Button>
     </div>
+  ) : verwijderVraag ? (
+    <div className="flex w-full flex-wrap items-center justify-end gap-2">
+      <p className="mr-auto flex items-center gap-2 text-sm font-medium text-status-danger">
+        <TriangleAlert className="h-4 w-4" aria-hidden />
+        Deze activiteit van de kalender verwijderen?
+      </p>
+      <Button variant="secondary" onClick={() => setVerwijderVraag(false)}>
+        Nee, behouden
+      </Button>
+      <Button variant="danger" icon={Trash2} onClick={verwijder} autoFocus>
+        Ja, verwijderen
+      </Button>
+    </div>
   ) : (
     <>
-      <Button variant="danger-zacht" icon={Trash2} className="mr-auto" onClick={() => setVerwijderVraag(true)}>
+      <Button
+        variant="danger-zacht"
+        icon={Trash2}
+        className="mr-auto"
+        // Met ongedaan maken is een extra vraag overbodig.
+        onClick={() => (onVerwijderd ? verwijder() : setVerwijderVraag(true))}
+      >
         Verwijderen
       </Button>
       {gewijzigd && <span className="hidden text-xs text-ink-subtle sm:inline">Niet opgeslagen</span>}
       <Button variant="ghost" onClick={onClose}>
         Annuleren
       </Button>
-      <Button variant="primary" onClick={opslaan} disabled={redenFout} title={redenFout ? 'Vul eerst een reden voor de afwijking in' : undefined}>
+      <Button variant="primary" onClick={opslaan} disabled={redenFout} title={redenFout ? 'Vul eerst een reden in voor het andere gesprek' : undefined}>
         Opslaan
       </Button>
     </>
@@ -382,19 +436,15 @@ function BewerkVenster({ item, editScope, kalenderNaam, onClose }: DetailVenster
     >
       <form
         className="space-y-5"
+        data-rondleiding="detailvenster"
         onSubmit={(e) => {
           e.preventDefault();
           opslaan();
         }}
       >
-        <ActiviteitKop item={item} />
+        <ActiviteitKop item={item} kort />
 
-        <Veld label="Eigen naam (optioneel)" hint={naamHint}>
-          {(id) => (
-            <Input id={id} value={c.eigenNaam} placeholder={bibliotheekNaam} onChange={(e) => zet('eigenNaam', e.target.value)} />
-          )}
-        </Veld>
-
+        {/* Laag 1: wat bijna altijd nodig is */}
         <fieldset>
           <legend className="mb-1 text-xs font-semibold text-ink-muted">Status</legend>
           <div role="radiogroup" aria-label="Status" className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -424,23 +474,7 @@ function BewerkVenster({ item, editScope, kalenderNaam, onClose }: DetailVenster
           </div>
         </fieldset>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Veld label="Eigenaar" hint={PRIVACY_REGEL + ' Gebruik bij voorkeur een rol.'}>
-            {(id) => (
-              <Input
-                id={id}
-                value={c.eigenaar}
-                placeholder={a?.verantwoordelijke ? `Naam of rol, bv. ${a.verantwoordelijke}` : 'Naam of rol'}
-                onChange={(e) => zet('eigenaar', e.target.value)}
-              />
-            )}
-          </Veld>
-          <Veld
-            label="Deadline"
-            fout={deadlineVerstreken ? 'Deze deadline is verstreken en de activiteit is nog niet gereed.' : undefined}
-          >
-            {(id) => <Input id={id} type="date" value={c.deadline} onChange={(e) => zet('deadline', e.target.value)} />}
-          </Veld>
+        <div className="grid items-start gap-4 sm:grid-cols-[1fr_1fr_1.3fr]">
           <Veld label="Maand">
             {(id) => (
               <Select
@@ -451,113 +485,157 @@ function BewerkVenster({ item, editScope, kalenderNaam, onClose }: DetailVenster
               />
             )}
           </Veld>
-          <Veld label="Gekoppeld gesprek">
+          <Veld
+            label="Deadline"
+            fout={deadlineVerstreken ? 'Verstreken en nog niet gereed.' : undefined}
+          >
+            {(id) => <Input id={id} type="date" value={c.deadline} onChange={(e) => zet('deadline', e.target.value)} />}
+          </Veld>
+          <Veld label="Eigenaar" hint={`${PRIVACY_REGEL} Bij voorkeur een rol.`}>
             {(id) => (
-              <Select
+              <Input
                 id={id}
-                value={c.gesprek}
-                onChange={(e) => zet('gesprek', e.target.value)}
-                options={opties.map((g) => ({
-                  value: g.id,
-                  label: g.id === standaardGesprek ? `${g.naam} (standaard)` : g.naam,
-                }))}
+                value={c.eigenaar}
+                placeholder={a?.verantwoordelijke ? `bv. ${a.verantwoordelijke}` : 'Naam of rol'}
+                onChange={(e) => zet('eigenaar', e.target.value)}
               />
             )}
           </Veld>
         </div>
 
-        {afwijkend && (
-          <div className="rounded-md border border-dashed border-status-warning-border bg-status-warning-surface p-3">
-            <Veld
-              label={
-                <span className="inline-flex items-center gap-1.5">
-                  <ArrowLeftRight className="h-3.5 w-3.5 text-status-warning" aria-hidden />
-                  Reden voor afwijking
-                </span>
-              }
-              verplicht
-              hint={`Het standaardgesprek is ${vindGesprek(cyclus, standaardGesprek ?? 'Doorlopend').naam}. ${PRIVACY_REGEL}`}
-              fout={redenFout && c.reden.length > 0 ? 'Gebruik minstens 2 tekens.' : undefined}
-            >
-              {(id) => (
-                <Input
-                  id={id}
-                  value={c.reden}
-                  placeholder="Korte toelichting (zichtbaar voor bestuur)"
-                  onChange={(e) => zet('reden', e.target.value)}
-                  aria-invalid={redenFout}
-                />
-              )}
-            </Veld>
-          </div>
-        )}
-
         <Veld label="Notitie" hint={PRIVACY_REGEL}>
-          {(id) => <Textarea id={id} value={c.notitie} rows={3} onChange={(e) => zet('notitie', e.target.value)} />}
+          {(id) => <Textarea id={id} value={c.notitie} rows={2} onChange={(e) => zet('notitie', e.target.value)} />}
         </Veld>
 
-        <section>
-          <Sectiekop icon={Paperclip}>Bewijs ({c.bewijs.length})</Sectiekop>
-          {c.bewijs.length > 0 && (
-            <ul className="mb-2 space-y-1.5">
-              {c.bewijs.map((b) => (
-                <BewijsRegel
-                  key={b.id}
-                  b={b}
-                  nieuw={b.id.startsWith('nieuw-')}
-                  onVerwijder={() =>
-                    zet(
-                      'bewijs',
-                      c.bewijs.filter((x) => x.id !== b.id),
-                    )
-                  }
-                />
-              ))}
-            </ul>
-          )}
-          <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
-            <Input
-              veldMaat="sm"
-              aria-label="Naam document of verslag"
-              placeholder="Naam document of verslag"
-              value={bewijsLabel}
-              onChange={(e) => {
-                setBewijsLabel(e.target.value);
-                setBewijsFout('');
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  koppelBewijs();
-                }
-              }}
-            />
-            <Input
-              veldMaat="sm"
-              aria-label="Link (optioneel)"
-              placeholder="Link (optioneel)"
-              value={bewijsUrl}
-              onChange={(e) => {
-                setBewijsUrl(e.target.value);
-                setBewijsFout('');
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  koppelBewijs();
-                }
-              }}
-            />
-            <Button type="button" variant="secondary" size="sm" icon={Plus} onClick={koppelBewijs}>
-              Koppel
-            </Button>
-          </div>
-          <p className={cx('mt-1 text-2xs leading-snug', bewijsFout ? 'text-xs text-status-danger' : 'text-ink-subtle')}>
-            {bewijsFout || `${BEWIJS_HINT} De link wordt alleen bewaard, nooit geopend.`}
-          </p>
-        </section>
+        {/* Laag 2: rustig eronder, uitklapbaar */}
+        <div className="rounded-lg border border-line-subtle">
+          <button
+            type="button"
+            aria-expanded={meerOpen}
+            aria-controls="detail-meer"
+            onClick={() => setMeerOpen((o) => !o)}
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left hover:bg-surface-hover"
+          >
+            <ChevronRight className={cx('h-4 w-4 shrink-0 text-ink-muted transition-transform duration-fast', meerOpen && 'rotate-90')} aria-hidden />
+            <span className="text-sm font-semibold text-ink-strong">Meer</span>
+            <span className="min-w-0 flex-1 truncate text-xs text-ink-muted">
+              {meerSamenvatting.length ? meerSamenvatting.join(' · ') : 'gesprek, eigen naam, bewijs, historie'}
+            </span>
+          </button>
+          {meerOpen && (
+            <div id="detail-meer" className="space-y-5 border-t border-line-subtle px-3 pb-4 pt-4">
+              <Veld label="Gekoppeld gesprek">
+                {(id) => (
+                  <Select
+                    id={id}
+                    value={c.gesprek}
+                    onChange={(e) => zet('gesprek', e.target.value)}
+                    options={opties.map((g) => ({
+                      value: g.id,
+                      label: g.id === standaardGesprek ? `${g.naam} (standaard)` : g.naam,
+                    }))}
+                  />
+                )}
+              </Veld>
 
-        <HistorieLijst item={item} />
+              {afwijkend && (
+                <div className="-mt-2 rounded-md border border-dashed border-status-warning-border bg-status-warning-surface p-3">
+                  <Veld
+                    label={
+                      <span className="inline-flex items-center gap-1.5">
+                        <ArrowLeftRight className="h-3.5 w-3.5 text-status-warning" aria-hidden />
+                        Reden voor afwijking
+                      </span>
+                    }
+                    verplicht
+                    hint={`Het standaardgesprek is ${vindGesprek(cyclus, standaardGesprek ?? 'Doorlopend').naam}. ${PRIVACY_REGEL}`}
+                    fout={redenFout && c.reden.length > 0 ? 'Gebruik minstens 2 tekens.' : undefined}
+                  >
+                    {(id) => (
+                      <Input
+                        id={id}
+                        value={c.reden}
+                        placeholder="Korte toelichting (zichtbaar voor bestuur)"
+                        onChange={(e) => zet('reden', e.target.value)}
+                        aria-invalid={redenFout}
+                      />
+                    )}
+                  </Veld>
+                </div>
+              )}
+
+              <Veld label="Eigen naam (optioneel)" hint={naamHint}>
+                {(id) => (
+                  <Input id={id} value={c.eigenNaam} placeholder={bibliotheekNaam} onChange={(e) => zet('eigenNaam', e.target.value)} />
+                )}
+              </Veld>
+
+              <section>
+                <Sectiekop icon={Paperclip}>Bewijs ({c.bewijs.length})</Sectiekop>
+                {c.bewijs.length > 0 && (
+                  <ul className="mb-2 space-y-1.5">
+                    {c.bewijs.map((b) => (
+                      <BewijsRegel
+                        key={b.id}
+                        b={b}
+                        nieuw={b.id.startsWith('nieuw-')}
+                        onVerwijder={() =>
+                          zet(
+                            'bewijs',
+                            c.bewijs.filter((x) => x.id !== b.id),
+                          )
+                        }
+                      />
+                    ))}
+                  </ul>
+                )}
+                <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
+                  <Input
+                    veldMaat="sm"
+                    aria-label="Naam document of verslag"
+                    placeholder="Naam document of verslag"
+                    value={bewijsLabel}
+                    onChange={(e) => {
+                      setBewijsLabel(e.target.value);
+                      setBewijsFout('');
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        koppelBewijs();
+                      }
+                    }}
+                  />
+                  <Input
+                    veldMaat="sm"
+                    aria-label="Link (optioneel)"
+                    placeholder="Link (optioneel)"
+                    value={bewijsUrl}
+                    onChange={(e) => {
+                      setBewijsUrl(e.target.value);
+                      setBewijsFout('');
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        koppelBewijs();
+                      }
+                    }}
+                  />
+                  <Button type="button" variant="secondary" size="sm" icon={Plus} onClick={koppelBewijs}>
+                    Koppel
+                  </Button>
+                </div>
+                <p className={cx('mt-1 text-2xs leading-snug', bewijsFout ? 'text-xs text-status-danger' : 'text-ink-subtle')}>
+                  {bewijsFout || `${BEWIJS_HINT} De link wordt alleen bewaard, nooit geopend.`}
+                </p>
+              </section>
+
+              <OverActiviteit item={item} />
+              <HistorieLijst item={item} />
+            </div>
+          )}
+        </div>
         {/* Enter in een veld slaat op */}
         <button type="submit" hidden tabIndex={-1} aria-hidden />
       </form>

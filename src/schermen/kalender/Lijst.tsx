@@ -1,12 +1,16 @@
 /**
- * Lijstweergave van de kalender: per maand (alleen maanden met activiteiten) een kaart.
- * Klik op een rij opent het detailvenster (op clusterniveau alleen-lezen).
+ * Lijstweergave van de kalender: per maand een kaart. Elke rij heeft links een statusknop (status
+ * zetten zonder het detailvenster) en opent met een klik op de naam het detailvenster. Bij elke
+ * maand staat een knop om daar iets toe te voegen. Op clusterniveau alleen-lezen.
  */
-import { ArrowLeftRight, CalendarDays, CalendarClock, ChevronRight, Paperclip, School, UserRound } from 'lucide-react';
-import { GebiedDot, GesprekIcoonView, SeizoenBadge, StatusBadge, VerplichtBadge, cx, seizoenKlassen } from '../../componenten';
+import { ArrowLeftRight, CalendarClock, CalendarDays, ChevronRight, Paperclip, Plus, School, UserRound } from 'lucide-react';
+import { GesprekIcoonView, SeizoenBadge, StatusBadge, cx, seizoenKlassen } from '../../componenten';
 import { activiteitVan, aantal, effectieveNaam, formatDatumKort, vandaagISO, vindGesprek } from '../../domein/hulp';
-import type { Gesprek, KalenderItem, Maand } from '../../domein/types';
-import { itemsPerMaand, maandTitel, standaardVan } from './hulp';
+import type { Gesprek, KalenderItem, Maand, Status } from '../../domein/types';
+import { itemsPerMaand, maandTitel, maandVoluit, standaardVan } from './hulp';
+import { chipTitel } from './Matrix';
+import { StatusKeuze } from './StatusKeuze';
+import type { ToevoegBegin } from './ToevoegPaneel';
 
 export interface LijstProps {
   items: KalenderItem[];
@@ -14,10 +18,14 @@ export interface LijstProps {
   gesprekken: Record<Maand, Gesprek[]>;
   huidigeMaand: Maand;
   onOpen: (uid: string) => void;
+  /** Bewerkbaar: status zetten en toevoegen */
+  onStatus?: (uid: string, s: Status) => void;
+  onToevoegen?: (begin: ToevoegBegin) => void;
   schoolNaamVan?: (uid: string) => string;
+  markeerUid?: string | null;
 }
 
-export function Lijst({ items, cyclus, gesprekken, huidigeMaand, onOpen, schoolNaamVan }: LijstProps) {
+export function Lijst({ items, cyclus, gesprekken, huidigeMaand, onOpen, onStatus, onToevoegen, schoolNaamVan, markeerUid }: LijstProps) {
   const vandaag = vandaagISO();
   return (
     <div className="space-y-4">
@@ -31,7 +39,10 @@ export function Lijst({ items, cyclus, gesprekken, huidigeMaand, onOpen, schoolN
             className="overflow-hidden rounded-lg border border-line-subtle bg-surface-card shadow-xs"
           >
             <header
-              className={cx('flex flex-wrap items-center gap-x-3 gap-y-1 border-b px-4 py-2.5', k ? cx(k.surface, k.border) : 'border-line-subtle bg-surface-subtle')}
+              className={cx(
+                'flex flex-wrap items-center gap-x-3 gap-y-1 border-b px-4 py-2',
+                k ? cx(k.surface, k.border) : 'border-line-subtle bg-surface-subtle',
+              )}
             >
               <CalendarDays className={cx('h-4 w-4', k ? k.ink : 'text-ink-subtle')} aria-hidden />
               <h2 id={`maand-${maand}`} className={cx('text-sm font-bold', k ? k.ink : 'text-ink-strong')}>
@@ -49,26 +60,50 @@ export function Lijst({ items, cyclus, gesprekken, huidigeMaand, onOpen, schoolN
                 </span>
               ))}
               <span className="tnum ml-auto text-xs text-ink-muted">{aantal(lijst.length, 'activiteit', 'activiteiten')}</span>
+              {onToevoegen && (
+                <button
+                  type="button"
+                  onClick={() => onToevoegen({ maand })}
+                  aria-label={`Activiteit toevoegen in ${maandVoluit(maand)}`}
+                  title={`Activiteit toevoegen in ${maandVoluit(maand)}`}
+                  className="-mr-2 grid h-7 w-7 place-items-center rounded-sm text-ink-muted hover:bg-surface-card hover:text-niveau-strong"
+                >
+                  <Plus className="h-4 w-4" aria-hidden />
+                </button>
+              )}
             </header>
             <ul className="divide-y divide-line-subtle">
               {lijst.map((item) => {
                 const a = activiteitVan(item);
                 const verstreken = !!item.deadline && item.deadline < vandaag && item.status !== 'gereed';
+                const naam = effectieveNaam(item);
                 return (
-                  <li key={item.uid}>
+                  <li
+                    key={item.uid}
+                    data-lijstitem={item.uid}
+                    className={cx(
+                      'group flex items-center gap-2 pl-3 pr-2 transition-colors duration-base hover:bg-surface-hover sm:pl-4',
+                      markeerUid === item.uid && 'bg-brand-yellow-soft',
+                    )}
+                  >
+                    {onStatus ? (
+                      <StatusKeuze status={item.status} onKies={(s) => onStatus(item.uid, s)} naam={naam} groot />
+                    ) : null}
                     <button
                       type="button"
                       onClick={() => onOpen(item.uid)}
-                      className="group flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors duration-fast hover:bg-surface-hover"
+                      title={chipTitel(item)}
+                      className="flex min-w-0 flex-1 items-center gap-3 py-2.5 text-left outline-none focus-visible:underline"
                     >
-                      <GebiedDot gebied={a?.gebied ?? 'OP'} className="shrink-0" />
                       <span className="min-w-0 flex-1">
-                        <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                          <span className="text-sm font-semibold text-ink-strong">{effectieveNaam(item)}</span>
-                          {a?.verplicht && <VerplichtBadge />}
+                        <span
+                          className={cx('block text-sm font-semibold', item.status === 'gereed' ? 'text-ink-muted' : 'text-ink-strong')}
+                        >
+                          {naam}
                         </span>
                         <span className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-ink-muted">
                           <span className="font-semibold">{standaardVan(item)}</span>
+                          {a?.verplicht && <span className="font-medium text-status-warning">verplicht</span>}
                           {schoolNaamVan && (
                             <span className="inline-flex items-center gap-1">
                               <School className="h-3 w-3" aria-hidden />
@@ -95,18 +130,18 @@ export function Lijst({ items, cyclus, gesprekken, huidigeMaand, onOpen, schoolN
                             </span>
                           )}
                           {item.afwijking && (
-                            <span className="inline-flex items-center gap-1 font-medium text-status-warning" title={item.afwijking.reden}>
+                            <span className="inline-flex items-center gap-1" title={item.afwijking.reden}>
                               <ArrowLeftRight className="h-3 w-3" aria-hidden />
-                              afwijking
+                              ander gesprek
                             </span>
                           )}
                         </span>
                       </span>
-                      <span className="flex shrink-0 flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-2">
+                      <span className="hidden shrink-0 sm:block">
                         <SeizoenBadge gesprek={vindGesprek(cyclus, item.gesprek)} />
-                        <StatusBadge status={item.status} />
                       </span>
-                      <ChevronRight className="hidden h-4 w-4 shrink-0 text-ink-subtle group-hover:text-ink-strong sm:block" aria-hidden />
+                      {!onStatus && <StatusBadge status={item.status} />}
+                      <ChevronRight className="h-4 w-4 shrink-0 text-ink-subtle group-hover:text-ink-strong" aria-hidden />
                     </button>
                   </li>
                 );

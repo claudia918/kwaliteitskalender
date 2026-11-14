@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { STANDAARDEN_SCHOOL } from '../../domein/seed';
+import { ACTIVITEITEN_SCHOOL, STANDAARDEN_SCHOOL } from '../../domein/seed';
 import type { KalenderItem } from '../../domein/types';
 import {
+  ontbrekendeVerplichte,
+  pastBijFilter,
+  periodeMaanden,
+  toevoegSuggesties,
   bundel,
   gesprekkenPerMaand,
   isBruikbareLink,
@@ -86,5 +90,45 @@ describe('kalender-hulp', () => {
     expect(isBruikbareLink('intranet.school.nl/kwaliteit')).toBe(true);
     expect(isBruikbareLink('javascript:alert(1)')).toBe(false);
     expect(isBruikbareLink('zomaar wat tekst')).toBe(false);
+  });
+
+  it('filter: nog te doen, gesprek, risico', () => {
+    const a = item('a', 'OP2-01', 'Nov', { status: 'gereed' });
+    const b = item('b', 'OP2-02', 'Nov', { status: 'risico', gesprek: 'Winter' });
+    expect([a, b].filter((i) => pastBijFilter(i, 'te-doen', null)).map((i) => i.uid)).toEqual(['b']);
+    expect([a, b].filter((i) => pastBijFilter(i, 'gesprek', 'Herfst')).map((i) => i.uid)).toEqual(['a']);
+    expect([a, b].filter((i) => pastBijFilter(i, 'gesprek', null))).toEqual([]);
+    expect([a, b].filter((i) => pastBijFilter(i, 'risico', null)).map((i) => i.uid)).toEqual(['b']);
+    expect([a, b].filter((i) => pastBijFilter(i, 'alles', null))).toHaveLength(2);
+  });
+
+  it('periodes naar maanden', () => {
+    expect(periodeMaanden('sep-okt')).toEqual(['Sep', 'Okt']);
+    expect(periodeMaanden('okt-feb')).toEqual(['Okt', 'Nov', 'Dec', 'Jan', 'Feb']);
+    expect(periodeMaanden('jul-aug')).toEqual(['Jul', 'Aug']);
+    expect(periodeMaanden('nov, mrt')).toEqual(['Nov', 'Mrt']);
+    expect(periodeMaanden('variabel')).toEqual([]);
+    expect(periodeMaanden(undefined)).toEqual([]);
+  });
+
+  it('toevoegsuggesties: niet op kalender en passend eerst', () => {
+    const lib = ACTIVITEITEN_SCHOOL.filter((a) => a.standaard === 'SKA1');
+    const opKal = lib[0];
+    const r = toevoegSuggesties(lib, [item('x', opKal.id, 'Sep')], { standaard: 'SKA1', maand: 'Jun' });
+    expect(r).toHaveLength(lib.length);
+    expect(r.at(-1)?.activiteit.id).toBe(opKal.id);
+    expect(r.at(-1)?.opKalender?.uid).toBe('x');
+    const eersteNiet = r.filter((s) => !s.opKalender);
+    const idxPast = eersteNiet.findIndex((s) => !s.pastInMaand);
+    expect(eersteNiet.slice(idxPast < 0 ? eersteNiet.length : idxPast).every((s) => !s.pastInMaand)).toBe(true);
+    expect(toevoegSuggesties(lib, [], { zoek: 'zzzz' })).toEqual([]);
+  });
+
+  it('ontbrekende verplichte activiteiten', () => {
+    const verplicht = ACTIVITEITEN_SCHOOL.filter((a) => a.verplicht);
+    expect(ontbrekendeVerplichte(ACTIVITEITEN_SCHOOL, [])).toHaveLength(verplicht.length);
+    const een = ontbrekendeVerplichte(ACTIVITEITEN_SCHOOL, [item('x', verplicht[0].id, 'Sep')]);
+    expect(een).toHaveLength(verplicht.length - 1);
+    expect(ontbrekendeVerplichte(ACTIVITEITEN_SCHOOL, [], 'Zomer').every((a) => a.gesprek === 'Zomer')).toBe(true);
   });
 });
