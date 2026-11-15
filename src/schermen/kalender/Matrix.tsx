@@ -143,7 +143,7 @@ export function Matrix(p: MatrixProps) {
                 scope="col"
                 className="sticky left-0 top-0 z-30 border-b border-r border-line bg-surface-subtle px-3 py-2 align-bottom md:px-4"
               >
-                <span className="eyebrow">Standaard</span>
+                <span className="kk-groepskop">Standaard</span>
               </th>
               {p.maanden.map((m) => {
                 const g = p.gesprekken[m] ?? [];
@@ -162,7 +162,7 @@ export function Matrix(p: MatrixProps) {
                     <span className={cx('flex items-center justify-center gap-1 text-xs font-bold', k ? k.ink : 'text-ink-body')}>
                       {maandTitel(m).slice(0, 3)}
                       {nu && (
-                        <span className="rounded-pill bg-niveau px-1.5 py-px text-[9px] font-bold uppercase leading-tight tracking-label text-white">
+                        <span className="rounded-xs bg-gray-900 px-1 py-px text-[10px] font-semibold leading-tight text-white">
                           nu
                         </span>
                       )}
@@ -191,7 +191,7 @@ export function Matrix(p: MatrixProps) {
                     <th colSpan={aantalKolommen} scope="colgroup" className="border-b border-line-subtle bg-surface-sunken p-0">
                       <span className="sticky left-0 flex w-max items-center gap-2 px-3 py-1.5 md:px-4">
                         <span aria-hidden className={cx('h-2.5 w-2.5 rounded-xs', gk ? gk.dot : 'bg-gray-400')} />
-                        <span className={cx('text-2xs font-bold uppercase tracking-wide', gk ? gk.ink : 'text-ink-muted')}>
+                        <span className={cx('text-xs font-bold', gk ? gk.ink : 'text-ink-muted')}>
                           {groep.titel}
                         </span>
                       </span>
@@ -203,7 +203,7 @@ export function Matrix(p: MatrixProps) {
                         scope="row"
                         className={cx(
                           'sticky left-0 z-10 border-b border-r border-line bg-surface-card px-3 py-2 align-top font-normal md:px-4',
-                          actief?.rij === rij.code && 'bg-niveau-surface',
+                          actief?.rij === rij.code && 'bg-surface-sunken',
                         )}
                       >
                         <span className="flex items-center gap-1.5">
@@ -220,7 +220,7 @@ export function Matrix(p: MatrixProps) {
                               onClick={() => p.onToevoegen({ standaard: rij.code })}
                               aria-label={`Activiteit toevoegen bij ${rij.code}`}
                               title={`Activiteit toevoegen bij ${rij.code}`}
-                              className="ml-auto grid h-6 w-6 place-items-center rounded-sm text-ink-subtle opacity-0 transition-opacity duration-fast hover:bg-niveau-surface hover:text-niveau-strong focus-visible:opacity-100 group-hover/rij:opacity-100"
+                              className="ml-auto grid h-6 w-6 place-items-center rounded-sm text-ink-subtle opacity-0 transition-opacity duration-fast hover:bg-surface-sunken hover:text-ink-strong focus-visible:opacity-100 group-hover/rij:opacity-100"
                             >
                               <Plus className="h-4 w-4" aria-hidden />
                             </button>
@@ -263,8 +263,8 @@ export function Matrix(p: MatrixProps) {
                             title={doel ? `Verplaats naar ${maandVoluit(m)}` : undefined}
                             className={cx(
                               'group/cel relative h-12 border-b border-r border-line-subtle p-1 align-top transition-colors duration-fast',
-                              doel && 'cursor-pointer bg-niveau-surface outline-dashed outline-2 -outline-offset-4 outline-niveau-border hover:outline-niveau',
-                              boven === sleutel && 'outline-niveau',
+                              doel && 'cursor-pointer bg-brand-yellow-soft outline-dashed outline-2 -outline-offset-4 outline-gray-400 hover:outline-gray-900',
+                              boven === sleutel && 'outline-gray-900',
                             )}
                           >
                             <div className="flex flex-col gap-1">
@@ -290,7 +290,7 @@ export function Matrix(p: MatrixProps) {
                                 <span
                                   aria-hidden
                                   className={cx(
-                                    'pointer-events-none py-1 text-center text-2xs font-semibold text-niveau-strong',
+                                    'pointer-events-none py-1 text-center text-2xs font-semibold text-ink-strong',
                                     boven === sleutel ? 'block' : 'hidden group-hover/cel:block',
                                   )}
                                 >
@@ -310,7 +310,7 @@ export function Matrix(p: MatrixProps) {
                                   title={`Toevoegen bij ${rij.code} in ${maandVoluit(m)}`}
                                   className={cx(
                                     'absolute inset-1 grid place-items-center rounded-sm border border-dashed border-transparent text-ink-subtle opacity-0 transition-opacity duration-fast',
-                                    'hover:border-niveau-border hover:bg-niveau-surface hover:text-niveau-strong group-hover/cel:opacity-100',
+                                    'hover:border-line hover:bg-surface-hover hover:text-ink-strong group-hover/cel:opacity-100',
                                   )}
                                 >
                                   <Plus className="h-3.5 w-3.5" aria-hidden />
@@ -396,9 +396,9 @@ function MatrixChip({ item, geselecteerd, sleept, gemarkeerd, onClick, onKeyDown
         'group/chip relative flex w-full items-start gap-0.5 rounded-sm border py-0.5 pl-0.5 pr-1 transition-[box-shadow,border-color,opacity,background-color] duration-base',
         item.status === 'risico' ? 'border-status-warning-border bg-status-warning-surface' : 'bg-surface-card',
         geselecteerd
-          ? 'z-[2] border-transparent shadow-md ring-2 ring-niveau'
-          : cx('z-[1] shadow-xs hover:shadow-sm', item.status === 'risico' ? '' : 'border-line-subtle hover:border-line'),
-        !geselecteerd && 'has-[[data-uid]:focus-visible]:ring-2 has-[[data-uid]:focus-visible]:ring-niveau-border',
+          ? 'z-[2] border-transparent shadow-md ring-2 ring-gray-900'
+          : cx('z-[1]', item.status === 'risico' ? '' : 'border-line-subtle hover:border-gray-900'),
+        !geselecteerd && 'has-[[data-uid]:focus-visible]:ring-2 has-[[data-uid]:focus-visible]:ring-brand-yellow',
         gemarkeerd && !geselecteerd && 'bg-brand-yellow-soft',
         sleept && 'opacity-50',
       )}

@@ -114,10 +114,10 @@ function Cijfers({
   ];
   return (
     <Card>
-      <p className="eyebrow">Voortgang</p>
-      <p className="mt-0.5 text-xs text-ink-subtle">{bron}</p>
-      <p className="mt-2 flex items-baseline gap-2">
-        <span className="tnum text-display font-bold leading-none text-niveau-strong">{v.pct}%</span>
+      <h3 className="text-h4 text-ink-strong">Voortgang</h3>
+      <p className="mt-0.5 text-sm text-ink-muted">{bron}</p>
+      <p className="mt-3 flex items-baseline gap-2">
+        <span className="tnum text-display font-bold leading-none text-ink-strong">{v.pct}%</span>
         <span className="text-sm text-ink-muted">
           gereed · {v.gereed} van {v.totaal}
         </span>
@@ -210,10 +210,10 @@ function Aandachtspunten({
               <>
                 <IconTile icon={p.icon} tone={p.toon} size="sm" />
                 <span className="min-w-0 flex-1 text-sm text-ink-strong">{p.tekst}</span>
-                <span className="hidden shrink-0 items-center gap-1 text-xs font-semibold text-niveau-strong group-hover:underline sm:inline-flex">
+                <span className="hidden shrink-0 items-center gap-1 text-xs font-semibold text-ink-strong underline decoration-line-strong underline-offset-[3px] group-hover:decoration-current sm:inline-flex">
                   {p.actie} <ArrowRight className="h-3 w-3" aria-hidden />
                 </span>
-                <ArrowRight className="h-4 w-4 shrink-0 text-ink-subtle sm:hidden" aria-hidden />
+                <ArrowRight className="h-4 w-4 shrink-0 text-ink-muted sm:hidden" aria-hidden />
               </>
             );
             const klassen = 'group flex w-full items-center gap-3 py-2.5 text-left';
@@ -245,7 +245,7 @@ function VoortgangPerSchool({ overzicht, onKiesSchool }: { overzicht: SchoolOver
       title="Voortgang per school"
       subtitle="Percentage gereed van alle activiteiten. Klik op een school om haar te openen."
       action={
-        <Link to="/gesprekken" className="text-sm font-semibold text-niveau-strong hover:underline">
+        <Link to="/gesprekken" className="text-sm font-semibold kk-link">
           Per gesprek
         </Link>
       }

@@ -121,8 +121,11 @@
 
   --text-strong:   var(--gray-900);
   --text-body:     var(--gray-800);
+  /* Twee grijstinten voor tekst, niet vier: hiërarchie komt uit maat en gewicht.
+     muted en subtle zijn bewust gelijk (beide ruim AA op wit en op surface-page). */
   --text-muted:    var(--gray-600);
-  --text-subtle:   var(--gray-500);
+  --text-subtle:   var(--gray-600);
+  --text-placeholder: var(--gray-500);
   --text-on-dark:  #FFFFFF;
   --text-on-brand: var(--lv-black);   /* black text on yellow = AA */
 
@@ -131,7 +134,9 @@
   --border-strong: var(--gray-400);
 
   /* ---------- FOCUS ---------- */
-  --focus-ring: 0 0 0 3px rgba(238, 194, 27, .55);
+  /* Gele ring met een dunne zwarte binnenrand: geel blijft het merkmoment, zwart geeft contrast (AA voor
+     niet-tekst, ook op witte en gele vlakken). */
+  --focus-ring: 0 0 0 1px var(--lv-black), 0 0 0 4px var(--lv-yellow);
   --focus-ring-color: var(--lv-yellow);
 }
 
@@ -173,18 +178,20 @@
   --space-12: 3rem;     /* 48 */
   --space-16: 4rem;     /* 64 */
 
-  /* Radii — geometric, moderate (echoes Poppins' rounded-geometric forms) */
-  --radius-xs:  3px;
-  --radius-sm:  5px;
-  --radius-md:  8px;
-  --radius-lg:  12px;
-  --radius-xl:  16px;
+  /* Radii: papier, geen bubbels. Klein en gelijk; alleen dialogen iets ronder.
+     rounded-pill is alleen nog voor echte stippen en balkjes (rounded-full). */
+  --radius-xs:  2px;
+  --radius-sm:  3px;
+  --radius-md:  4px;
+  --radius-lg:  4px;
+  --radius-xl:  6px;
   --radius-pill:999px;
 
-  /* Shadows — soft, cool-neutral; the UI leans on borders more than shadow */
-  --shadow-xs: 0 1px 2px rgba(24,24,21,.06);
-  --shadow-sm: 0 1px 3px rgba(24,24,21,.08), 0 1px 2px rgba(24,24,21,.05);
-  --shadow-md: 0 4px 10px -2px rgba(24,24,21,.10), 0 2px 4px -2px rgba(24,24,21,.06);
+  /* Schaduw alleen voor wat echt zweeft (menu, dialoog, melding, een opgepakte chip).
+     Vlakken in de pagina hebben een 1px haarlijn en geen schaduw: xs en sm zijn bewust leeg. */
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-md: 0 2px 8px -2px rgba(24,24,21,.14);
   --shadow-lg: 0 12px 28px -6px rgba(24,24,21,.16), 0 4px 8px -4px rgba(24,24,21,.08);
   --shadow-pop:0 16px 40px -8px rgba(24,24,21,.22);
 

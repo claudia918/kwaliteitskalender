@@ -127,7 +127,7 @@ export function SearchField({ value, onChange, placeholder = 'Zoeken…', label,
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         aria-label={label ?? placeholder}
-        className="min-w-0 flex-1 bg-transparent text-sm text-ink-strong outline-none placeholder:text-ink-subtle [&::-webkit-search-cancel-button]:hidden"
+        className="min-w-0 flex-1 bg-transparent text-sm text-ink-strong outline-none placeholder:text-gray-500 [&::-webkit-search-cancel-button]:hidden"
         style={{ boxShadow: 'none' }}
       />
       {value && (
@@ -187,7 +187,7 @@ export interface FilterChipProps {
   className?: string;
 }
 
-/** Filterchip. Aan: niveaukleur met witte tekst; uit: wit met rand. */
+/** Filterknop, rechthoekig. Aan: zwart met witte tekst; uit: wit met haarlijn. Telling als gewone tekst. */
 export function FilterChip({ children, active, onClick, dotClassName, icon: Icon, count, className }: FilterChipProps) {
   return (
     <button
@@ -195,10 +195,10 @@ export function FilterChip({ children, active, onClick, dotClassName, icon: Icon
       aria-pressed={active}
       onClick={onClick}
       className={cx(
-        'inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-pill border px-3 text-xs font-semibold transition-colors duration-fast',
+        'inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-sm border px-2.5 text-xs font-semibold transition-colors duration-fast',
         active
-          ? 'border-transparent bg-niveau text-white shadow-xs'
-          : 'border-line bg-surface-card text-ink-body hover:border-line-strong hover:bg-surface-hover',
+          ? 'border-gray-900 bg-gray-900 text-white'
+          : 'border-line bg-surface-card text-ink-body hover:border-gray-900',
         className,
       )}
     >
@@ -208,8 +208,8 @@ export function FilterChip({ children, active, onClick, dotClassName, icon: Icon
       {count !== undefined && (
         <span
           className={cx(
-            'tnum rounded-pill px-1.5 text-2xs font-bold',
-            active ? 'bg-white text-niveau-strong' : 'bg-gray-100 text-ink-muted',
+            'tnum text-xs font-medium',
+            active ? 'text-white' : 'text-ink-muted',
           )}
         >
           {count}
@@ -233,19 +233,18 @@ export interface SegmentedControlProps<T extends string> {
   value: T;
   onChange: (waarde: T) => void;
   options: SegmentOptie<T>[];
-  /** niveau: actief = niveaukleur met wit; neutraal: actief = wit vlak (bv. Matrix/Lijst) */
+  /** Vervallen onderscheid: beide tonen de actieve keuze als vette tekst met een zwarte streep eronder. */
   accent?: 'niveau' | 'neutraal';
   size?: 'sm' | 'md';
   label?: string;
   className?: string;
 }
 
-/** Gesegmenteerde keuze (tabs in een grijze bak). */
+/** Keuze tussen een paar weergaven: tekst met een onderstreping onder de actieve keuze, geen bak. */
 export function SegmentedControl<T extends string>({
   value,
   onChange,
   options,
-  accent = 'neutraal',
   size = 'sm',
   label,
   className,
@@ -254,7 +253,7 @@ export function SegmentedControl<T extends string>({
     <div
       role="tablist"
       aria-label={label}
-      className={cx('inline-flex items-center gap-0.5 rounded-md bg-surface-sunken p-0.5', className)}
+      className={cx('inline-flex items-center gap-1', className)}
     >
       {options.map((o) => {
         const actief = o.value === value;
@@ -267,13 +266,11 @@ export function SegmentedControl<T extends string>({
             aria-selected={actief}
             onClick={() => onChange(o.value)}
             className={cx(
-              'inline-flex items-center gap-1.5 whitespace-nowrap rounded-sm font-semibold transition-colors duration-fast',
-              size === 'sm' ? 'h-8 px-2.5 text-xs' : 'h-9 px-3.5 text-sm',
+              'inline-flex items-center gap-1.5 whitespace-nowrap rounded-xs border-b-2 font-semibold transition-colors duration-fast',
+              size === 'sm' ? 'h-8 px-2 text-xs' : 'h-9 px-2.5 text-sm',
               actief
-                ? accent === 'niveau'
-                  ? 'bg-niveau text-white shadow-xs'
-                  : 'bg-surface-card text-ink-strong shadow-xs'
-                : 'text-ink-muted hover:text-ink-strong',
+                ? 'border-gray-900 text-ink-strong'
+                : 'border-transparent font-medium text-ink-muted hover:border-line hover:text-ink-strong',
             )}
           >
             {Icon && <Icon className="h-4 w-4" aria-hidden />}

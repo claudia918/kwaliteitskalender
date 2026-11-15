@@ -98,7 +98,7 @@ export function Werklijst({ komend }: { komend: KomendGesprek | null }) {
               : 'Zet activiteiten op de kalender vanuit de bibliotheek.'
           }
           action={
-            <Link to="/bibliotheek" className="text-sm font-semibold text-niveau-strong hover:underline">
+            <Link to="/bibliotheek" className="text-sm font-semibold kk-link">
               Naar de bibliotheek
             </Link>
           }
@@ -114,13 +114,13 @@ export function Werklijst({ komend }: { komend: KomendGesprek | null }) {
       {lijst.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line-subtle px-5 py-3 text-sm">
           {lijst.length > MAX ? (
-            <button type="button" onClick={() => setAlles(!alles)} className="font-semibold text-niveau-strong hover:underline">
+            <button type="button" onClick={() => setAlles(!alles)} className="font-semibold kk-link">
               {alles ? 'Minder tonen' : `Alle ${lijst.length} tonen`}
             </button>
           ) : (
             <span />
           )}
-          <Link to={tab === 'maand' ? '/kalender' : '/gesprekken'} className="inline-flex items-center gap-1 font-semibold text-niveau-strong hover:underline">
+          <Link to={tab === 'maand' ? '/kalender' : '/gesprekken'} className="inline-flex items-center gap-1 font-semibold kk-link">
             {tab === 'maand' ? 'Open de kalender' : 'Bekijk het hele gesprek'} <ArrowRight className="h-3.5 w-3.5" aria-hidden />
           </Link>
         </div>
@@ -208,10 +208,11 @@ function StatusKnop({
       title={actief ? `${naam} terugzetten op gepland` : `${naam} op ${st.label.toLowerCase()} zetten`}
       className={cx(
         'inline-flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-xs font-semibold transition-colors duration-fast',
-        actief ? cx(st.surface, st.ink, st.border) : 'border-line-subtle bg-surface-card text-ink-muted hover:border-line hover:text-ink-strong',
+        // Aan: zwarte rand en tekst, icoon in de statuskleur. Uit: lichte rand, grijze tekst.
+        actief ? 'border-gray-900 bg-surface-card text-ink-strong' : 'border-line-subtle bg-surface-card text-ink-muted hover:border-line hover:text-ink-strong',
       )}
     >
-      <Icoon className="h-3.5 w-3.5" aria-hidden />
+      <Icoon className={cx('h-3.5 w-3.5', actief && st.ink)} aria-hidden />
       {st.label}
     </button>
   );

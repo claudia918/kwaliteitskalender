@@ -320,7 +320,7 @@ function Zoekvenster({ onSluit }: { onSluit: () => void }) {
         aria-modal="true"
         aria-label="Zoeken"
         onKeyDown={opToets}
-        className="flex max-h-[80vh] w-full max-w-[640px] animate-rise flex-col overflow-hidden rounded-xl bg-surface-card shadow-pop"
+        className="flex max-h-[80vh] w-full max-w-[640px] animate-rise flex-col overflow-hidden rounded-xl border border-line bg-surface-card shadow-pop"
       >
         <div className="flex items-center gap-3 border-b border-line-subtle px-4">
           <Search className="h-5 w-5 shrink-0 text-ink-subtle" aria-hidden />
@@ -338,7 +338,7 @@ function Zoekvenster({ onSluit }: { onSluit: () => void }) {
               setVraag(e.target.value);
               setActief(0);
             }}
-            className="h-14 min-w-0 flex-1 bg-transparent text-base text-ink-strong outline-none placeholder:text-ink-subtle focus-visible:shadow-none"
+            className="h-14 min-w-0 flex-1 bg-transparent text-base text-ink-strong outline-none placeholder:text-gray-500 focus-visible:shadow-none"
           />
           <kbd className="hidden rounded-sm border border-line px-1.5 py-0.5 text-2xs font-semibold text-ink-muted sm:inline">Esc</kbd>
         </div>
@@ -352,7 +352,7 @@ function Zoekvenster({ onSluit }: { onSluit: () => void }) {
           ) : (
             groepen.map((g) => (
               <div key={g.groep} role="group" aria-label={g.groep} className="pb-1">
-                <p className="eyebrow flex items-center justify-between px-3 pb-1 pt-2.5">
+                <p className="kk-groepskop flex items-center justify-between px-3 pb-1 pt-2.5">
                   <span>{vraag.trim() ? g.groep : 'Snel naar'}</span>
                   {g.totaal > g.rs.length && <span className="normal-case tracking-normal text-ink-subtle">{g.rs.length} van {g.totaal}</span>}
                 </p>
@@ -371,13 +371,13 @@ function Zoekvenster({ onSluit }: { onSluit: () => void }) {
                       onClick={r.kies}
                       className={cx(
                         'flex cursor-pointer items-center gap-3 rounded-md px-3 py-2',
-                        i === actief ? 'bg-niveau-surface' : 'hover:bg-surface-hover',
+                        i === actief ? 'bg-surface-sunken' : 'hover:bg-surface-hover',
                       )}
                     >
                       {r.niveau ? (
                         <NiveauTegel niveau={r.niveau} klein />
                       ) : (
-                        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-surface-sunken text-ink-muted">
+                        <span className="grid h-7 w-5 shrink-0 place-items-center text-ink-muted">
                           {Icoon && <Icoon className="h-4 w-4" aria-hidden />}
                         </span>
                       )}
@@ -386,7 +386,7 @@ function Zoekvenster({ onSluit }: { onSluit: () => void }) {
                         <span className={cx('text-xs text-ink-muted', r.groep === 'Begrippen' ? 'line-clamp-2' : 'truncate')}>{r.sub}</span>
                       </span>
                       {r.rechts}
-                      {i === actief && <CornerDownLeft className="hidden h-4 w-4 shrink-0 text-niveau-strong sm:block" aria-hidden />}
+                      {i === actief && <CornerDownLeft className="hidden h-4 w-4 shrink-0 text-ink-strong sm:block" aria-hidden />}
                     </div>
                   );
                 })}

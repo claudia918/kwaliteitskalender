@@ -54,13 +54,13 @@ type PrintDoel = 'matrix' | 'dossier';
 
 function Actie({
   icon,
-  tone,
   titel,
   children,
   knop,
 }: {
   icon: LucideIcon;
-  tone: 'success' | 'danger' | 'info' | 'niveau';
+  /** Vervallen: het icoon is altijd zwart (geen kleur als versiering). */
+  tone?: 'success' | 'danger' | 'info' | 'niveau';
   titel: string;
   children: ReactNode;
   knop: ReactNode;
@@ -68,7 +68,7 @@ function Actie({
   return (
     <div className="flex min-w-0 flex-col rounded-md border border-line-subtle p-4">
       <div className="flex items-center gap-3">
-        <IconTile icon={icon} tone={tone} size="sm" />
+        <IconTile icon={icon} tone="niveau" size="sm" />
         <h3 className="text-h4 text-ink-strong">{titel}</h3>
       </div>
       <p className="mt-2 flex-1 text-sm text-ink-muted">{children}</p>
@@ -219,13 +219,12 @@ export default function Export() {
     <>
       <div className="no-print space-y-6">
         <PageHeader
-          eyebrow="Voorbereiden"
           title="Dossier en export"
           subtitle={`Print het dossier voor een gesprek, zet de kalender in Excel of PDF, of maak een back-up. Nu: ${scopeLabel}, ${aantal(scope.items.length, 'activiteit', 'activiteiten')}.`}
         />
 
         {/* Gespreksdossier */}
-        <Card rondleiding="export-dossier" padding="lg" className="border-niveau-border">
+        <Card rondleiding="export-dossier" padding="lg">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
             <IconTile icon={FileText} tone="niveau" />
             <div className="min-w-0 flex-1">
@@ -322,7 +321,7 @@ export default function Export() {
               tone="success"
               titel="Excel"
               knop={
-                <Button variant="primary" icon={Download} onClick={() => void downloadWerkmap()} disabled={excelBezig}>
+                <Button variant="secondary" icon={Download} onClick={() => void downloadWerkmap()} disabled={excelBezig}>
                   {excelBezig ? 'Bezig…' : 'Download Excel'}
                 </Button>
               }
@@ -352,7 +351,7 @@ export default function Export() {
         <Card rondleiding="export-backup" padding="lg">
           <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-              <IconTile icon={ArchiveRestore} tone="info" />
+              <IconTile icon={ArchiveRestore} tone="niveau" />
               <div className="min-w-0 flex-1">
                 <h2 className="text-h3 text-ink-strong">
                   <Begrip term="back-up">Back-up</Begrip> (JSON)
@@ -402,7 +401,7 @@ export default function Export() {
                 </div>
               </dl>
               {gekoppeld && (
-                <p className={cx('mt-3 flex items-start gap-1.5 text-sm text-niveau-strong')}>
+                <p className={cx('mt-3 flex items-start gap-1.5 text-sm text-ink-body')}>
                   <FolderSync className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
                   <span>Je kalender is gekoppeld aan {sync.bestandsnaam ?? 'een gedeeld bestand'}.</span>
                 </p>

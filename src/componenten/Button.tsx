@@ -7,18 +7,20 @@ export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'dang
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 const VARIANT: Record<ButtonVariant, string> = {
-  // geel merkaccent; één of twee keer per scherm
+  // geel merkaccent met zwarte tekst; één keer per scherm
   primary: 'bg-brand-yellow text-ink-on-brand border-transparent hover:bg-brand-yellow-600',
-  secondary: 'bg-surface-card text-ink-strong border-line hover:bg-surface-hover hover:border-line-strong',
-  ghost: 'bg-transparent text-ink-body border-transparent hover:bg-surface-hover hover:text-ink-strong',
+  // zwart omlijnd op wit
+  secondary: 'bg-surface-card text-ink-strong border-gray-900 hover:bg-surface-hover',
+  ghost: 'bg-transparent text-ink-strong border-transparent hover:bg-surface-sunken',
   danger: 'bg-status-danger text-white border-transparent hover:brightness-95',
   'danger-zacht':
-    'bg-status-danger-surface text-status-danger border-status-danger-border hover:bg-status-danger hover:text-white hover:border-transparent',
-  niveau: 'bg-niveau text-white border-transparent hover:bg-niveau-strong',
+    'bg-surface-card text-status-danger border-status-danger hover:bg-status-danger hover:text-white hover:border-transparent',
+  // Historische naam: was de niveaukleur, is nu zwart (de niveaukleur zit alleen in de schil).
+  niveau: 'bg-gray-900 text-white border-transparent hover:bg-gray-700',
 };
 
 const SIZE: Record<ButtonSize, string> = {
-  sm: 'h-8 px-3 text-xs gap-1.5 rounded-sm',
+  sm: 'h-8 px-3 text-xs gap-1.5 rounded-sm',  // radius: 3px
   md: 'h-10 px-4 text-sm gap-2 rounded-md',
   lg: 'h-11 px-5 text-base gap-2 rounded-md',
 };
@@ -50,8 +52,8 @@ interface Gedeeld {
 export type ButtonProps = Gedeeld & ButtonHTMLAttributes<HTMLButtonElement>;
 
 /**
- * Knop naar het design system. Varianten: primary (geel), secondary (wit met rand), ghost,
- * danger (rood), danger-zacht (rode tint, vol rood bij hover), niveau (accentkleur van het niveau).
+ * Knop. Varianten: primary (geel met zwarte tekst), secondary (wit, zwart omlijnd), ghost (alleen tekst),
+ * danger (rood), danger-zacht (rood omlijnd, vol rood bij hover), niveau (zwart; de naam is historisch).
  */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   { variant = 'secondary', size = 'md', icon: Icon, iconRight: IconRechts, className, children, type = 'button', ...rest },
@@ -106,7 +108,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       title={label}
       className={cx(
         'inline-grid shrink-0 place-items-center rounded-md border text-ink-muted transition-colors duration-fast',
-        'hover:bg-surface-hover hover:text-ink-strong disabled:pointer-events-none disabled:opacity-45',
+        'hover:bg-surface-sunken hover:text-ink-strong disabled:pointer-events-none disabled:opacity-45',
         variant === 'ghost' ? 'border-transparent' : 'border-line bg-surface-card',
         size === 'sm' ? 'h-8 w-8' : 'h-9 w-9',
         className,

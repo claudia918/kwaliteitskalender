@@ -68,20 +68,18 @@ function GesprekInfo({ gesprek, toonBestuursinput, schooljaar }: { gesprek: Gesp
   const inhoud = GESPREKKEN_INHOUD.find((g) => g.key === gesprek.id);
   const deadline = deadlineVanGesprek(gesprek, startjaar(schooljaar, new Date().getFullYear()));
   return (
-    <Card className={cx('lg:col-span-1', k.border)} padding="lg" rondleiding="gesprek-info">
+    <Card className="lg:col-span-1" padding="lg" rondleiding="gesprek-info">
       <div className="flex items-start gap-3">
-        <span className={cx('grid h-10 w-10 shrink-0 place-items-center rounded-md border', k.surface, k.border)}>
-          <Icoon className={cx('h-5 w-5', k.ink)} aria-hidden />
-        </span>
+        <Icoon className={cx('mt-1 h-5 w-5 shrink-0', k.ink)} aria-hidden />
         <div className="min-w-0">
           <h2 className="text-h3 text-ink-strong">{gesprek.naam}</h2>
-          <p className="text-xs text-ink-muted">
+          <p className="text-sm text-ink-muted">
             {inhoud?.periode ?? gesprek.maand}
             {gesprek.thema ? ` · ${gesprek.thema}` : ''}
           </p>
         </div>
       </div>
-      <p className="mt-3 text-xs text-ink-muted">
+      <p className="mt-3 text-sm text-ink-muted">
         Deadline voorbereiding: <span className="font-semibold text-ink-strong">{formatDatumLang(deadline)}</span>
       </p>
       {inhoud ? (
@@ -102,10 +100,8 @@ function GesprekInfo({ gesprek, toonBestuursinput, schooljaar }: { gesprek: Gesp
                       key={code}
                       title={s ? `${s.naam}${s.kern ? ' (vaste standaard)' : ''}` : undefined}
                       className={cx(
-                        'tnum inline-flex h-6 items-center rounded-pill border px-2 text-2xs font-bold tracking-label',
-                        s?.kern
-                          ? 'border-brand-yellow bg-brand-yellow-soft text-brand-yellow-700'
-                          : 'border-line-subtle bg-surface-sunken text-ink-muted',
+                        'tnum inline-flex h-6 items-center rounded-sm border px-2 text-2xs font-bold',
+                        s?.kern ? 'border-brand-yellow bg-surface-card text-ink-strong' : 'border-line bg-surface-card text-ink-body',
                       )}
                     >
                       {code}
@@ -114,7 +110,7 @@ function GesprekInfo({ gesprek, toonBestuursinput, schooljaar }: { gesprek: Gesp
                 })}
               </div>
               {inhoud.standaarden.some((c) => STANDAARD_OP_CODE[c]?.kern) && (
-                <p className="mt-1.5 text-2xs text-ink-subtle">
+                <p className="mt-1.5 text-xs text-ink-muted">
                   Geel = <Begrip term="vaste-standaard" />
                 </p>
               )}
@@ -299,7 +295,7 @@ export default function Gesprekken() {
   if (!gesprek) {
     return (
       <div className="space-y-6">
-        <PageHeader eyebrow="Voorbereiden" title="Seizoensgesprekken" subtitle={scopeLabel} />
+        <PageHeader title="Seizoensgesprekken" subtitle={scopeLabel} />
         <EmptyState
           watermark
           icon={MessagesSquare}
@@ -321,7 +317,6 @@ export default function Gesprekken() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Voorbereiden"
         title="Seizoensgesprekken"
         subtitle={
           <>
@@ -331,7 +326,7 @@ export default function Gesprekken() {
         }
       />
 
-      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Gesprek" data-rondleiding="gesprek-keuze">
+      <div className="flex flex-wrap gap-x-1 border-b border-line-subtle" role="tablist" aria-label="Gesprek" data-rondleiding="gesprek-keuze">
         {cyclus.map((g) => {
           const k = seizoenKlassen(g.kleur);
           const Icoon = gesprekIcoon(g.icoon);
@@ -344,16 +339,17 @@ export default function Gesprekken() {
               aria-selected={actief}
               onClick={() => setKeuze(g.id)}
               className={cx(
-                'inline-flex h-10 items-center gap-2 rounded-md border px-3 text-sm font-semibold transition-colors duration-fast',
+                // Tab: tekst met een zwarte streep onder de actieve keuze; het seizoen zit in het icoon.
+                '-mb-px inline-flex h-11 items-center gap-2 rounded-t-sm border-b-2 px-3 text-sm transition-colors duration-fast',
                 actief
-                  ? cx(k.surface, k.border, k.ink, 'shadow-xs')
-                  : 'border-line-subtle bg-surface-card text-ink-muted hover:bg-surface-hover hover:text-ink-body',
+                  ? 'border-gray-900 font-semibold text-ink-strong'
+                  : 'border-transparent font-medium text-ink-muted hover:border-line hover:text-ink-strong',
               )}
             >
-              <Icoon className="h-4 w-4" aria-hidden />
+              <Icoon className={cx('h-4 w-4', k.ink)} aria-hidden />
               {g.naam}
               {komend?.gesprek.id === g.id && !komend.verstreken && (
-                <span className="rounded-pill bg-surface-card px-1.5 py-0.5 text-2xs font-semibold text-ink-muted">komend</span>
+                <span className="text-xs font-normal text-ink-muted">(komend)</span>
               )}
             </button>
           );

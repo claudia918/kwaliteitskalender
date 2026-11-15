@@ -48,8 +48,9 @@ function VasteTegel({ d }: { d: StandaardDekking }) {
   return (
     <div
       className={cx(
-        'flex min-w-0 flex-col rounded-lg border p-3.5',
-        d.afgedekt ? 'border-status-success-border bg-status-success-surface' : 'border-status-warning-border bg-status-warning-surface',
+        // Wit met haarlijn; niet afgedekt krijgt een oranje rand. Het icoon en de tekst dragen de betekenis.
+        'flex min-w-0 flex-col rounded-md border bg-surface-card p-3.5',
+        d.afgedekt ? 'border-line-subtle' : 'border-status-warning',
       )}
     >
       <div className="flex items-center justify-between gap-2">
@@ -61,7 +62,7 @@ function VasteTegel({ d }: { d: StandaardDekking }) {
         )}
       </div>
       <p className="mt-1 flex-1 text-xs leading-snug text-ink-body">{d.standaard.naam}</p>
-      <p className="tnum mt-2 text-2xs text-ink-muted">
+      <p className="tnum mt-2 text-xs text-ink-muted">
         {d.afgedekt ? `${d.aantal} ${d.aantal === 1 ? 'activiteit' : 'activiteiten'} · ${d.gereed} gereed` : 'Nog geen activiteit op de kalender'}
       </p>
     </div>
@@ -86,7 +87,7 @@ function AfwijkingRegel({ item, cyclus, link }: { item: KalenderItem; cyclus: Ge
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium text-ink-strong">
           {link ? (
-            <Link to={`/kalender?item=${encodeURIComponent(item.uid)}`} className="hover:text-niveau-strong hover:underline">
+            <Link to={`/kalender?item=${encodeURIComponent(item.uid)}`} className="hover:underline">
               {naam}
             </Link>
           ) : (
@@ -151,7 +152,6 @@ export default function Compliance() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Controleren"
         title="Dekking standaarden"
         subtitle={
           <>
@@ -227,7 +227,7 @@ export default function Compliance() {
             const k = gebiedKlassen(gebied);
             return (
               <section key={gebied} aria-label={`${gebied} ${GEBIEDEN[gebied]?.naam ?? ''}`}>
-                <h3 className="mb-1.5 flex items-center gap-2 text-2xs font-bold uppercase tracking-label">
+                <h3 className="mb-1.5 flex items-center gap-2 text-sm font-semibold">
                   <span className={cx('h-2.5 w-2.5 rounded-xs', k.dot)} aria-hidden />
                   <span className={k.ink}>{gebied}</span>
                   <span className="text-ink-muted">{GEBIEDEN[gebied]?.naam}</span>

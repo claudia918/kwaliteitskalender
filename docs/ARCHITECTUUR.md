@@ -54,7 +54,7 @@ Importeer vanuit schermen bij voorkeur via de barrels: `../componenten`, `../sto
   `src/schermen/<scherm>/...` (bv. `src/schermen/kalender/DetailVenster.tsx`). Wijzig geen bestanden van
   andere schermen. Iets dat meerdere schermen nodig hebben: voeg het toe aan `src/componenten` of
   `src/domein` zonder bestaande signaturen te breken, en documenteer het hier.
-- Opbouw: `<div className="space-y-6">` met eerst `<PageHeader eyebrow="<menugroep>" title="<menulabel>" subtitle="<één regel: wat je hier doet>" actions=... />`. Zet vaktermen in de subtitel met `<Begrip>`.
+- Opbouw: `<div className="space-y-6">` met eerst `<PageHeader title="<menulabel>" subtitle="<één regel: wat je hier doet>" actions=... />`. Zet vaktermen in de subtitel met `<Begrip>`. Geen label boven de titel (de prop `eyebrow` bestaat nog maar wordt genegeerd); de kop heeft een haarlijn eronder.
   De schil levert de paginabreedte (max 1440px) en padding; voeg zelf geen buitenmarge toe.
 - Grids: `grid gap-4 lg:grid-cols-3`, KPI-rij `grid grid-cols-2 gap-4 lg:grid-cols-4`. Kaarten met `Card`.
 - Data: `useStore()` voor state en acties, `useScope()` voor de scope van het niveau, berekeningen uit
@@ -257,42 +257,46 @@ Alle waarden komen uit `src/stijl/tokens.css` (design system). Tailwind-kleuren 
 `bg-niveau`, `text-niveau-strong`, `bg-niveau-surface`, `border-niveau-border`, `bg-brand-yellow(-soft)`,
 `text-status-{success,warning,danger,info,neutral}`, `bg-status-*-surface`, `border-status-*-border`,
 `text-kg-op`, `bg-kg-op-surface`, `text-seizoen-herfst`, `bg-seizoen-herfst-surface`, `gray-25..900`.
-Tekst: `text-display|h1|h2|h3|h4|base|sm|xs|2xs`, `.eyebrow`, `.tnum`. Radius `rounded-sm|md|lg|xl|pill`.
-Schaduw `shadow-xs|sm|md|lg|pop`. Geen opacity-modifiers (`bg-niveau/40` werkt niet).
+Tekst: `text-display|h1|h2|h3|h4|base|sm|xs|2xs`, `.eyebrow` (klein label in sentence case boven een blok),
+`.kk-groepskop` (kleine hoofdletters, alleen voor groepskoppen in menu, zoeklijst en tabelkop), `.kk-link` (zwart,
+onderstreept), `.tnum`. Radius `rounded-sm|md|lg|xl` (3, 4, 4, 6 px); `rounded-full` alleen voor stippen.
+Schaduw: `shadow-xs` en `shadow-sm` zijn leeg (vlakken zweven niet); `shadow-md|lg|pop` alleen voor wat echt zweeft
+(opgepakte chip, menu, dialoog, melding). Geen opacity-modifiers (`bg-niveau/40` werkt niet).
+`text-ink-muted` en `text-ink-subtle` zijn bewust dezelfde grijstint.
 Voor dynamische kleuren altijd de tabellen in `stijlen.ts` gebruiken (Tailwind ziet geen samengestelde klassen).
 
 | Component | Props (belangrijkste) |
 |---|---|
-| `Button` | `variant: 'primary' \| 'secondary' \| 'ghost' \| 'danger' \| 'danger-zacht' \| 'niveau'`, `size: 'sm' \| 'md' \| 'lg'`, `icon`, `iconRight` (Lucide-component), + button-props |
+| `Button` | `variant: 'primary' (geel) \| 'secondary' (zwart omlijnd) \| 'ghost' \| 'danger' \| 'danger-zacht' \| 'niveau' (zwart; historische naam)`, `size: 'sm' \| 'md' \| 'lg'`, `icon`, `iconRight` (Lucide-component), + button-props. Eén gele knop per scherm |
 | `ButtonLink` | als Button + `to` (react-router) |
 | `IconButton` | `icon`, `label` (verplicht), `size`, `variant: 'ghost' \| 'secondary'` |
 | `knopKlassen(variant, size, className)` | klassen voor een `<a>`/`<label>` als knop |
-| `Badge` | `tone: neutral\|brand\|success\|warning\|danger\|info\|niveau`, `variant: soft\|solid\|outline`, `size`, `icon`, `dot`, `title` |
+| `Badge` | `tone: neutral\|brand\|success\|warning\|danger\|info\|niveau`, `variant: soft\|solid\|outline`, `size`, `icon`, `dot`, `title`. Rechthoekig, wit met haarlijn; alleen waar het informatie draagt |
 | `StandaardBadge` | `code` |
 | `VasteStandaardBadge` | `compact` ("vast") |
 | `VerplichtBadge`, `AfwijkingBadge` | `reden?`, `label?` |
-| `StatusBadge` | `status`, `size: 'sm' \| 'md'` (icoon + label) |
+| `StatusBadge` | `status`, `size: 'sm' \| 'md'` (icoon in statuskleur + label, zonder vlak) |
 | `StatusDot` | `status` |
-| `SeizoenBadge` | `gesprek: { naam, kleur, icoon }`, `size`, `showLabel`, `label` |
+| `SeizoenBadge` | `gesprek: { naam, kleur, icoon }`, `size`, `showLabel`, `label` (icoon in seizoenskleur + naam, zonder vlak) |
 | `GesprekIcoonView` | `icoon`, `kleur` |
 | `KwaliteitsgebiedTag` | `gebied`, `showName`, `size` (kleurvlak + code op wit) |
 | `GebiedDot` | `gebied` |
-| `Card` | `title`, `subtitle`, `action`, `padding: none\|sm\|md\|lg`, `elevated`, `divider`, `as`, `className`, `bodyClassName`, `rondleiding` (anker) |
+| `Card` | `title`, `subtitle`, `action`, `padding: none\|sm\|md\|lg`, `divider`, `as`, `className`, `bodyClassName`, `rondleiding` (anker). Wit, 1px haarlijn, radius 4px, geen schaduw (`elevated` doet niets meer). Liever lijnen en witruimte dan kaart-in-kaart |
 | `KpiTile` | `label`, `value`, `unit`, `icon`, `tone: neutral\|success\|warning\|danger\|niveau`, `hint` |
-| `ProgressBar` | `value` (0-100), `color` (CSS, bv. `seizoenKlassen(k).var`; standaard niveau), `size`, `label`, `showValue` |
-| `IconTile` | `icon`, `tone: niveau\|brand\|success\|info\|danger\|warning\|neutral`, `size` |
-| `EmptyState` | `icon`, `title`, `body`, `action`, `watermark`, `compact` (binnen een kaart) |
-| `InfoBalk` | `tone: info\|warning\|niveau\|neutral`, `icon` |
-| `PageHeader` | `eyebrow`, `title`, `subtitle`, `actions` |
+| `ProgressBar` | `value` (0-100), `color` (CSS, bv. `seizoenKlassen(k).var`; standaard zwart), `size`, `label`, `showValue`. Dun en recht |
+| `IconTile` | `icon`, `tone: niveau\|brand\|success\|info\|danger\|warning\|neutral`, `size`. Alleen het icoon, geen tegel; niveau en brand zijn zwart |
+| `EmptyState` | `icon` (los, grijs), `title`, `body`, `action`, `watermark`, `compact` (binnen een kaart) |
+| `InfoBalk` | `tone: info\|warning\|niveau\|neutral`, `icon`. Wit met haarlijn; de toon zit alleen in het icoon |
+| `PageHeader` | `title`, `subtitle`, `actions` (`eyebrow` wordt genegeerd) |
 | `SectionHeader` | `title`, `subtitle`, `action` |
-| `Swoosh` | (gele S-curve; staat al in de footer, gebruik hooguit één extra) |
+| `Swoosh` | gele S-curve; staat al in de footer. Verder alleen op schermen zonder footer (welkom, introductie van de rondleiding) |
 | `Veld` | `label`, `verplicht`, `hint`, `fout`, children: `(id) => <Input id={id} …/>` |
 | `Input`, `Textarea` | + `veldMaat: 'sm' \| 'md'` |
 | `Select` | `options: (string \| { value, label })[]`, `placeholder`, `veldMaat`, + select-props |
 | `SearchField` | `value`, `onChange(string)`, `placeholder`, `label` |
 | `Checkbox` | `checked`, `onChange(bool)`, `label`, `beschrijving` |
-| `FilterChip` | `active`, `onClick`, `dotClassName` (bv. `gebiedKlassen('OP').dot`), `icon`, `count` |
-| `SegmentedControl` | `value`, `onChange`, `options: { value, label, icon?, compact? }[]`, `accent: 'niveau' \| 'neutraal'` |
+| `FilterChip` | `active`, `onClick`, `dotClassName` (bv. `gebiedKlassen('OP').dot`), `icon`, `count`. Rechthoekig; aan = zwart met witte tekst; telling als gewone tekst |
+| `SegmentedControl` | `value`, `onChange`, `options: { value, label, icon?, compact? }[]`. Tekst met een zwarte streep onder de actieve keuze, geen bak (`accent` wordt genegeerd) |
 | `Begrip` | `term: BegripSleutel`, `children?` (eigen tekst). Stippellijn; uitleg bij hover, focus en tik; Esc sluit. Het is een knop: niet binnen een link of knop zetten |
 | `Dialog` | `open`, `onClose`, `title`, `subtitle`, `footer`, `width: sm\|md\|lg\|xl`, `blokkeerAchtergrond` (Esc, focus-trap, focus terug) |
 | `useBevestig()` | `await bevestig({ titel, tekst, bevestigLabel, annuleerLabel, gevaarlijk }) → boolean` |
@@ -309,11 +313,25 @@ Voorbeelden van alles: `src/schil/Stijlgids.tsx` (`#/stijlgids`).
 
 ### Keuzes waar het design system het origineel verving
 - Niveaukleur school is staalblauw `#34607A` (was magenta). Bestuur wijnrood, cluster pruim.
-- Niveaukleur zit alleen in de schil (topbar-streep, weergaveknop, menu, filterchips, balken);
-  data-kleuren (gebied, seizoen, status) veranderen niet mee.
+- Niveaukleur zit alleen op twee plekken in de schil: de 3px-lijn boven de topbar (en de mobiele lade) en de
+  weergaveknop (blokje met icoon, het label "School"/"Hele bestuur", de iconen in de keuzelijst). Menu, knoppen,
+  filters, links en voortgangsbalken zijn zwart en geel. Data-kleuren (gebied, seizoen, status) veranderen niet mee.
 - Kwaliteitsgebied = kleurvlak + code op wit (geen getinte vakken); matrixchips zijn wit met haarlijn.
-- "Verplicht" is oranje met stip (was rood); "Vaste standaard" geel met sleutel.
-- Toasts zijn witte kaarten met getinte icoontegel (was zwarte pil). Dialogen radius 16px.
+- "Verplicht" is oranje met stip (was rood); "Vaste standaard" gele rand met sleutel en zwarte tekst.
+- Toasts zijn witte kaarten met haarlijn en een los icoon in de toonkleur (was zwarte pil). Dialogen radius 6px.
+
+### Vormgevingsronde "papier" (huisstijl Leren verbeteren)
+Doel: de app moet aanvoelen als papier en niet als een gegenereerd dashboard. Regels:
+- Twee kleuren (geel `--lv-yellow`, zwart), één lettertype (Poppins), één swoosh per scherm (de voettekst).
+- Geel is schaars: de primaire knop (één per scherm), de focusring (geel met dunne zwarte binnenrand voor contrast),
+  het actieve menu-item (gele markering links), de swoosh. Overige knoppen zwart omlijnd of zwart.
+- Vlakken wit met 1px haarlijn en radius 4px, geen schaduw. Geen getinte vlakken als versiering, geen gekleurde
+  linkerranden, geen iconen in tegeltjes. Getinte vlakken alleen waar het vlak informatie draagt: heatmap,
+  seizoen in de kop van de matrix, een opgepakte/gemarkeerde chip, een net toegevoegde regel.
+- Geen labels in hoofdletters boven titels en kaarten; `.eyebrow` is gewone tekst. Hoofdletters alleen in `.kk-groepskop`.
+- Keuzes (weergave, gesprek, tabbladen) als tekst met een zwarte streep onder de actieve keuze; filters rechthoekig.
+- Status en seizoen klein: icoon of stip in de kleur, tekst donker.
+- Geen AI-clichés zoals het `Sparkles`-icoon.
 - Logo: LV-monogram (geel in zwarte tegel); footer het volledige Leren verbeteren-logo.
 - Niveau-icoon cluster is `Layers` (was `Users`).
 

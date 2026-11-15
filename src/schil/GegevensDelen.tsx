@@ -29,7 +29,7 @@ import { useBestandKeuze } from './BestandKeuze';
 function Stap({ nummer, titel, children }: { nummer: number; titel: string; children: ReactNode }) {
   return (
     <li className="flex gap-3">
-      <span className="tnum grid h-7 w-7 shrink-0 place-items-center rounded-full bg-niveau-surface text-sm font-bold text-niveau-strong">
+      <span className="tnum grid h-7 w-7 shrink-0 place-items-center rounded-full border border-gray-900 bg-surface-card text-sm font-bold text-ink-strong">
         {nummer}
       </span>
       <div className="min-w-0 pt-0.5">
@@ -90,7 +90,7 @@ function StatusBlok() {
       className={cx(
         'flex flex-col gap-4 rounded-md border p-4 sm:flex-row sm:items-center',
         toon === 'niveau'
-          ? 'border-niveau-border bg-niveau-surface'
+          ? 'border-gray-900 bg-surface-card'
           : toon === 'warning'
             ? 'border-status-warning-border bg-status-warning-surface'
             : 'border-line-subtle bg-surface-subtle',
@@ -161,7 +161,6 @@ export default function GegevensDelen() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Beheer"
         title="Gegevens & delen"
         subtitle="Werk met collega’s in één gedeeld kalenderbestand en zie waar je gegevens staan. Er gaat niets via internet."
       />

@@ -463,11 +463,11 @@ function BewerkVenster({ item, editScope, kalenderNaam, onClose, onOpgeslagen, o
                   className={cx(
                     'inline-flex h-10 items-center justify-center gap-1.5 rounded-md border text-sm font-semibold transition-colors duration-fast',
                     actief
-                      ? cx(st.surface, st.ink, st.border, 'shadow-xs')
-                      : 'border-line bg-surface-card text-ink-body hover:border-line-strong hover:bg-surface-hover',
+                      ? 'border-gray-900 bg-surface-card text-ink-strong ring-1 ring-gray-900'
+                      : 'border-line bg-surface-card text-ink-muted hover:border-gray-900 hover:text-ink-strong',
                   )}
                 >
-                  <Icoon className="h-4 w-4" aria-hidden style={{ strokeWidth: 2.2 }} />
+                  <Icoon className={cx('h-4 w-4', st.ink)} aria-hidden style={{ strokeWidth: 2.2 }} />
                   {st.label}
                 </button>
               );
@@ -540,7 +540,7 @@ function BewerkVenster({ item, editScope, kalenderNaam, onClose, onOpgeslagen, o
               </Veld>
 
               {afwijkend && (
-                <div className="-mt-2 rounded-md border border-dashed border-status-warning-border bg-status-warning-surface p-3">
+                <div className="-mt-2 rounded-md border border-dashed border-status-warning bg-surface-card p-3">
                   <p className="mb-2 text-xs text-ink-body">
                     Dit is een <Begrip term="afwijking" /> van de <Begrip term="standaardkoppeling" />. Leg kort uit waarom.
                   </p>

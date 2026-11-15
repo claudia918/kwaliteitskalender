@@ -69,7 +69,7 @@ export function Venster({
         aria-modal="true"
         aria-labelledby={labelId}
         tabIndex={-1}
-        className={cx('w-full animate-rise overflow-hidden rounded-xl bg-surface-card shadow-pop outline-none', breedte, className)}
+        className={cx('w-full animate-rise overflow-hidden rounded-xl border border-line bg-surface-card shadow-pop outline-none', breedte, className)}
       >
         {children}
       </div>

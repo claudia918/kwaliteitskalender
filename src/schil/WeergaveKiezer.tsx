@@ -87,14 +87,14 @@ export function useWeergave() {
   return { opties, huidigeSleutel, kies, huidig, eenSchool };
 }
 
-/** Kleine tegel in de kleur van een niveau (los van het actieve niveau). */
+/** Icoon in de kleur van een niveau (los van het actieve niveau), zonder tegel. */
 export function NiveauTegel({ niveau, klein }: { niveau: Niveau; klein?: boolean }) {
   const Icoon = NIVEAU_ICONEN[niveau];
   return (
     <span data-niveau={niveau} className="contents">
       <span
         className={cx(
-          'grid shrink-0 place-items-center rounded-md border border-niveau-border bg-niveau-surface text-niveau-strong',
+          'grid shrink-0 place-items-center text-niveau-strong',
           klein ? 'h-7 w-7' : 'h-8 w-8',
         )}
       >
@@ -200,7 +200,8 @@ export function WeergaveKiezer() {
         aria-label={`Je bekijkt ${huidig.naam} (${huidig.soort.toLowerCase()}). Kies wat je wilt bekijken`}
         onClick={() => (open ? sluit() : openen())}
         className={cx(
-          'group inline-flex h-10 min-w-0 max-w-full items-center gap-2 rounded-md border border-niveau-border bg-niveau-surface py-1 pl-1.5 pr-2 text-left transition-colors duration-fast hover:border-niveau focus-visible:border-niveau',
+          // De enige plek in de inhoud van de schil met de niveaukleur: blokje, label en rand bij hover.
+          'group inline-flex h-10 min-w-0 max-w-full items-center gap-2.5 rounded-md border border-line bg-surface-card py-1 pl-1 pr-2 text-left transition-colors duration-fast hover:border-niveau focus-visible:border-niveau',
           open && 'border-niveau',
         )}
       >
@@ -208,11 +209,11 @@ export function WeergaveKiezer() {
           <Icoon className="h-4 w-4" aria-hidden />
         </span>
         <span className="flex min-w-0 flex-col leading-tight">
-          <span className="text-2xs font-semibold uppercase tracking-wide text-niveau-strong">{huidig.soort}</span>
+          <span className="text-2xs font-semibold text-niveau-strong">{huidig.soort}</span>
           <span className="truncate text-sm font-semibold text-ink-strong">{huidig.naam}</span>
         </span>
         <ChevronDown
-          className={cx('h-4 w-4 shrink-0 text-niveau-strong transition-transform duration-fast', open && 'rotate-180')}
+          className={cx('h-4 w-4 shrink-0 text-ink-strong transition-transform duration-fast', open && 'rotate-180')}
           aria-hidden
         />
       </button>
@@ -232,7 +233,7 @@ export function WeergaveKiezer() {
               <p className="text-sm font-semibold text-ink-strong">Wat wil je bekijken?</p>
               <p className="mt-0.5 text-xs text-ink-muted">Menu en schermen volgen je keuze.</p>
               {metZoeken && (
-                <label className="mt-3 flex h-9 items-center gap-2 rounded-md border border-line bg-surface-card px-2.5 focus-within:border-niveau">
+                <label className="mt-3 flex h-9 items-center gap-2 rounded-md border border-line bg-surface-card px-2.5 focus-within:border-gray-900">
                   <Search className="h-4 w-4 text-ink-subtle" aria-hidden />
                   <input
                     ref={zoekveld}
@@ -245,7 +246,7 @@ export function WeergaveKiezer() {
                     aria-label="Zoek een school of cluster"
                     aria-controls={lijstId}
                     aria-activedescendant={zichtbaar[actief] ? `${lijstId}-${zichtbaar[actief].sleutel}` : undefined}
-                    className="h-full min-w-0 flex-1 bg-transparent text-sm text-ink-strong outline-none placeholder:text-ink-subtle focus-visible:shadow-none"
+                    className="h-full min-w-0 flex-1 bg-transparent text-sm text-ink-strong outline-none placeholder:text-gray-500 focus-visible:shadow-none"
                   />
                 </label>
               )}
@@ -259,7 +260,7 @@ export function WeergaveKiezer() {
                 return (
                   <li key={o.sleutel} role="presentation">
                     {kop && (
-                      <p role="presentation" className="eyebrow px-2.5 pb-1 pt-2.5 first:pt-1">
+                      <p role="presentation" className="kk-groepskop px-2.5 pb-1 pt-2.5 first:pt-1">
                         {kop}
                       </p>
                     )}

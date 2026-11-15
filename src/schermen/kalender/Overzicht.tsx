@@ -45,7 +45,7 @@ export function Overzicht({ items, filter, onFilter, komend, rechts }: Overzicht
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 rounded-lg border border-line-subtle bg-surface-card px-3 py-2.5">
         <div className="flex shrink-0 items-center gap-3" data-rondleiding="voortgang">
           <div
-            className="flex h-2 w-20 shrink-0 overflow-hidden rounded-pill bg-surface-sunken"
+            className="flex h-2 w-20 shrink-0 overflow-hidden rounded-sm bg-surface-sunken"
             role="img"
             aria-label={`${v.gereed} gereed, ${v.bezig} bezig, ${v.risico} risico, ${v.gepland} gepland`}
           >
@@ -72,9 +72,9 @@ export function Overzicht({ items, filter, onFilter, komend, rechts }: Overzicht
                   title={o.titel}
                   onClick={() => onFilter(o.value)}
                   className={cx(
-                    'inline-flex h-7 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-pill border px-2.5 text-xs font-semibold transition-colors duration-fast',
+                    'inline-flex h-7 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-sm border px-2.5 text-xs font-semibold transition-colors duration-fast',
                     aan
-                      ? 'border-transparent bg-niveau text-white'
+                      ? 'border-transparent bg-gray-900 text-white'
                       : 'border-line-subtle bg-surface-card text-ink-body hover:border-line hover:bg-surface-hover',
                   )}
                 >
@@ -94,7 +94,7 @@ export function Overzicht({ items, filter, onFilter, komend, rechts }: Overzicht
       {filter !== 'alles' && verborgen > 0 && (
         <p className="text-xs text-ink-muted" aria-live="polite">
           {verborgen === 1 ? '1 activiteit' : `${verborgen} activiteiten`} verborgen door het filter.{' '}
-          <button type="button" onClick={() => onFilter('alles')} className="font-semibold text-niveau-strong hover:underline">
+          <button type="button" onClick={() => onFilter('alles')} className="font-semibold kk-link">
             Toon alles
           </button>
         </p>
@@ -140,7 +140,7 @@ export function Legenda({ editable }: { editable: boolean }) {
           <ul className="space-y-1.5 text-xs text-ink-body">
             {STATUS_VOLGORDE.map((s) => (
               <li key={s} className="flex items-center gap-2">
-                <span className={cx('grid h-5 w-5 place-items-center rounded-full', STATUS_STIJL[s].surface, STATUS_STIJL[s].ink)}>
+                <span className={cx('grid h-5 w-5 place-items-center', STATUS_STIJL[s].ink)}>
                   <StatusIcoon status={s} className="h-3 w-3" />
                 </span>
                 {STATUS_STIJL[s].label}

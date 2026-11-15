@@ -35,7 +35,7 @@ export class Foutgrens extends Component<Props, State> {
     return (
       <div role="alert" className="mx-auto my-10 max-w-lg rounded-lg border border-line-subtle bg-surface-card p-6 shadow-sm">
         <div className="flex items-start gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-status-warning-surface text-status-warning">
+          <span className="grid h-10 w-6 shrink-0 place-items-center text-status-warning">
             <TriangleAlert className="h-6 w-6" aria-hidden />
           </span>
           <div className="min-w-0">
