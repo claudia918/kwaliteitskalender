@@ -46,7 +46,7 @@ export function ActiviteitKaart({ activiteit: a, gesprek, opKalender, dekking, o
             {opKalender ? (
               <Link
                 to={`/kalender?item=${encodeURIComponent(opKalender.uid)}`}
-                className="group inline-flex items-center gap-1 rounded-pill"
+                className="group inline-flex items-center gap-1 rounded-sm"
                 title="Bekijk op de kalender"
               >
                 <Badge tone="success" icon={Check}>

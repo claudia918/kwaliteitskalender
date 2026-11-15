@@ -70,7 +70,7 @@ export function Heatmap({
                       <button
                         type="button"
                         onClick={() => onKiesSchool(o.schoolId)}
-                        className="text-left text-ink-strong hover:text-niveau-strong hover:underline"
+                        className="text-left text-ink-strong hover:underline"
                         title="Open deze school"
                       >
                         {o.school?.naam ?? 'Onbekende school'}

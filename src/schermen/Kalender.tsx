@@ -280,7 +280,6 @@ export default function Kalender() {
   return (
     <div className={dockZichtbaar ? 'space-y-5 pb-28' : 'space-y-5'}>
       <PageHeader
-        eyebrow="Plannen"
         title="Kalender"
         subtitle={
           <>

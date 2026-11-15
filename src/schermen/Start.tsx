@@ -6,7 +6,7 @@
  */
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Check, ChevronDown, Circle, FolderSync, Layers, Sparkles, X } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown, Circle, FolderSync, Layers, X } from 'lucide-react';
 import {
   Begrip,
   Button,
@@ -92,15 +92,13 @@ export default function Start() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+      <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b border-line-subtle pb-5">
         <div className="min-w-0">
-          <p className="eyebrow">
-            <span className="tnum">
-              {datum} · week {weekNummer(vandaag)}
-            </span>
+          <p className="tnum text-sm text-ink-muted first-letter:uppercase">
+            {datum} · week {weekNummer(vandaag)}
           </p>
           <h1 className="mt-1 text-h1 text-ink-strong">{scopeLabel}</h1>
-          <p className="mt-1 text-sm text-ink-muted">
+          <p className="mt-1.5 text-base text-ink-muted">
             {niveau === 'bestuur' ? (
               <>
                 De <Begrip term="bestuurskalender" /> en {aantal(state.organisatie.scholen.length, 'school', 'scholen')}
@@ -157,7 +155,7 @@ export default function Start() {
               </span>
             </span>
             <ChevronDown
-              className={cx('h-5 w-5 shrink-0 text-ink-subtle transition-transform duration-fast group-hover:text-ink-strong', overzichtOpen && 'rotate-180')}
+              className={cx('h-5 w-5 shrink-0 text-ink-muted transition-transform duration-fast group-hover:text-ink-strong', overzichtOpen && 'rotate-180')}
               aria-hidden
             />
           </button>
@@ -239,11 +237,10 @@ function VolgendeStapKaart({
   return (
     <section
       aria-labelledby="volgende-stap"
-      className="grid overflow-hidden rounded-xl border border-line-subtle bg-surface-card shadow-sm lg:grid-cols-[minmax(0,1fr)_340px]"
+      className="grid overflow-hidden rounded-md border border-line-subtle bg-surface-card lg:grid-cols-[minmax(0,1fr)_340px]"
     >
       <div data-rondleiding="volgende-stap" className="relative p-5 sm:p-6">
-        <span aria-hidden className="absolute inset-y-0 left-0 w-1 bg-niveau" />
-        <p id="volgende-stap" className="eyebrow text-niveau-strong">
+        <p id="volgende-stap" className="eyebrow">
           Volgende stap
         </p>
         <p className="mt-2 max-w-2xl text-h3 font-semibold leading-snug text-ink-strong">{zin}</p>
@@ -258,7 +255,7 @@ function VolgendeStapKaart({
             {knop}
           </Button>
           {tweede && (
-            <Link to={tweede.to} className="text-sm font-semibold text-niveau-strong hover:underline">
+            <Link to={tweede.to} className="text-sm font-semibold kk-link">
               {tweede.label}
             </Link>
           )}
@@ -273,7 +270,7 @@ function KomendGesprekPaneel({ komend }: { komend: KomendGesprek | null }) {
   const { scope, scopeLabel } = useScope();
   if (!komend) {
     return (
-      <aside className="border-t border-line-subtle bg-surface-subtle p-5 lg:border-l lg:border-t-0">
+      <aside className="border-t border-line-subtle p-5 lg:border-l lg:border-t-0">
         <p className="eyebrow">Komend gesprek</p>
         <p className="mt-2 text-sm text-ink-muted">Er is nog geen gesprekscyclus ingesteld.</p>
       </aside>
@@ -286,28 +283,26 @@ function KomendGesprekPaneel({ komend }: { komend: KomendGesprek | null }) {
   return (
     <aside
       aria-label="Komend gesprek"
-      className={cx('flex flex-col justify-between gap-4 border-t p-5 lg:border-l lg:border-t-0', k.surface, k.border)}
+      className="flex flex-col justify-between gap-4 border-t border-line-subtle p-5 lg:border-l lg:border-t-0"
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-start gap-3">
-          <span className={cx('grid h-10 w-10 shrink-0 place-items-center rounded-md border bg-surface-card', k.border)}>
-            <Icoon className={cx('h-5 w-5', k.ink)} aria-hidden />
-          </span>
-          <div className="min-w-0">
-            <p className={cx('eyebrow', k.ink)}>
-              Komend <Begrip term="seizoensgesprek">gesprek</Begrip>
-            </p>
-            <p className="text-h3 text-ink-strong">{g.naam}</p>
-            {g.thema && <p className="text-xs text-ink-body">{g.thema}</p>}
-          </div>
+        <div className="min-w-0">
+          <p className="eyebrow">
+            Komend <Begrip term="seizoensgesprek">gesprek</Begrip>
+          </p>
+          <p className="mt-1 flex items-center gap-2 text-h3 text-ink-strong">
+            <Icoon className={cx('h-5 w-5 shrink-0', k.ink)} aria-hidden />
+            {g.naam}
+          </p>
+          {g.thema && <p className="text-sm text-ink-body">{g.thema}</p>}
         </div>
         <div className="shrink-0 text-right">
           {komend.verstreken ? (
             <p className="text-sm font-semibold text-status-warning">Voorbij</p>
           ) : (
             <>
-              <p className={cx('tnum text-h1 font-bold leading-none', k.ink)}>{komend.dagenTot}</p>
-              <p className="mt-0.5 text-2xs text-ink-muted">{komend.dagenTot === 1 ? 'dag' : 'dagen'}</p>
+              <p className="tnum text-h1 font-bold leading-none text-ink-strong">{komend.dagenTot}</p>
+              <p className="mt-0.5 text-xs text-ink-muted">{komend.dagenTot === 1 ? 'dag' : 'dagen'}</p>
             </>
           )}
         </div>
@@ -317,7 +312,7 @@ function KomendGesprekPaneel({ komend }: { komend: KomendGesprek | null }) {
           {VERSTREKEN_UITLEG} ({dagenTekst(komend)})
         </p>
       ) : (
-        <div className="rounded-md bg-surface-card p-3">
+        <div>
           <ProgressBar
             value={v.pct}
             color={k.var}
@@ -330,7 +325,7 @@ function KomendGesprekPaneel({ komend }: { komend: KomendGesprek | null }) {
               </>
             }
           />
-          <p className="tnum mt-2 text-2xs text-ink-muted">Deadline {formatDatumLang(komend.datum)}</p>
+          <p className="tnum mt-2 text-xs text-ink-muted">Deadline {formatDatumLang(komend.datum)}</p>
         </div>
       )}
     </aside>
@@ -380,13 +375,12 @@ function AanDeSlag() {
   return (
     <section
       data-rondleiding="aan-de-slag"
-      className="rounded-lg border border-niveau-border bg-niveau-surface p-5"
+      className="rounded-md border border-line-subtle bg-surface-card p-5"
       aria-labelledby="aan-de-slag"
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="eyebrow flex items-center gap-1.5 text-niveau-strong">
-            <Sparkles className="h-3.5 w-3.5" aria-hidden />
+          <p className="eyebrow">
             Aan de slag · {klaar} van {stappen.length}
           </p>
           <h2 id="aan-de-slag" className="mt-1 text-h3 text-ink-strong">
@@ -395,16 +389,16 @@ function AanDeSlag() {
         </div>
         <IconButton icon={X} label="Aan de slag verbergen" size="sm" onClick={verbergOnboarding} />
       </div>
-      <ol className="mt-4 divide-y divide-niveau-border rounded-md border border-niveau-border bg-surface-card">
+      <ol className="mt-4 divide-y divide-line-subtle border-t border-line-subtle">
         {stappen.map((s, i) => (
-          <li key={s.titel} className="flex flex-wrap items-start gap-x-3 gap-y-2 px-4 py-3">
+          <li key={s.titel} className="flex flex-wrap items-start gap-x-3 gap-y-2 py-3">
             {s.klaar ? (
               <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-status-success text-white">
                 <Check className="h-3.5 w-3.5" aria-hidden />
                 <span className="sr-only">Klaar:</span>
               </span>
             ) : (
-              <Circle className={cx('mt-0.5 h-5 w-5 shrink-0', i === volgende ? 'text-niveau' : 'text-ink-subtle')} aria-hidden />
+              <Circle className={cx('mt-0.5 h-5 w-5 shrink-0', i === volgende ? 'text-ink-strong' : 'text-gray-400')} aria-hidden />
             )}
             <span className="min-w-0 flex-1">
               <span className={cx('block text-sm', s.klaar ? 'text-ink-muted line-through' : 'font-semibold text-ink-strong')}>{s.titel}</span>
@@ -448,13 +442,13 @@ function SindsVorigBezoek() {
   const lijst = useMemo(() => (vorig ? gewijzigdSinds(scope.items, vorig, begin) : []), [scope.items, vorig, begin]);
   if (weg || !vorig || sync.status !== 'gekoppeld' || lijst.length === 0) return null;
   return (
-    <div data-rondleiding="sinds-vorig-bezoek" className="rounded-lg border border-status-info-border bg-status-info-surface px-4 py-3 text-sm">
+    <div data-rondleiding="sinds-vorig-bezoek" className="rounded-md border border-line-subtle bg-surface-card px-4 py-3 text-sm">
       <div className="flex items-start gap-3">
         <p className="min-w-0 flex-1 text-ink-body">
           <strong className="text-ink-strong">Sinds je vorige bezoek</strong> ({formatTijdstip(vorig)}) zijn{' '}
           {aantal(lijst.length, 'activiteit', 'activiteiten')} gewijzigd in het gedeelde{' '}
           <Begrip term="kalenderbestand" />.{' '}
-          <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="font-semibold text-status-info hover:underline">
+          <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="font-semibold kk-link">
             {open ? 'Verbergen' : 'Laten zien'}
           </button>
         </p>

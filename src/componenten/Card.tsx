@@ -1,6 +1,6 @@
 /**
  * Vlakken en kopjes: Card, KpiTile, ProgressBar, IconTile, EmptyState, InfoBalk, PageHeader,
- * SectionHeader en Swoosh. Randen boven schaduwen (design system).
+ * SectionHeader en Swoosh. Vlak papier: 1px haarlijn, kleine radius, geen schaduw en geen getinte vlakken.
  */
 import type { CSSProperties, ElementType, ReactNode } from 'react';
 import { Info, type LucideIcon } from 'lucide-react';
@@ -16,7 +16,7 @@ export interface CardProps {
   action?: ReactNode;
   /** Binnenruimte: none | sm (12px) | md (20px, standaard) | lg (24px) */
   padding?: 'none' | 'sm' | 'md' | 'lg';
-  /** Iets zwevender (hover-tegels, welkom) */
+  /** Vervallen: kaarten zweven niet meer. Blijft voor compatibiliteit en doet niets. */
   elevated?: boolean;
   /** Kopregel met scheidingslijn (standaard true als er een titel is) */
   divider?: boolean;
@@ -32,14 +32,13 @@ export interface CardProps {
 const PAD = { none: '', sm: 'p-3', md: 'p-5', lg: 'p-6' } as const;
 const PAD_X = { none: 'px-5', sm: 'px-3', md: 'px-5', lg: 'px-6' } as const;
 
-/** Wit vlak met 1px rand en radius lg. */
+/** Wit vlak met 1px haarlijn, kleine radius, geen schaduw. */
 export function Card({
   children,
   title,
   subtitle,
   action,
   padding = 'md',
-  elevated,
   divider = true,
   as: Tag = 'section',
   className,
@@ -55,8 +54,7 @@ export function Card({
       data-rondleiding={rondleiding}
       style={style}
       className={cx(
-        'min-w-0 rounded-lg border border-line-subtle bg-surface-card',
-        elevated ? 'shadow-md' : 'shadow-xs',
+        'min-w-0 rounded-md border border-line-subtle bg-surface-card',
         className,
       )}
     >
@@ -65,7 +63,7 @@ export function Card({
           className={cx(
             'flex items-start justify-between gap-4 pt-4',
             PAD_X[padding],
-            divider ? 'border-b border-gray-100 pb-3' : 'pb-0',
+            divider ? 'border-b border-line-subtle pb-3' : 'pb-0',
           )}
         >
           <div className="min-w-0">
@@ -85,11 +83,11 @@ export function Card({
 export type KpiTone = 'neutral' | 'success' | 'warning' | 'danger' | 'niveau';
 
 const KPI_TOON: Record<KpiTone, string> = {
-  neutral: 'text-ink-subtle',
+  neutral: 'text-ink-muted',
   success: 'text-status-success',
   warning: 'text-status-warning',
   danger: 'text-status-danger',
-  niveau: 'text-niveau',
+  niveau: 'text-ink-muted',
 };
 
 export interface KpiTileProps {
@@ -103,25 +101,25 @@ export interface KpiTileProps {
   className?: string;
 }
 
-/** Snelle telling: label in hoofdletters, groot tabulair getal, optionele hint. */
+/** Snelle telling: label in gewone tekst, groot tabulair getal, optionele hint. */
 export function KpiTile({ label, value, unit, icon: Icon, tone = 'neutral', hint, className }: KpiTileProps) {
   const waardeKleur = tone === 'warning' || tone === 'danger' || tone === 'success' ? KPI_TOON[tone] : 'text-ink-strong';
   return (
     <div
       className={cx(
-        'flex min-w-0 flex-col gap-2.5 rounded-lg border border-line-subtle bg-surface-card p-4 shadow-xs',
+        'flex min-w-0 flex-col gap-2 rounded-md border border-line-subtle bg-surface-card p-4',
         className,
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="truncate text-2xs font-semibold uppercase tracking-label text-ink-muted">{label}</span>
+        <span className="truncate text-sm font-medium text-ink-muted">{label}</span>
         {Icon && <Icon className={cx('h-4 w-4', KPI_TOON[tone])} aria-hidden />}
       </div>
       <div className="flex items-baseline gap-1.5">
         <span className={cx('tnum text-h1 font-bold leading-none tracking-tight', waardeKleur)}>{value}</span>
         {unit && <span className="text-base font-semibold text-ink-muted">{unit}</span>}
       </div>
-      {hint && <span className="text-xs text-ink-subtle">{hint}</span>}
+      {hint && <span className="text-xs text-ink-muted">{hint}</span>}
     </div>
   );
 }
@@ -131,7 +129,7 @@ export function KpiTile({ label, value, unit, icon: Icon, tone = 'neutral', hint
 export interface ProgressBarProps {
   /** Percentage 0..100 */
   value: number;
-  /** CSS-kleur van de vulling; standaard de niveaukleur. Gebruik bv. seizoenKlassen(k).var. */
+  /** CSS-kleur van de vulling; standaard zwart. Gebruik bv. seizoenKlassen(k).var voor een seizoen. */
   color?: string;
   size?: 'sm' | 'md' | 'lg';
   /** Label links boven de balk */
@@ -142,9 +140,9 @@ export interface ProgressBarProps {
 }
 
 /** Voortgangsbalk; de waarde staat er als tekst bij als showValue (nooit alleen kleur/lengte). */
-export function ProgressBar({ value, color = 'var(--niveau)', size = 'md', label, showValue, className }: ProgressBarProps) {
+export function ProgressBar({ value, color = 'var(--text-strong)', size = 'md', label, showValue, className }: ProgressBarProps) {
   const pct = Math.max(0, Math.min(100, Math.round(value)));
-  const h = size === 'sm' ? 'h-1.5' : size === 'lg' ? 'h-3' : 'h-2';
+  const h = size === 'sm' ? 'h-1' : size === 'lg' ? 'h-2' : 'h-1.5';
   return (
     <div className={cx('flex min-w-0 flex-col gap-1.5', className)}>
       {(label !== undefined || showValue) && (
@@ -158,10 +156,10 @@ export function ProgressBar({ value, color = 'var(--niveau)', size = 'md', label
         aria-valuenow={pct}
         aria-valuemin={0}
         aria-valuemax={100}
-        className={cx('overflow-hidden rounded-pill bg-gray-200', h)}
+        className={cx('overflow-hidden bg-gray-200', h)}
       >
         <div
-          className="h-full rounded-pill transition-[width] duration-slow ease-out"
+          className="h-full transition-[width] duration-slow ease-out"
           style={{ width: `${pct}%`, background: color }}
         />
       </div>
@@ -174,16 +172,19 @@ export function ProgressBar({ value, color = 'var(--niveau)', size = 'md', label
 export type IconTileTone = 'niveau' | 'brand' | 'success' | 'info' | 'danger' | 'warning' | 'neutral';
 
 const TEGEL: Record<IconTileTone, string> = {
-  niveau: 'bg-niveau-surface text-niveau',
-  brand: 'bg-brand-yellow-soft text-brand-yellow-700',
-  success: 'bg-status-success-surface text-status-success',
-  info: 'bg-status-info-surface text-status-info',
-  danger: 'bg-status-danger-surface text-status-danger',
-  warning: 'bg-status-warning-surface text-status-warning',
-  neutral: 'bg-surface-sunken text-ink-muted',
+  niveau: 'text-ink-strong',
+  brand: 'text-ink-strong',
+  success: 'text-status-success',
+  info: 'text-status-info',
+  danger: 'text-status-danger',
+  warning: 'text-status-warning',
+  neutral: 'text-ink-muted',
 };
 
-/** Icoon in een getint vierkant (starttegels, welkom, export). */
+/**
+ * Alleen het icoon, zonder getint tegeltje (geen versiering). De naam blijft voor compatibiliteit.
+ * Statustonen houden hun kleur; niveau, brand en neutral zijn zwart of grijs.
+ */
 export function IconTile({
   icon: Icon,
   tone = 'niveau',
@@ -195,10 +196,9 @@ export function IconTile({
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }) {
-  const maat = size === 'sm' ? 'h-8 w-8' : size === 'lg' ? 'h-12 w-12' : 'h-10 w-10';
   const icoon = size === 'sm' ? 'h-4 w-4' : size === 'lg' ? 'h-6 w-6' : 'h-5 w-5';
   return (
-    <span className={cx('grid shrink-0 place-items-center rounded-md', maat, TEGEL[tone], className)}>
+    <span className={cx('inline-flex shrink-0 items-start', TEGEL[tone], className)}>
       <Icon className={icoon} aria-hidden />
     </span>
   );
@@ -221,13 +221,13 @@ export interface EmptyStateProps {
   className?: string;
 }
 
-/** Lege toestand: icoon in gele tegel, titel, uitleg, optionele actie. */
+/** Lege toestand: los icoon, titel, uitleg, optionele actie. */
 export function EmptyState({ icon: Icon, title, body, action, watermark, compact, className }: EmptyStateProps) {
   return (
     <div
       className={cx(
         'relative flex flex-col items-center overflow-hidden text-center',
-        compact ? 'gap-2 px-4 py-8' : 'gap-3 rounded-lg border border-dashed border-line bg-surface-card px-8 py-12',
+        compact ? 'gap-2 px-4 py-8' : 'gap-3 rounded-md border border-line-subtle bg-surface-card px-8 py-12',
         className,
       )}
     >
@@ -241,9 +241,7 @@ export function EmptyState({ icon: Icon, title, body, action, watermark, compact
         </svg>
       )}
       {Icon && (
-        <span className="relative grid h-12 w-12 place-items-center rounded-lg bg-brand-yellow-soft text-brand-yellow-700">
-          <Icon className="h-6 w-6" aria-hidden />
-        </span>
+        <Icon className="relative h-6 w-6 text-ink-muted" aria-hidden />
       )}
       <div className="relative flex max-w-md flex-col gap-1">
         <h3 className={cx(compact ? 'text-h4' : 'text-h3', 'text-ink-strong')}>{title}</h3>
@@ -268,14 +266,18 @@ export function InfoBalk({
   tone?: 'info' | 'warning' | 'niveau' | 'neutral';
   className?: string;
 }) {
+  // Geen getint vlak: haarlijn op wit, de toon zit alleen in het icoon.
   const t = {
-    info: 'bg-status-info-surface border-status-info-border text-status-info',
-    warning: 'bg-status-warning-surface border-status-warning-border text-status-warning',
-    niveau: 'bg-niveau-surface border-niveau-border text-niveau-strong',
-    neutral: 'bg-surface-sunken border-line-subtle text-ink-muted',
+    info: 'text-status-info',
+    warning: 'text-status-warning',
+    niveau: 'text-ink-strong',
+    neutral: 'text-ink-muted',
   }[tone];
   return (
-    <div role="note" className={cx('flex items-start gap-2.5 rounded-md border px-3.5 py-2.5 text-sm', t, className)}>
+    <div
+      role="note"
+      className={cx('flex items-start gap-2.5 rounded-md border border-line-subtle bg-surface-card px-3.5 py-2.5 text-sm', t, className)}
+    >
       <Icon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
       <div className="min-w-0 text-ink-body">{children}</div>
     </div>
@@ -285,8 +287,11 @@ export function InfoBalk({
 /* ------------------------------------------------------------------ */
 
 export interface PageHeaderProps {
-  /** Kleine hoofdletterkop boven de titel, bv. "Dashboard" */
-  eyebrow: ReactNode;
+  /**
+   * Vervallen: het kleine label boven de titel (de menugroep) is weggehaald, want het herhaalde alleen
+   * het menu. Wordt genegeerd.
+   */
+  eyebrow?: ReactNode;
   title: ReactNode;
   subtitle?: ReactNode;
   /** Knoppen rechts */
@@ -294,14 +299,15 @@ export interface PageHeaderProps {
   className?: string;
 }
 
-/** Kop van elk scherm: eyebrow, h1, subtitel, acties rechts. */
-export function PageHeader({ eyebrow, title, subtitle, actions, className }: PageHeaderProps) {
+/** Kop van elk scherm: h1, subtitel, acties rechts, met een haarlijn eronder. */
+export function PageHeader({ title, subtitle, actions, className }: PageHeaderProps) {
   return (
-    <header className={cx('flex flex-wrap items-end justify-between gap-x-6 gap-y-3', className)}>
+    <header
+      className={cx('flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-b border-line-subtle pb-5', className)}
+    >
       <div className="min-w-0">
-        <p className="eyebrow">{eyebrow}</p>
-        <h1 className="mt-1 text-h1 text-ink-strong">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-ink-muted">{subtitle}</p>}
+        <h1 className="text-h1 text-ink-strong">{title}</h1>
+        {subtitle && <p className="mt-1.5 text-base text-ink-muted">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </header>

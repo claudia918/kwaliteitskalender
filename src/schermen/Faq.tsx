@@ -33,12 +33,11 @@ export default function Faq() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Hulp"
         title="Veelgestelde vragen"
         subtitle={
           <>
             Antwoorden over werken met de kalender, samenwerken en privacy. Staat je vraag er niet bij?{' '}
-            <Link to="/contact" className="font-semibold text-niveau-strong hover:underline">
+            <Link to="/contact" className="font-semibold kk-link">
               Neem contact met ons op
             </Link>
             .
@@ -72,7 +71,7 @@ export default function Faq() {
                 <div className="mt-2 divide-y divide-line-subtle">
                   {c.vragen.map((v) => (
                     <details key={v.v} className="group py-1" open={!!q}>
-                      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-sm py-2 text-sm font-medium text-ink-strong hover:text-niveau-strong [&::-webkit-details-marker]:hidden">
+                      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-sm py-2 text-sm font-medium text-ink-strong hover:text-ink-strong [&::-webkit-details-marker]:hidden">
                         {v.v}
                         <ChevronDown
                           className="h-4 w-4 shrink-0 text-ink-subtle transition-transform duration-fast group-open:rotate-180"

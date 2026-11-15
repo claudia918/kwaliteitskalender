@@ -1,6 +1,6 @@
 /**
  * Toasts: korte meldingen onderaan in het midden. Maximaal 3 tegelijk, elk 2400 ms (zoals het origineel),
- * vormgegeven als de Toast van het design system (witte kaart met getinte icoontegel).
+ * vormgegeven als de Toast van het design system (witte kaart met haarlijn, los icoon in de toonkleur).
  *
  *   const toast = useToast();
  *   toast('Wijzigingen opgeslagen');                 // success
@@ -69,7 +69,7 @@ export function useToast(): ToonToast {
 }
 
 const TOON: Record<ToastToon, { icoon: typeof Check; kleur: string; tegel: string }> = {
-  success: { icoon: Check, kleur: 'text-status-success', tegel: 'bg-status-success-surface' },
+  success: { icoon: Check, kleur: 'text-status-success', tegel: '' },
   info: { icoon: Info, kleur: 'text-status-info', tegel: 'bg-status-info-surface' },
   danger: { icoon: Trash2, kleur: 'text-status-danger', tegel: 'bg-status-danger-surface' },
   warning: { icoon: TriangleAlert, kleur: 'text-status-warning', tegel: 'bg-status-warning-surface' },
@@ -105,22 +105,20 @@ export function Toast({
       onFocus={onPauze && (() => onPauze(true))}
       onBlur={onPauze && (() => onPauze(false))}
       className={cx(
-        'pointer-events-auto flex items-center gap-3 rounded-md border border-line-subtle bg-surface-card py-2 pl-2 shadow-lg',
+        'pointer-events-auto flex items-center gap-3 rounded-md border border-line bg-surface-card py-2 pl-2 shadow-lg',
         actie ? 'max-w-[min(94vw,520px)] pr-1.5' : 'max-w-[min(92vw,440px)] pr-3',
         'transition-all duration-base ease-out animate-rise',
         verdwijnt && 'opacity-0 translate-y-1',
       )}
     >
-      <span className={cx('grid h-7 w-7 shrink-0 place-items-center rounded-md', t.tegel, t.kleur)}>
-        <Icoon className="h-4 w-4" aria-hidden strokeWidth={2.2} />
-      </span>
+      <Icoon className={cx('ml-1 h-4 w-4 shrink-0', t.kleur)} aria-hidden strokeWidth={2.2} />
       <span className="min-w-0 flex-1 text-sm font-medium text-ink-strong">{tekst}</span>
       {actie && (
         <button
           type="button"
           onClick={actie.onClick}
           title={`${actie.label} (Ctrl+Z)`}
-          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-sm px-2.5 text-xs font-semibold text-niveau-strong hover:bg-niveau-surface"
+          className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-sm px-2.5 text-xs font-semibold text-ink-strong underline decoration-line-strong underline-offset-[3px] hover:decoration-current"
         >
           <Undo2 className="h-3.5 w-3.5" aria-hidden />
           {actie.label}

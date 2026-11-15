@@ -3,7 +3,7 @@
  * Bedoeld om vormgeving te controleren en als voorbeeld voor schermen.
  */
 import { useState } from 'react';
-import { CalendarClock, GitBranch, LayoutGrid, List, ListChecks, Plus, ShieldAlert, Sparkles, Trash2 } from 'lucide-react';
+import { CalendarClock, GitBranch, LayoutGrid, List, ListChecks, Plus, ShieldAlert, Trash2 } from 'lucide-react';
 import {
   ActivityChip,
   AfwijkingBadge,
@@ -58,18 +58,38 @@ export default function Stijlgids() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Stijlgids"
         title="Componenten"
-        subtitle="Alle bouwstenen uit src/componenten, naar het Leren verbeteren design system."
+        subtitle="Alle bouwstenen uit src/componenten, in de huisstijl van Leren verbeteren."
         actions={
           <>
-            <Button icon={Sparkles}>Secundair</Button>
+            <Button icon={ListChecks}>Secundair</Button>
             <Button variant="primary" icon={Plus}>
               Primair
             </Button>
           </>
         }
       />
+
+      <Card title="Huisstijl in het kort" subtitle="Papier, geen dashboard">
+        <ul className="grid gap-x-8 gap-y-2 text-sm text-ink-body md:grid-cols-2">
+          <li>Twee kleuren: geel en zwart, op warm wit en warmgrijs. Eén lettertype: Poppins.</li>
+          <li>Geel is schaars: de primaire knop, de focusring en één swoosh per scherm (de voettekst).</li>
+          <li>Vlakken zijn wit met een 1px haarlijn en een kleine radius. Geen schaduw, behalve voor wat zweeft.</li>
+          <li>Geen getinte vlakken, gekleurde linkerranden of iconen in tegeltjes als versiering.</li>
+          <li>Labels in gewone tekst (sentence case). Kleine hoofdletters alleen voor groepskoppen in menu en tabel.</li>
+          <li>Links zwart en onderstreept. De niveaukleur zit alleen in de weergaveknop en de lijn boven de topbar.</li>
+          <li>Gebied, seizoen en status houden hun kleur, maar klein: stip, code of icoon met tekst.</li>
+          <li>Twee grijstinten voor tekst: donker (tekst) en middelgrijs (bijregels).</li>
+        </ul>
+        <div className="mt-4 flex flex-wrap items-baseline gap-x-6 gap-y-2 border-t border-line-subtle pt-4 text-sm">
+          <span className="eyebrow">Label boven een blok</span>
+          <span className="kk-groepskop">Groepskop</span>
+          <a href="#/stijlgids" className="kk-link">
+            Link
+          </a>
+          <span className="text-ink-muted">Bijregel</span>
+        </div>
+      </Card>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KpiTile label="Activiteiten" value={67} icon={ListChecks} />
@@ -79,12 +99,12 @@ export default function Stijlgids() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card title="Knoppen" subtitle="primary, secondary, ghost, niveau, danger, danger-zacht">
+        <Card title="Knoppen" subtitle="primary (geel), secondary (zwart omlijnd), ghost, niveau (zwart), danger, danger-zacht">
           <div className="flex flex-wrap items-center gap-2">
             <Button variant="primary">Naar gesprekken</Button>
             <Button>Open kalender</Button>
             <Button variant="ghost">Annuleren</Button>
-            <Button variant="niveau">Niveau</Button>
+            <Button variant="niveau">Zwart</Button>
             <Button variant="danger">Verwijderen</Button>
             <Button variant="danger-zacht" icon={Trash2}>
               Verwijderen
@@ -273,7 +293,8 @@ export default function Stijlgids() {
             </InfoBalk>
             <InfoBalk tone="warning">Vaste standaard OP3 (Pedagogisch-didactisch handelen) nog niet afgedekt</InfoBalk>
           </div>
-          <div className="mt-4 flex items-center gap-3">
+          <p className="mt-4 text-xs text-ink-muted">IconTile: alleen het icoon, geen tegel</p>
+          <div className="mt-1.5 flex items-center gap-3">
             <IconTile icon={ListChecks} />
             <IconTile icon={ListChecks} tone="brand" />
             <IconTile icon={ListChecks} tone="success" />

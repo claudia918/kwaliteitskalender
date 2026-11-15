@@ -14,7 +14,7 @@ export interface ActivityChipProps extends Omit<ButtonHTMLAttributes<HTMLButtonE
   verplicht?: boolean;
   /** Reden van afwijking; toont "afwijking" */
   afwijking?: string;
-  /** Opgepakt voor verplaatsen (ring in niveaukleur) */
+  /** Opgepakt voor verplaatsen (zwarte ring) */
   selected?: boolean;
   /** Alleen code + stip, zonder naam */
   compact?: boolean;
@@ -22,7 +22,7 @@ export interface ActivityChipProps extends Omit<ButtonHTMLAttributes<HTMLButtonE
 
 /**
  * Activiteit in een matrixcel. Wit vlak met haarlijn; het kwaliteitsgebied blijkt uit het
- * kleurvlakje en de gekleurde code. Geselecteerd = 2px ring in de niveaukleur.
+ * kleurvlakje en de gekleurde code. Geselecteerd = 2px zwarte ring.
  */
 export const ActivityChip = forwardRef<HTMLButtonElement, ActivityChipProps>(function ActivityChip(
   { gebied, code, naam, status, verplicht, afwijking, selected, compact, className, type = 'button', ...rest },
@@ -38,15 +38,15 @@ export const ActivityChip = forwardRef<HTMLButtonElement, ActivityChipProps>(fun
         'group relative flex w-full flex-col gap-0.5 rounded-sm border bg-surface-card text-left transition-[box-shadow,transform,border-color] duration-fast ease-out',
         compact ? 'px-1.5 py-1' : 'px-2 py-1.5',
         selected
-          ? 'z-[2] -translate-y-px border-transparent shadow-md ring-2 ring-niveau'
-          : 'z-[1] border-line-subtle shadow-xs hover:border-line hover:shadow-sm',
+          ? 'z-[2] -translate-y-px border-transparent shadow-md ring-2 ring-gray-900'
+          : 'z-[1] border-line-subtle hover:border-gray-900',
         className,
       )}
       {...rest}
     >
       <span className="flex items-center gap-1.5">
         <span aria-hidden className={cx('h-[7px] w-[7px] shrink-0 rounded-[2px]', k.dot)} />
-        {code && <span className={cx('text-[10px] font-bold leading-none tracking-label', k.ink)}>{code}</span>}
+        {code && <span className={cx('text-[10px] font-bold leading-none', k.ink)}>{code}</span>}
         {verplicht && (
           <span
             title="Verplicht"

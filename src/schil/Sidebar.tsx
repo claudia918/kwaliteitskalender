@@ -17,13 +17,14 @@ function MenuLink({ item, pad, onKlik }: { item: MenuItem; pad: string; onKlik?:
       aria-current={actief ? 'page' : undefined}
       title={item.beschrijving}
       className={cx(
-        'flex h-9 items-center gap-3 rounded-md border-l-2 px-3 text-sm font-medium transition-colors duration-fast',
+        // Actief: zwart en vet met een gele markering links. Geen getinte pil.
+        'flex h-9 items-center gap-3 rounded-r-sm border-l-[3px] px-3 text-sm transition-colors duration-fast',
         actief
-          ? 'border-niveau bg-niveau-surface text-niveau-strong'
-          : 'border-transparent text-ink-body hover:bg-surface-hover hover:text-ink-strong',
+          ? 'border-brand-yellow font-semibold text-ink-strong'
+          : 'border-transparent font-medium text-ink-body hover:border-line hover:text-ink-strong',
       )}
     >
-      <Icon className={cx('h-4 w-4 shrink-0', actief ? 'text-niveau' : 'text-ink-subtle')} aria-hidden />
+      <Icon className={cx('h-4 w-4 shrink-0', actief ? 'text-ink-strong' : 'text-ink-muted')} aria-hidden />
       <span className="truncate">{item.label}</span>
     </Link>
   );
@@ -41,12 +42,12 @@ function RondleidingKnop({ onKlik }: { onKlik?: () => void }) {
         r.openKeuze();
       }}
       title="Oefen met de app op een oefenkalender"
-      className="flex h-9 items-center gap-3 rounded-md border-l-2 border-transparent px-3 text-left text-sm font-medium text-ink-body transition-colors duration-fast hover:bg-surface-hover hover:text-ink-strong"
+      className="flex h-9 items-center gap-3 rounded-r-sm border-l-[3px] border-transparent px-3 text-left text-sm font-medium text-ink-body transition-colors duration-fast hover:border-line hover:text-ink-strong"
     >
-      <GraduationCap className="h-4 w-4 shrink-0 text-ink-subtle" aria-hidden />
+      <GraduationCap className="h-4 w-4 shrink-0 text-ink-muted" aria-hidden />
       <span className="truncate">Rondleiding</span>
       {r.voortgang.lopend && !r.oefenen && (
-        <span className="ml-auto rounded-pill bg-brand-yellow px-1.5 text-2xs font-bold text-ink-on-brand">verder</span>
+        <span className="ml-auto rounded-sm bg-brand-yellow px-1.5 text-2xs font-bold text-ink-on-brand">verder</span>
       )}
     </button>
   );
@@ -60,7 +61,7 @@ function Menu({ onKlik }: { onKlik?: () => void }) {
   const groep = (g: (typeof MENU)[number]) => (
     <div key={g.id} role="group" aria-labelledby={g.titel ? `menu-${g.id}` : undefined} data-rondleiding={`menu-${g.id}`}>
       {g.titel && (
-        <p id={`menu-${g.id}`} className="eyebrow px-3 pb-1 pt-4">
+        <p id={`menu-${g.id}`} className="kk-groepskop px-3 pb-1.5 pt-5">
           {g.titel}
         </p>
       )}
@@ -84,7 +85,7 @@ function Menu({ onKlik }: { onKlik?: () => void }) {
 /** Vaste zijbalk vanaf 768px. */
 export function Sidebar() {
   return (
-    <aside className="no-print hidden w-sidebar shrink-0 border-r border-line-subtle bg-surface-card md:block">
+    <aside className="no-print hidden w-sidebar shrink-0 border-r border-line-subtle bg-surface-page md:block">
       <div className="sticky top-[59px] flex max-h-[calc(100vh-59px)] flex-col overflow-y-auto">
         <Menu />
       </div>

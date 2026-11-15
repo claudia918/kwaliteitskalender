@@ -10,7 +10,7 @@
 import { useId } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ArrowRight, Check, GraduationCap, PlayCircle, X } from 'lucide-react';
-import { LvMonogram, cx } from '../../componenten';
+import { LvMonogram, Swoosh, cx } from '../../componenten';
 import { useRondleiding } from './RondleidingProvider';
 import { EERSTE_RONDLEIDING, SCHERM_RONDLEIDINGEN, tourVoorPad, vindTour } from './tours';
 import { Venster } from './Venster';
@@ -32,26 +32,28 @@ function Introductie() {
   const titelId = useId();
   return (
     <Venster labelId={titelId} onSluit={r.sluitAanbod} breedte="max-w-[600px]">
-      <div className="bg-brand-yellow px-6 pb-5 pt-6 text-ink-on-brand sm:px-8">
+      {/* Wit en rustig: het geel zit in het monogram, de swoosh en de knop. */}
+      <div className="px-6 pt-6 sm:px-8">
         <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-md bg-brand-black">
-            <LvMonogram className="h-6 w-6" />
+          <span className="grid h-9 w-9 place-items-center rounded-sm bg-brand-black">
+            <LvMonogram className="h-5 w-5" />
           </span>
-          <p className="text-xs font-bold uppercase tracking-wide">Rondleiding · {EERSTE_RONDLEIDING.duur}</p>
+          <p className="text-sm font-medium text-ink-muted">Rondleiding · {EERSTE_RONDLEIDING.duur}</p>
         </div>
-        <h2 id={titelId} className="mt-4 text-h1 font-bold">
+        <h2 id={titelId} className="mt-4 text-h1 font-bold text-ink-strong">
           Zullen we even oefenen?
         </h2>
-        <p className="mt-2 text-base">
+        <p className="mt-2 text-base text-ink-body">
           Je doet de belangrijkste dingen één keer zelf, op een oefenkalender. Wat je daar doet, verdwijnt weer. Je eigen
           kalender blijft precies zoals hij is.
         </p>
       </div>
-      <div className="px-6 py-5 sm:px-8">
+      <Swoosh className="mt-3 h-6" />
+      <div className="px-6 pb-5 pt-2 sm:px-8">
         <ol className="grid gap-x-6 gap-y-1.5 text-sm text-ink-body sm:grid-cols-2" aria-label="De stappen">
           {EERSTE_RONDLEIDING.stappen.map((s, k) => (
             <li key={s.id} className="flex items-center gap-2.5">
-              <span className="tnum grid h-5 w-5 shrink-0 place-items-center rounded-full bg-surface-sunken text-2xs font-bold text-ink-muted">
+              <span className="tnum w-4 shrink-0 text-right text-xs font-semibold text-ink-muted">
                 {k + 1}
               </span>
               {s.titel}
@@ -88,9 +90,7 @@ function HoekAanbod() {
       className="no-print fixed bottom-4 right-4 z-[950] w-[min(360px,calc(100vw-32px))] animate-rise overflow-hidden rounded-xl border border-line-subtle bg-surface-card shadow-pop"
     >
       <div className="flex items-start gap-3 p-4">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-brand-yellow text-ink-on-brand">
-          <GraduationCap className="h-5 w-5" aria-hidden />
-        </span>
+        <GraduationCap className="mt-0.5 h-5 w-5 shrink-0 text-ink-strong" aria-hidden />
         <div className="min-w-0 flex-1">
           <h2 id={titelId} className="text-sm font-semibold text-ink-strong">
             {hervat ? 'Verder met de rondleiding?' : 'Nieuw in de Kwaliteitskalender?'}
@@ -146,12 +146,7 @@ export function RondleidingKeuze() {
           nadruk && 'bg-brand-yellow-soft hover:bg-brand-yellow-soft',
         )}
       >
-        <span
-          className={cx(
-            'grid h-7 w-7 shrink-0 place-items-center rounded-md',
-            gedaan ? 'bg-status-success-surface text-status-success' : 'bg-surface-sunken text-ink-muted',
-          )}
-        >
+        <span className={cx('grid h-7 w-5 shrink-0 place-items-center', gedaan ? 'text-status-success' : 'text-ink-muted')}>
           {gedaan ? <Check className="h-4 w-4" aria-label="gedaan" /> : <PlayCircle className="h-4 w-4" aria-hidden />}
         </span>
         <span className="min-w-0 flex-1">
@@ -193,7 +188,7 @@ export function RondleidingKeuze() {
           () => r.start(EERSTE_RONDLEIDING.id),
         )}
         <li aria-hidden className="px-3 pb-1 pt-3">
-          <p className="eyebrow">Per scherm</p>
+          <p className="kk-groepskop">Per scherm</p>
         </li>
         {SCHERM_RONDLEIDINGEN.filter((t) => t !== hier).map((t) =>
           regel(t.id, t.titel, t.duur, r.voortgang.schermen.includes(t.pad!), () => r.start(t.id)),

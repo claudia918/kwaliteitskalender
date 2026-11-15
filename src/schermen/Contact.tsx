@@ -23,7 +23,6 @@ export default function Contact() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Hulp"
         title="Contact"
         subtitle="Vragen, ideeën of ergens tegenaan gelopen? We horen het graag."
       />
@@ -39,12 +38,12 @@ export default function Contact() {
           </div>
           <div className="divide-y divide-line-subtle">
             <Gegeven icon={Mail} label="E-mail">
-              <a href={CONTACT.mailto} className="text-niveau-strong hover:underline">
+              <a href={CONTACT.mailto} className="kk-link">
                 {CONTACT.email}
               </a>
             </Gegeven>
             <Gegeven icon={Phone} label="Telefoon">
-              <a href={CONTACT.tel} className="tnum text-niveau-strong hover:underline">
+              <a href={CONTACT.tel} className="tnum kk-link">
                 {CONTACT.telefoon}
               </a>
             </Gegeven>

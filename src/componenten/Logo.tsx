@@ -25,14 +25,14 @@ export function AppLogo({ groot, compact = true, className }: { groot?: boolean;
       <span
         className={cx(
           'grid shrink-0 place-items-center bg-brand-black',
-          groot ? 'h-14 w-14 rounded-[14px]' : 'h-9 w-9 rounded-[9px]',
+          groot ? 'h-14 w-14 rounded-md' : 'h-9 w-9 rounded-sm',
         )}
       >
         <LvMonogram className={groot ? 'w-9' : 'w-[22px]'} />
       </span>
       <span className={cx('flex-col leading-tight', compact ? 'hidden sm:flex' : 'flex')}>
         <span className={cx('font-bold tracking-tight text-ink-strong', groot ? 'text-h3' : 'text-sm')}>Kwaliteitskalender</span>
-        <span className="text-2xs font-medium uppercase tracking-label text-ink-subtle">Leren verbeteren · VO</span>
+        <span className="text-2xs font-medium text-ink-muted">Leren verbeteren · VO</span>
       </span>
     </span>
   );

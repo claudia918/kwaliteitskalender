@@ -74,11 +74,11 @@ export function StatusKeuze({ status, onKies, naam, vorm = 'icoon', groot, class
           }
         }}
         className={cx(
-          'shrink-0 transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-niveau',
+          'shrink-0 transition-colors duration-fast focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow',
           vorm === 'icoon'
             ? cx('grid place-items-center rounded-full hover:bg-surface-sunken', groot ? 'h-8 w-8' : 'h-5 w-5', status === 'gepland' ? 'text-gray-400 hover:text-ink-muted' : st.ink)
-            : cx('inline-flex h-7 items-center gap-1 rounded-pill border pl-2 pr-1.5 text-xs font-semibold hover:shadow-xs', st.surface, st.border, st.ink),
-          open && 'ring-2 ring-niveau',
+            : cx('inline-flex h-7 items-center gap-1 rounded-sm border border-line bg-surface-card pl-2 pr-1.5 text-xs font-semibold hover:border-gray-900', st.ink),
+          open && 'ring-2 ring-gray-900',
           className,
         )}
       >
@@ -195,7 +195,7 @@ function StatusMenu({
               i === actief && 'bg-surface-sunken',
             )}
           >
-            <span className={cx('grid h-5 w-5 place-items-center rounded-full', st.surface, st.ink)}>
+            <span className={cx('grid h-5 w-5 place-items-center', st.ink)}>
               <StatusIcoon status={s} className="h-3 w-3" />
             </span>
             <span className="flex-1">{st.label}</span>

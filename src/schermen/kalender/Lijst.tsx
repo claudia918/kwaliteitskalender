@@ -42,7 +42,7 @@ export function Lijst({ items, cyclus, gesprekken, huidigeMaand, onOpen, onStatu
             <header
               className={cx(
                 'flex flex-wrap items-center gap-x-3 gap-y-1 border-b px-4 py-2',
-                k ? cx(k.surface, k.border) : 'border-line-subtle bg-surface-subtle',
+                'border-line-subtle bg-surface-subtle',
               )}
             >
               <CalendarDays className={cx('h-4 w-4', k ? k.ink : 'text-ink-subtle')} aria-hidden />
@@ -50,7 +50,7 @@ export function Lijst({ items, cyclus, gesprekken, huidigeMaand, onOpen, onStatu
                 {maandTitel(maand)}
               </h2>
               {maand === huidigeMaand && (
-                <span className="rounded-pill bg-niveau px-1.5 py-px text-[9px] font-bold uppercase leading-tight tracking-label text-white">
+                <span className="rounded-xs bg-gray-900 px-1 py-px text-[10px] font-semibold leading-tight text-white">
                   nu
                 </span>
               )}
@@ -67,7 +67,7 @@ export function Lijst({ items, cyclus, gesprekken, huidigeMaand, onOpen, onStatu
                   onClick={() => onToevoegen({ maand })}
                   aria-label={`Activiteit toevoegen in ${maandVoluit(maand)}`}
                   title={`Activiteit toevoegen in ${maandVoluit(maand)}`}
-                  className="-mr-2 grid h-7 w-7 place-items-center rounded-sm text-ink-muted hover:bg-surface-card hover:text-niveau-strong"
+                  className="-mr-2 grid h-7 w-7 place-items-center rounded-sm text-ink-muted hover:bg-surface-card hover:text-ink-strong"
                 >
                   <Plus className="h-4 w-4" aria-hidden />
                 </button>

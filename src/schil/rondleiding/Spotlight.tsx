@@ -330,7 +330,7 @@ function StapKaart({ tour, index }: { tour: Tour; index: number }) {
         <div
           data-rondleiding-kaart
           data-mini
-          className="fixed inset-x-4 top-1.5 z-[1150] flex h-8 items-center gap-2 rounded-pill bg-brand-yellow pl-3 pr-1 text-xs text-ink-on-brand shadow-lg"
+          className="fixed inset-x-4 top-1.5 z-[1150] flex h-8 items-center gap-2 rounded-sm bg-brand-yellow pl-3 pr-1 text-xs text-ink-on-brand shadow-lg"
         >
           <span className="tnum shrink-0 font-bold">stap {index + 1} van {totaal}</span>
           <span className="min-w-0 flex-1 truncate">
@@ -340,7 +340,7 @@ function StapKaart({ tour, index }: { tour: Tour; index: number }) {
             type="button"
             onClick={r.onderbreek}
             aria-label="Rondleiding onderbreken (later verder)"
-            className="grid h-6 w-6 shrink-0 place-items-center rounded-pill hover:bg-brand-yellow-600"
+            className="grid h-6 w-6 shrink-0 place-items-center rounded-sm hover:bg-brand-yellow-600"
           >
             <X className="h-3.5 w-3.5" aria-hidden />
           </button>
@@ -362,16 +362,14 @@ function StapKaart({ tour, index }: { tour: Tour; index: number }) {
           }
         }}
         className={cx(
-          'fixed z-[1150] w-[min(380px,calc(100vw-32px))] rounded-xl border border-line-subtle bg-surface-card shadow-pop',
+          'fixed z-[1150] w-[min(380px,calc(100vw-32px))] rounded-xl border border-line bg-surface-card shadow-pop',
           'kk-kaart',
           !plek && 'invisible',
         )}
         style={plek ? { left: plek.left, top: plek.top } : { left: 16, top: 16 }}
       >
         <div className="flex items-center gap-2 px-4 pt-3">
-          <span className="inline-flex items-center gap-1.5 rounded-pill bg-brand-yellow px-2 py-0.5 text-2xs font-bold uppercase tracking-wide text-ink-on-brand">
-            Oefenen
-          </span>
+          <span className="text-xs font-semibold text-ink-strong">Oefenen</span>
           <span className="tnum text-xs font-medium text-ink-muted">
             {eerste ? '' : `${tour.titel} · `}stap {index + 1} van {totaal}
           </span>
@@ -395,7 +393,7 @@ function StapKaart({ tour, index }: { tour: Tour; index: number }) {
           <p className="mt-1 text-sm text-ink-body">{stap.wat}</p>
 
           {fase === 'gelukt' ? (
-            <p className="mt-3 flex items-start gap-2 rounded-md bg-status-success-surface px-3 py-2 text-sm font-semibold text-ink-strong">
+            <p className="mt-3 flex items-start gap-2 text-sm font-semibold text-ink-strong">
               <span className="kk-vinkje mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand-yellow text-ink-on-brand">
                 <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden />
               </span>
@@ -410,14 +408,14 @@ function StapKaart({ tour, index }: { tour: Tour; index: number }) {
             <p className="mt-3 rounded-md bg-surface-sunken px-3 py-2 text-sm text-ink-body">
               Dit onderdeel is nu niet in beeld.{' '}
               {stap.pad && (
-                <button type="button" onClick={() => navigate(stap.pad!)} className="font-semibold text-niveau-strong underline">
+                <button type="button" onClick={() => navigate(stap.pad!)} className="font-semibold kk-link">
                   Breng me erheen
                 </button>
               )}
             </p>
           ) : doe ? (
             <p className="mt-3 flex items-start gap-2 text-sm font-semibold text-ink-strong">
-              <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-brand-yellow-700" aria-hidden />
+              <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-ink-strong" aria-hidden />
               {doe}
             </p>
           ) : null}

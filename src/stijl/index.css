@@ -51,13 +51,22 @@
 }
 
 @layer components {
-  /* Kleine hoofdletterkop boven elke paginatitel ("DASHBOARD") */
+  /* Klein label boven een blok ("Komend gesprek", "Voortgang"): gewone tekst in sentence case,
+     geen hoofdletters en geen letterspatiëring. */
   .eyebrow {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--text-muted);
+    line-height: 1.3;
+  }
+  /* Groepskop in lijsten en menu's (menugroepen, zoekresultaten): de enige plek met kleine
+     hoofdletters, ingetogen. */
+  .kk-groepskop {
     font-size: var(--text-2xs);
     font-weight: 600;
-    letter-spacing: var(--tracking-wide);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    color: var(--text-subtle);
+    color: var(--text-muted);
     line-height: 1.2;
   }
   .tnum {
@@ -80,7 +89,7 @@
     transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
   }
   .kk-veld::placeholder {
-    color: var(--text-subtle);
+    color: var(--text-placeholder);
   }
   .kk-veld:hover:not(:disabled) {
     border-color: var(--border-strong);
@@ -115,20 +124,23 @@
     height: 2.125rem;
     font-size: var(--text-xs);
   }
-  /* Linkstijl in de niveaukleur */
+  /* Link: zwart en onderstreept (niet in de niveaukleur). Bij hover wordt de lijn dikker. */
   .kk-link {
-    color: var(--niveau-strong);
-    font-weight: 600;
-    text-decoration: none;
+    color: var(--text-strong);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--border-strong);
     border-radius: var(--radius-xs);
+    transition: text-decoration-color var(--dur-fast);
   }
   .kk-link:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    text-decoration-color: currentColor;
+    text-decoration-thickness: 2px;
   }
   /* De S-curve van het merk: een stille gele scheidingslijn. Eén keer per scherm. */
   .lv-swoosh {
-    height: 40px;
+    height: 32px;
     width: 100%;
     background: no-repeat center/100% 100%
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 40' preserveAspectRatio='none'%3E%3Cpath d='M0 38 H360 C400 38 420 30 440 18 C460 6 480 2 520 2 H600' fill='none' stroke='%23EEC21B' stroke-width='2.5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");

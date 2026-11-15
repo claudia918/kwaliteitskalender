@@ -167,7 +167,6 @@ export default function Bibliotheek() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Plannen"
         title="Bibliotheek"
         subtitle={
           <>
@@ -204,7 +203,7 @@ export default function Bibliotheek() {
             pct={(aantalOpKalender / Math.max(1, library.length)) * 100}
             actie={
               aantalOpKalender < library.length ? (
-                <button type="button" className="text-left text-xs font-semibold text-niveau-strong hover:underline" onClick={() => setToon('niet-op-kalender')}>
+                <button type="button" className="text-left text-xs font-semibold kk-link" onClick={() => setToon('niet-op-kalender')}>
                   Toon wat er nog niet op staat
                 </button>
               ) : undefined
@@ -217,7 +216,7 @@ export default function Bibliotheek() {
             klaar={ontbrekend.length === 0}
             actie={
               ontbrekend.length > 0 ? (
-                <button type="button" className="text-left text-xs font-semibold text-niveau-strong hover:underline" onClick={() => setToon('ontbreekt')}>
+                <button type="button" className="text-left text-xs font-semibold kk-link" onClick={() => setToon('ontbreekt')}>
                   Toon de {ontbrekend.length} die ontbreken
                 </button>
               ) : (
@@ -228,7 +227,7 @@ export default function Bibliotheek() {
               )
             }
           />
-          <div className="col-span-2 flex flex-col rounded-lg border border-line-subtle bg-surface-card p-3 shadow-xs md:col-span-1 md:p-4">
+          <div className="col-span-2 flex flex-col rounded-lg border border-line-subtle bg-surface-card p-3 md:col-span-1 md:p-4">
             <p className="eyebrow">{komend ? `Gesprek ${komend.gesprek.naam}` : 'Komend gesprek'}</p>
             {komend ? (
               <>
@@ -251,7 +250,7 @@ export default function Bibliotheek() {
                   Voeg alle {ontbrekend.length} ontbrekende verplichte toe
                 </Button>
               ) : (
-                <Link to="/kalender" className="inline-flex items-center gap-1 text-xs font-semibold text-niveau-strong hover:underline">
+                <Link to="/kalender" className="inline-flex items-center gap-1 text-xs font-semibold kk-link">
                   <CalendarDays className="h-3.5 w-3.5" aria-hidden />
                   Naar de kalender
                 </Link>
@@ -317,8 +316,8 @@ export default function Bibliotheek() {
       </Card>
 
       {eigenItems.length > 0 && (
-        <section aria-labelledby="eigen-kop" className="rounded-lg border border-niveau-border bg-niveau-surface px-4 py-3">
-          <h2 id="eigen-kop" className="text-sm font-semibold text-niveau-strong">
+        <section aria-labelledby="eigen-kop" className="rounded-md border border-line-subtle bg-surface-card px-4 py-3">
+          <h2 id="eigen-kop" className="text-sm font-semibold text-ink-strong">
             Eigen activiteiten op de kalender van {scopeLabel} ({eigenItems.length})
           </h2>
           <p className="mt-0.5 text-xs text-ink-muted">Eigen activiteiten staan niet in de bibliotheek, alleen op deze kalender.</p>
@@ -327,7 +326,7 @@ export default function Bibliotheek() {
               <li key={i.uid}>
                 <Link
                   to={`/kalender?item=${encodeURIComponent(i.uid)}`}
-                  className="inline-flex items-center gap-1.5 rounded-pill border border-line bg-surface-card py-1 pl-2.5 pr-2 text-xs font-semibold text-ink-strong hover:border-line-strong"
+                  className="inline-flex items-center gap-1.5 rounded-sm border border-line bg-surface-card py-1 pl-2.5 pr-2 text-xs font-semibold text-ink-strong hover:border-gray-900"
                 >
                   <span aria-hidden className={cx('h-2 w-2 rounded-xs', gebiedKlassen(i.custom?.gebied).dot)} />
                   {effectieveNaam(i)}
@@ -345,7 +344,7 @@ export default function Bibliotheek() {
           {resultaten.length} {resultaten.length === 1 ? 'resultaat' : 'resultaten'}
         </p>
         {filtersActief && (
-          <button type="button" onClick={wisFilters} className="text-xs font-semibold text-niveau-strong hover:underline">
+          <button type="button" onClick={wisFilters} className="text-xs font-semibold kk-link">
             Filters wissen
           </button>
         )}
@@ -425,7 +424,7 @@ export default function Bibliotheek() {
 
 function StandTegel({ label, waarde, pct, klaar, actie }: { label: string; waarde: string; pct: number; klaar?: boolean; actie?: React.ReactNode }) {
   return (
-    <div className="flex flex-col rounded-lg border border-line-subtle bg-surface-card p-3 shadow-xs md:p-4">
+    <div className="flex flex-col rounded-lg border border-line-subtle bg-surface-card p-3 md:p-4">
       <p className="eyebrow">{label}</p>
       <p className="tnum mt-1 text-h4 text-ink-strong md:text-h3">{waarde}</p>
       <ProgressBar value={pct} size="sm" className="mt-2" color={klaar ? 'var(--status-success)' : undefined} />

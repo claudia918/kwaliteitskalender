@@ -13,7 +13,7 @@ import {
   Plus,
   School as SchoolIcoon,
   Share2,
-  Sparkles,
+  ListChecks,
   Trash2,
 } from 'lucide-react';
 import {
@@ -46,7 +46,6 @@ export default function Organisatie() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="Beheer"
         title="Organisatie"
         subtitle={
           <>
@@ -320,7 +319,7 @@ function DelenKaart() {
   const sync = useSync();
   const gekoppeld = sync.status === 'gekoppeld';
   return (
-    <Card padding="md" className="border-niveau-border">
+    <Card padding="md">
       <div className="flex items-start gap-3">
         <IconTile icon={Share2} tone="niveau" />
         <div className="min-w-0">
@@ -369,7 +368,7 @@ function SjabloonKaart() {
       </p>
       <Button
         variant="primary"
-        icon={Sparkles}
+        icon={ListChecks}
         className="mt-4"
         onClick={async () => {
           if (

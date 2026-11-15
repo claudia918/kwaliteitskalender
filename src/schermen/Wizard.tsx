@@ -9,7 +9,7 @@ import {
   Check,
   Plus,
   School as SchoolIcoon,
-  Sparkles,
+  ListChecks,
   SquareDashed,
   Trash2,
   type LucideIcon as LucideIconType,
@@ -67,7 +67,7 @@ export default function Wizard({ onTerug }: WizardProps) {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-4 py-10">
-      <section className="rounded-xl border border-line-subtle bg-surface-card p-5 shadow-md sm:p-8">
+      <section className="rounded-md border border-line-subtle bg-surface-card p-5 sm:p-8">
         <div className="flex items-center justify-between gap-4">
           <AppLogo />
           <Button variant="ghost" size="sm" icon={ArrowLeft} onClick={onTerug}>
@@ -83,13 +83,13 @@ export default function Wizard({ onTerug }: WizardProps) {
                 aria-hidden
                 className={cx(
                   'grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-bold',
-                  i <= stap ? 'bg-niveau text-white' : 'bg-surface-sunken text-ink-subtle',
+                  i <= stap ? 'bg-gray-900 text-white' : 'border border-line text-ink-muted',
                 )}
               >
                 {i < stap ? <Check className="h-4 w-4" /> : i + 1}
               </span>
               <span
-                className={cx('text-sm font-medium', i === stap ? 'text-ink-strong' : 'text-ink-subtle', i !== stap && 'hidden sm:inline')}
+                className={cx('text-sm font-medium', i === stap ? 'text-ink-strong' : 'text-ink-muted', i !== stap && 'hidden sm:inline')}
                 aria-current={i === stap ? 'step' : undefined}
               >
                 {label}
@@ -208,7 +208,7 @@ export default function Wizard({ onTerug }: WizardProps) {
                 <Keuzekaart
                   actief={sjabloon === 'sjabloon'}
                   onClick={() => setSjabloon('sjabloon')}
-                  icon={Sparkles}
+                  icon={ListChecks}
                   titel="Vul met aanbevolen activiteiten"
                   aanbevolen
                   tekst={`Plaatst ${AANTAL_AANBEVOLEN} aanbevolen (verplichte) activiteiten op ${
@@ -283,17 +283,10 @@ function Keuzekaart({
       onClick={onClick}
       className={cx(
         'flex w-full items-start gap-3 rounded-lg border p-4 text-left transition-colors duration-fast',
-        actief ? 'border-niveau bg-niveau-surface' : 'border-line-subtle hover:bg-surface-hover',
+        actief ? 'border-gray-900 bg-surface-card' : 'border-line-subtle hover:border-line',
       )}
     >
-      <span
-        className={cx(
-          'grid h-9 w-9 shrink-0 place-items-center rounded-md',
-          actief ? 'bg-niveau text-white' : 'bg-surface-sunken text-ink-subtle',
-        )}
-      >
-        <Icon className="h-5 w-5" aria-hidden />
-      </span>
+      <Icon className={cx('mt-0.5 h-5 w-5 shrink-0', actief ? 'text-ink-strong' : 'text-ink-muted')} aria-hidden />
       <span className="min-w-0 flex-1">
         <span className="flex flex-wrap items-center gap-2 text-sm font-semibold text-ink-strong">
           {titel}
@@ -303,13 +296,13 @@ function Keuzekaart({
             </Badge>
           )}
         </span>
-        <span className="mt-0.5 block text-xs leading-relaxed text-ink-muted">{tekst}</span>
+        <span className="mt-0.5 block text-sm leading-relaxed text-ink-muted">{tekst}</span>
       </span>
       <span
         aria-hidden
         className={cx(
           'mt-1 grid h-5 w-5 shrink-0 place-items-center rounded-full border-2',
-          actief ? 'border-niveau bg-niveau text-white' : 'border-line-strong',
+          actief ? 'border-gray-900 bg-gray-900 text-white' : 'border-line-strong',
         )}
       >
         {actief && <Check className="h-3 w-3" />}

@@ -30,7 +30,7 @@ export default function Begrippen() {
 
   return (
     <div className="space-y-6">
-      <PageHeader eyebrow="Hulp" title="Begrippen" subtitle="De vaktermen uit de kalender, in gewone taal." />
+      <PageHeader title="Begrippen" subtitle="De vaktermen uit de kalender, in gewone taal." />
       <div className="max-w-3xl space-y-4">
         <SearchField value={zoek} onChange={setZoek} placeholder="Zoek een begrip…" label="Zoek een begrip" />
         <Card padding="none">
@@ -47,7 +47,7 @@ export default function Begrippen() {
                     tabIndex={-1}
                     className={cx(
                       'grid gap-1 px-5 py-4 outline-none sm:grid-cols-[12rem_minmax(0,1fr)] sm:gap-6',
-                      gekozen === b.sleutel && 'bg-niveau-surface',
+                      gekozen === b.sleutel && 'bg-surface-sunken',
                     )}
                   >
                     <dt className="text-sm font-semibold text-ink-strong first-letter:uppercase">{b.term}</dt>
@@ -56,7 +56,7 @@ export default function Begrippen() {
                       {scherm && (
                         <Link
                           to={scherm.to}
-                          className="ml-2 inline-flex items-center gap-1 whitespace-nowrap text-xs font-semibold text-niveau-strong hover:underline"
+                          className="ml-2 inline-flex items-center gap-1 whitespace-nowrap text-xs font-semibold kk-link"
                         >
                           {scherm.label} <ArrowRight className="h-3 w-3" aria-hidden />
                         </Link>

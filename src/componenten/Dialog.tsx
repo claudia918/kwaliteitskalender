@@ -108,12 +108,12 @@ export function Dialog({
         aria-labelledby={titelId}
         tabIndex={-1}
         className={cx(
-          'flex max-h-[90vh] w-full animate-rise flex-col overflow-hidden rounded-xl bg-surface-card shadow-pop outline-none',
+          'flex max-h-[90vh] w-full animate-rise flex-col overflow-hidden rounded-xl border border-line bg-surface-card shadow-pop outline-none',
           BREEDTE[width],
           className,
         )}
       >
-        <header className="flex items-start justify-between gap-4 border-b border-gray-100 px-5 py-4 sm:px-6">
+        <header className="flex items-start justify-between gap-4 border-b border-line-subtle px-5 py-4 sm:px-6">
           <div className="min-w-0">
             <h2 id={titelId} className="text-h3 text-ink-strong">
               {title}
@@ -131,7 +131,7 @@ export function Dialog({
         </header>
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6">{children}</div>
         {footer && (
-          <footer className="flex flex-wrap items-center justify-end gap-2 border-t border-gray-100 bg-surface-subtle px-5 py-3 sm:px-6">
+          <footer className="flex flex-wrap items-center justify-end gap-2 border-t border-line-subtle bg-surface-card px-5 py-3 sm:px-6">
             {footer}
           </footer>
         )}

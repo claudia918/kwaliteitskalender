@@ -4,7 +4,7 @@
  * nog niet op de kalender, aanbevolen in deze maand, verplicht. Blijft open om meer toe te voegen.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { Check, Plus, Sparkles, Undo2 } from 'lucide-react';
+import { Check, Plus, CalendarCheck, Undo2 } from 'lucide-react';
 import { maandUitPeriode } from '../../domein/hulp';
 import { Button, Dialog, SearchField, Select, VerplichtBadge, cx, gebiedKlassen } from '../../componenten';
 import { MAANDEN, STANDAARD_OP_CODE } from '../../domein/seed';
@@ -221,7 +221,7 @@ function SuggestieRij({
           <span>aanbevolen {a.periode || 'variabel'}</span>
           {maand && s.pastInMaand && (
             <span className="inline-flex items-center gap-1 font-semibold text-status-success">
-              <Sparkles className="h-3 w-3" aria-hidden />
+              <CalendarCheck className="h-3 w-3" aria-hidden />
               past in {maandVoluit(maand)}
             </span>
           )}
@@ -236,7 +236,7 @@ function SuggestieRij({
           <button
             type="button"
             onClick={onTerug}
-            className="inline-flex h-7 items-center gap-1 rounded-sm px-2 text-xs font-semibold text-niveau-strong hover:bg-niveau-surface"
+            className="inline-flex h-7 items-center gap-1 rounded-sm px-2 text-xs font-semibold text-ink-strong hover:bg-surface-sunken"
             aria-label={`${a.naam} weer weghalen`}
           >
             <Undo2 className="h-3.5 w-3.5" aria-hidden />

@@ -70,7 +70,7 @@ export function SyncStatus({ compact }: { compact?: boolean }) {
       : sync.laatsteSync
         ? `Gesynchroniseerd ${formatTijdstip(sync.laatsteSync)}`
         : 'Gekoppeld';
-    toon = sync.fout ? 'text-status-warning' : 'text-niveau-strong';
+    toon = sync.fout ? 'text-status-warning' : 'text-ink-strong';
   } else if (sync.status === 'verbinden') {
     icoon = RefreshCw;
     titel = 'Verbinden…';
@@ -210,7 +210,7 @@ export function HelpKnop() {
         <p className="mt-4 text-xs text-ink-muted">
           Iets zoeken? Druk op <kbd className="font-semibold text-ink-body">{SNELTOETS}</kbd> of gebruik de zoekknop bovenin.
           Woorden met een stippellijn kun je aanwijzen of aantikken voor uitleg.{' '}
-          <button type="button" className="font-semibold text-niveau-strong underline" onClick={start(r.openKeuze)}>
+          <button type="button" className="font-semibold kk-link" onClick={start(r.openKeuze)}>
             Alle rondleidingen
           </button>
         </p>
