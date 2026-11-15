@@ -1,14 +1,24 @@
 import { Link } from 'react-router-dom';
 import { Globe, Mail, Phone } from 'lucide-react';
-import { LvLogo, Swoosh } from '../componenten';
+import { LvLogo } from '../componenten';
 import { CONTACT, FOOTER_TEKST } from '../domein/inhoud';
 
 /** Voettekst met logo, contactgegevens en hulplinks. De website staat er als tekst (geen netwerk). */
 export function Footer() {
   return (
     <footer className="no-print mt-12">
-      <Swoosh className="h-6 opacity-80" />
-      <div className="border-t border-line-subtle bg-surface-card">
+      {/* De swoosh is de bovenrand van het witte vlak: het wit vult de ruimte onder de lijn. */}
+      <svg aria-hidden viewBox="0 0 600 40" preserveAspectRatio="none" className="block h-8 w-full">
+        <path d="M0 38 H360 C400 38 420 30 440 18 C460 6 480 2 520 2 H600 V40 H0 Z" fill="var(--surface-card)" />
+        <path
+          d="M0 38 H360 C400 38 420 30 440 18 C460 6 480 2 520 2 H600"
+          fill="none"
+          stroke="var(--lv-yellow)"
+          strokeWidth="2.5"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+      <div className="bg-surface-card">
         <div className="mx-auto grid max-w-content gap-6 px-4 py-6 text-sm md:grid-cols-[1fr_auto_auto] md:items-center md:gap-10 md:px-6">
           <div className="flex items-center gap-4">
             <LvLogo className="h-11 w-auto shrink-0" />
