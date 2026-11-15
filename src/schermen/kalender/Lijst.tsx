@@ -27,6 +27,7 @@ export interface LijstProps {
 
 export function Lijst({ items, cyclus, gesprekken, huidigeMaand, onOpen, onStatus, onToevoegen, schoolNaamVan, markeerUid }: LijstProps) {
   const vandaag = vandaagISO();
+  const eersteUid = itemsPerMaand(items)[0]?.items[0]?.uid; // anker voor de rondleiding
   return (
     <div className="space-y-4">
       {itemsPerMaand(items).map(({ maand, items: lijst }) => {
@@ -81,6 +82,7 @@ export function Lijst({ items, cyclus, gesprekken, huidigeMaand, onOpen, onStatu
                   <li
                     key={item.uid}
                     data-lijstitem={item.uid}
+                    data-rondleiding={item.uid === eersteUid ? 'eerste-rij' : undefined}
                     className={cx(
                       'group flex items-center gap-2 pl-3 pr-2 transition-colors duration-base hover:bg-surface-hover sm:pl-4',
                       markeerUid === item.uid && 'bg-brand-yellow-soft',

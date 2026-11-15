@@ -23,6 +23,9 @@ const fouten = [];
 const browser = await chromium.launch();
 async function nieuwePagina(breedte) {
   const ctx = await browser.newContext({ viewport: { width: breedte, height: breedte < 600 ? 844 : 900 }, locale: 'nl-NL' });
+  // De rondleiding is in deze test al aangeboden (zie e2e-rondleiding.mjs). Bewust geen init-script:
+  // localStorage aanraken bij het begin van elk document laat Chromium soms latere schrijfacties vergeten.
+  await (async () => { const p = await ctx.newPage(); await p.goto(URL); await p.evaluate(() => localStorage.setItem('kwaliteitskalender:rondleiding:v1', JSON.stringify({ aangeboden: true }))); await p.waitForTimeout(150); await p.close(); })();
   const page = await ctx.newPage();
   page.on('request', (r) => {
     const u = r.url();

@@ -15,9 +15,9 @@ import {
   type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
-import { BookOpenText, CalendarDays, CircleHelp, CornerDownLeft, Library, Search, type LucideIcon } from 'lucide-react';
-import { STATUS_STIJL, cx } from '../componenten';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { BookOpenText, CalendarDays, CircleHelp, CornerDownLeft, GraduationCap, Library, Search, type LucideIcon } from 'lucide-react';
+import { STATUS_STIJL, cx, meldSignaal } from '../componenten';
 import { BEGRIPPEN_LIJST } from '../domein/begrippen';
 import { activiteitVan, bibliotheek, effectieveNaam } from '../domein/hulp';
 import { FAQ } from '../domein/inhoud';
@@ -27,6 +27,8 @@ import { zoekScore } from '../domein/zoeken';
 import { useScope, useStore } from '../store';
 import { ALLE_MENU_ITEMS } from './navigatie';
 import { NiveauTegel, useWeergave } from './WeergaveKiezer';
+import { useRondleiding } from './rondleiding/RondleidingProvider';
+import { ALLE_RONDLEIDINGEN, EERSTE_RONDLEIDING, tourVoorPad } from './rondleiding/tours';
 
 /* ------------------------------------------------------------------ */
 /* Context: openen vanuit de topbar en met de sneltoets                 */
@@ -75,8 +77,8 @@ export function ZoekProvider({ children }: { children: ReactNode }) {
 /* Resultaten                                                           */
 /* ------------------------------------------------------------------ */
 
-type Groep = 'Schermen' | 'Op de kalender' | 'In de bibliotheek' | 'Scholen en clusters' | 'Begrippen' | 'Veelgestelde vragen';
-const GROEP_VOLGORDE: Groep[] = ['Op de kalender', 'In de bibliotheek', 'Scholen en clusters', 'Schermen', 'Begrippen', 'Veelgestelde vragen'];
+type Groep = 'Schermen' | 'Op de kalender' | 'In de bibliotheek' | 'Scholen en clusters' | 'Begrippen' | 'Veelgestelde vragen' | 'Rondleidingen';
+const GROEP_VOLGORDE: Groep[] = ['Op de kalender', 'In de bibliotheek', 'Scholen en clusters', 'Schermen', 'Rondleidingen', 'Begrippen', 'Veelgestelde vragen'];
 const PER_GROEP = 5;
 
 interface Resultaat {
@@ -97,6 +99,8 @@ function Zoekvenster({ onSluit }: { onSluit: () => void }) {
   const { editScope, isBestuur } = useScope();
   const { opties, kies: kiesWeergave } = useWeergave();
   const navigate = useNavigate();
+  const rondleiding = useRondleiding();
+  const { pathname } = useLocation();
   const [vraag, setVraag] = useState('');
   const [actief, setActief] = useState(0);
   const invoer = useRef<HTMLInputElement>(null);
@@ -108,6 +112,7 @@ function Zoekvenster({ onSluit }: { onSluit: () => void }) {
     (fn: () => void) => () => {
       onSluit();
       fn();
+      meldSignaal('zoek-gekozen');
     },
     [onSluit],
   );
@@ -218,6 +223,24 @@ function Zoekvenster({ onSluit }: { onSluit: () => void }) {
       });
     }
 
+    // Rondleidingen (altijd op de oefenkalender)
+    const hierTour = tourVoorPad(pathname);
+    for (const t of ALLE_RONDLEIDINGEN) {
+      const eerste = t.id === EERSTE_RONDLEIDING.id;
+      const titel = eerste ? 'De rondleiding' : t === hierTour ? 'Laat zien hoe dit scherm werkt' : `Laat zien hoe ${t.titel} werkt`;
+      const score = zoekScore(v, titel, `rondleiding tutorial uitleg oefenen hoe werkt help instructie ${t.titel}`) + (t === hierTour ? 15 : eerste ? 10 : 0);
+      if (score <= (t === hierTour ? 15 : eerste ? 10 : 0)) continue;
+      uit.push({
+        sleutel: `rondleiding:${t.id}`,
+        groep: 'Rondleidingen',
+        titel,
+        sub: eerste ? `Oefen alles een keer zelf · ${t.duur}` : `${t.titel} · ${t.duur}, op een oefenkalender`,
+        score,
+        icon: GraduationCap,
+        kies: ga(() => rondleiding.start(t.id)),
+      });
+    }
+
     // Veelgestelde vragen
     for (const c of FAQ) {
       for (const q of c.vragen) {
@@ -235,7 +258,7 @@ function Zoekvenster({ onSluit }: { onSluit: () => void }) {
       }
     }
     return uit;
-  }, [vraag, state, org, niveau, schoolId, clusterId, editScope, isBestuur, opties, kiesWeergave, navigate, ga]);
+  }, [vraag, state, org, niveau, schoolId, clusterId, editScope, isBestuur, opties, kiesWeergave, navigate, ga, rondleiding, pathname]);
 
   // Groeperen: per groep de beste PER_GROEP; groepen op volgorde van hun beste treffer
   const groepen = useMemo(() => {

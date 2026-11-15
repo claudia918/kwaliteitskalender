@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import {
   Badge,
+  Begrip,
   Button,
   Dialog,
   Input,
@@ -540,6 +541,9 @@ function BewerkVenster({ item, editScope, kalenderNaam, onClose, onOpgeslagen, o
 
               {afwijkend && (
                 <div className="-mt-2 rounded-md border border-dashed border-status-warning-border bg-status-warning-surface p-3">
+                  <p className="mb-2 text-xs text-ink-body">
+                    Dit is een <Begrip term="afwijking" /> van de <Begrip term="standaardkoppeling" />. Leg kort uit waarom.
+                  </p>
                   <Veld
                     label={
                       <span className="inline-flex items-center gap-1.5">
@@ -571,7 +575,7 @@ function BewerkVenster({ item, editScope, kalenderNaam, onClose, onOpgeslagen, o
               </Veld>
 
               <section>
-                <Sectiekop icon={Paperclip}>Bewijs ({c.bewijs.length})</Sectiekop>
+                <Sectiekop icon={Paperclip}><Begrip term="bewijs">Bewijs</Begrip> ({c.bewijs.length})</Sectiekop>
                 {c.bewijs.length > 0 && (
                   <ul className="mb-2 space-y-1.5">
                     {c.bewijs.map((b) => (
@@ -708,7 +712,7 @@ function LeesVenster({ item, kalenderNaam, onOpenSchool, onClose }: DetailVenste
           </Gegeven>
         )}
         <section>
-          <Sectiekop icon={Paperclip}>Bewijs ({item.bewijs?.length ?? 0})</Sectiekop>
+          <Sectiekop icon={Paperclip}><Begrip term="bewijs">Bewijs</Begrip> ({item.bewijs?.length ?? 0})</Sectiekop>
           {item.bewijs?.length ? (
             <ul className="space-y-1.5">
               {item.bewijs.map((b) => (

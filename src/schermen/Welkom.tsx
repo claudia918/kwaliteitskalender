@@ -2,12 +2,13 @@
  * Welkomstscherm (zolang de setup niet voltooid is), inventaris §1.7.
  * Drie ingangen: eigen bestuur (wizard), demo, of een gedeeld kalenderbestand van een collega.
  */
-import { ArrowRight, FolderOpen, Lock, PlayCircle } from 'lucide-react';
+import { ArrowRight, FolderOpen, GraduationCap, Lock, PlayCircle } from 'lucide-react';
 import { AppLogo, Button, IconTile, LvLogo, icoonOpNaam } from '../componenten';
 import { WELKOM_BOUWSTENEN, WELKOM_VOETNOOT } from '../domein/inhoud';
 import { useStore } from '../store';
 import { useSync } from '../sync/SyncProvider';
 import { kiesBestandHandmatig } from '../sync/bestandstoegang';
+import { rondleidingNa } from '../schil/rondleiding/RondleidingProvider';
 
 export interface WelkomProps {
   /** Naar de wizard ("Begin met mijn eigen bestuur") */
@@ -19,6 +20,7 @@ export default function Welkom({ onStartWizard }: WelkomProps) {
   const sync = useSync();
 
   const openGedeeld = async () => {
+    rondleidingNa('bestand');
     if (sync.ondersteund) {
       await sync.koppelBestaand();
     } else {
@@ -54,10 +56,24 @@ export default function Welkom({ onStartWizard }: WelkomProps) {
           <Button variant="primary" size="lg" iconRight={ArrowRight} onClick={onStartWizard}>
             Begin met mijn eigen bestuur
           </Button>
-          <Button variant="secondary" size="lg" icon={PlayCircle} onClick={loadDemo}>
+          <Button
+            variant="secondary"
+            size="lg"
+            icon={PlayCircle}
+            onClick={() => {
+              rondleidingNa('demo');
+              loadDemo();
+            }}
+          >
             Verken eerst de demo
           </Button>
         </div>
+        <p className="mt-3 flex items-start gap-2 text-sm text-ink-muted">
+          <GraduationCap className="mt-0.5 h-4 w-4 shrink-0 text-ink-subtle" aria-hidden />
+          <span>
+            Daarna kun je drie minuten oefenen: een rondleiding op een oefenkalender, waarin je alles één keer zelf doet.
+          </span>
+        </p>
 
         <div className="mt-6 flex flex-col gap-3 rounded-lg bg-surface-sunken p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">

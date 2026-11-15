@@ -3,13 +3,14 @@
  * Staan in localStorage, NIET in de state: ze gaan nooit naar het gedeelde kalenderbestand.
  */
 import { useCallback, useEffect, useState } from 'react';
+import { leesVoorkeurOpslag, schrijfVoorkeurOpslag } from './oefenopslag';
 
 export const VOORKEUR_SLEUTEL = 'kwaliteitskalender:voorkeur:v1';
 export const BEZOEK_SLEUTEL = 'kwaliteitskalender:bezoek:v1';
 
 function leesAlles(): Record<string, unknown> {
   try {
-    const t = localStorage.getItem(VOORKEUR_SLEUTEL);
+    const t = leesVoorkeurOpslag(VOORKEUR_SLEUTEL);
     return t ? (JSON.parse(t) as Record<string, unknown>) : {};
   } catch {
     return {};
@@ -25,11 +26,7 @@ export function useVoorkeur<T extends string | number | boolean>(sleutel: string
   const zet = useCallback(
     (v: T) => {
       setWaarde(v);
-      try {
-        localStorage.setItem(VOORKEUR_SLEUTEL, JSON.stringify({ ...leesAlles(), [sleutel]: v }));
-      } catch {
-        /* niet erg */
-      }
+      schrijfVoorkeurOpslag(VOORKEUR_SLEUTEL, JSON.stringify({ ...leesAlles(), [sleutel]: v }));
     },
     [sleutel],
   );

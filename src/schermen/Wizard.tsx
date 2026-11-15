@@ -19,6 +19,7 @@ import { VERPLICHTE_SCHOOLACTIVITEITEN, SCHOOLTYPE_SUGGESTIES, STANDAARD_SCHOOLJ
 import { PRIVACY_REGEL } from '../domein/inhoud';
 import { aantal } from '../domein/hulp';
 import { useStore } from '../store';
+import { rondleidingNa } from '../schil/rondleiding/RondleidingProvider';
 
 export interface WizardProps {
   /** Terug naar het welkomstscherm */
@@ -52,6 +53,7 @@ export default function Wizard({ onTerug }: WizardProps) {
   };
 
   const maakAan = () => {
+    rondleidingNa('eigen');
     voltooiWizard({ bestuurNaam: bestuurNaam.trim(), schooljaar: schooljaar.trim() || STANDAARD_SCHOOLJAAR, scholen, sjabloon: sjabloon === 'sjabloon' });
     toast('Je kwaliteitskalender is aangemaakt');
   };

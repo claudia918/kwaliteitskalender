@@ -103,6 +103,9 @@ function mediaBox(pad) {
 (async () => {
   const browser = await chromium.launch();
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, acceptDownloads: true });
+  // De rondleiding is in deze test al aangeboden (zie e2e-rondleiding.mjs). Bewust geen init-script:
+  // localStorage aanraken bij het begin van elk document laat Chromium soms latere schrijfacties vergeten.
+  await (async () => { const p = await ctx.newPage(); await p.goto(URL); await p.evaluate(() => localStorage.setItem('kwaliteitskalender:rondleiding:v1', JSON.stringify({ aangeboden: true }))); await p.waitForTimeout(150); await p.close(); })();
   // window.print() niet echt openen: de printweergave blijft dan staan voor page.pdf()
   await ctx.addInitScript(() => {
     window.__printTeller = 0;
@@ -129,6 +132,7 @@ function mediaBox(pad) {
     await page.evaluate(
       ([s, u, kS, kU]) => {
         localStorage.clear();
+        localStorage.setItem('kwaliteitskalender:rondleiding:v1', JSON.stringify({ aangeboden: true }));
         if (s) localStorage.setItem(kS, JSON.stringify(s));
         if (u) localStorage.setItem(kU, JSON.stringify(u));
       },
@@ -234,17 +238,17 @@ function mediaBox(pad) {
   const schoolItems = demo.schoolKalenders[eersteSchool].length;
   const kal = XLSX.utils.sheet_to_json(wb.Sheets.Kalender);
   ok('excel: bestandsnaam', /^kwaliteitskalender-lyceum-noord-2026-2027\.xlsx$/.test(dl.suggestedFilename()), dl.suggestedFilename());
-  ok('excel: tabbladen', wb.SheetNames.join() === 'Kalender,Compliance,Afwijkingen', wb.SheetNames.join());
+  ok('excel: tabbladen', wb.SheetNames.join() === 'Kalender,Dekking standaarden,Afwijkingen', wb.SheetNames.join());
   ok('excel: alle activiteiten', kal.length === schoolItems, `${kal.length}/${schoolItems}`);
   const kop = XLSX.utils.sheet_to_json(wb.Sheets.Kalender, { header: 1 })[0];
   ok('excel: kolommen', kop.join('|') === 'ID|Activiteit|Bibliotheeknaam|Standaard|Kwaliteitsgebied|Gesprek|Maand|Status|Eigenaar|Deadline|Bewijs|Verplicht|Afwijking|Notitie', kop.join('|'));
   ok('excel: statuslabels', kal.every((r) => ['Gepland', 'Bezig', 'Gereed', 'Risico'].includes(r.Status)));
   const gereedDemo = demo.schoolKalenders[eersteSchool].filter((i) => i.status === 'gereed').length;
   ok('excel: aantallen kloppen', kal.filter((r) => r.Status === 'Gereed').length === gereedDemo);
-  const comp = XLSX.utils.sheet_to_json(wb.Sheets.Compliance);
+  const comp = XLSX.utils.sheet_to_json(wb.Sheets['Dekking standaarden']);
   ok('excel: compliance 13 standaarden', comp.length === 13 && comp.some((r) => r.Standaard === 'OP0' && r['Vaste standaard'] === 'Ja'));
   // opties uit
-  await page.click('label:has-text("Compliance-overzicht")');
+  await page.click('label:has-text("Dekking standaarden")');
   await page.click('label:has-text("Afwijkingen")');
   [dl] = await Promise.all([page.waitForEvent('download'), page.click('button:has-text("Download Excel")')]);
   pad = `${UIT}/zonder-opties.xlsx`;

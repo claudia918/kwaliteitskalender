@@ -140,6 +140,7 @@ export default function Start() {
         <section aria-labelledby="overzicht-kop" className="space-y-4">
           <button
             type="button"
+            data-rondleiding="hoe-staat-het"
             onClick={() => setOverzichtOpen(!overzichtOpen)}
             aria-expanded={overzichtOpen}
             aria-controls="overzicht-inhoud"

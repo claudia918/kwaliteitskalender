@@ -27,7 +27,7 @@ describe('Excel-export (rijen)', () => {
       cyclus: d.organisatie.gesprekscyclus,
       opties: { compliance: true, afwijkingen: true },
     });
-    expect(bladen.map((b) => b.naam)).toEqual(['Kalender', 'Compliance', 'Afwijkingen']);
+    expect(bladen.map((b) => b.naam)).toEqual(['Kalender', 'Dekking standaarden', 'Afwijkingen']);
     expect(bladen[0].rijen).toHaveLength(0);
     expect(bladen[1].rijen).toHaveLength(13);
     expect(bladen[2].rijen).toEqual([{ Activiteit: 'Geen afwijkingen' }]);

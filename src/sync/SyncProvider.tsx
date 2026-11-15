@@ -139,8 +139,11 @@ export function useSync(): SyncInfo {
   return s;
 }
 
-export function SyncProvider({ children }: { children: ReactNode }) {
+export function SyncProvider({ children, gepauzeerd = false }: { children: ReactNode; gepauzeerd?: boolean }) {
   const store = useStore();
+  // Tijdens het oefenen (rondleiding) ligt de synchronisatie stil; daarna één keer bijwerken.
+  const gepauzeerdRef = useRef(gepauzeerd);
+  gepauzeerdRef.current = gepauzeerd;
   const toast = useToast();
   const storeRef = useRef(store);
   storeRef.current = store;
@@ -187,7 +190,7 @@ export function SyncProvider({ children }: { children: ReactNode }) {
 
   const synchroniseer = useCallback(async (): Promise<void> => {
     const h = handleRef.current;
-    if (!h || statusRef.current !== 'gekoppeld') return;
+    if (!h || statusRef.current !== 'gekoppeld' || gepauzeerdRef.current) return;
     if (bezigRef.current) {
       opnieuwRef.current = true;
       return;
@@ -517,6 +520,11 @@ export function SyncProvider({ children }: { children: ReactNode }) {
     };
   }, [ondersteund, setStatus, synchroniseer]);
 
+  // Na het oefenen meteen bijwerken (wijzigingen van collega's van de afgelopen minuten)
+  useEffect(() => {
+    if (!gepauzeerd) void synchroniseer();
+  }, [gepauzeerd, synchroniseer]);
+
   // Na elke wijziging (vertraagd)
   const { state, generatie } = store;
   useEffect(() => {
@@ -597,5 +605,38 @@ export function SyncProvider({ children }: { children: ReactNode }) {
     ],
   );
 
+  return <SyncContext.Provider value={waarde}>{children}</SyncContext.Provider>;
+}
+
+/**
+ * Synchronisatie op de oefenkalender: er is geen bestand, en koppelen of opslaan kan niet. Zo kan
+ * oefenen nooit het gedeelde kalenderbestand raken.
+ */
+export function OefenSyncProvider({ children }: { children: ReactNode }) {
+  const toast = useToast();
+  const waarde = useMemo<SyncInfo>(() => {
+    const nee = async () => {
+      toast('Tijdens het oefenen koppel je geen bestand. Dat doe je straks in je eigen kalender.', 'info', 4000);
+      return false;
+    };
+    return {
+      ondersteund: ondersteuntKoppelen(),
+      status: 'geen',
+      bestandsnaam: null,
+      laatsteSync: null,
+      bezig: false,
+      fout: null,
+      conflicten: [],
+      koppelBestaand: nee,
+      maakGedeeldBestand: nee,
+      herstelToestemming: nee,
+      synchroniseerNu: async () => undefined,
+      ontkoppel: async () => undefined,
+      openBestand: nee,
+      samenvoegenMetBestand: nee,
+      opslaanAlsBestand: () => void nee(),
+      sluitConflicten: () => undefined,
+    };
+  }, [toast]);
   return <SyncContext.Provider value={waarde}>{children}</SyncContext.Provider>;
 }

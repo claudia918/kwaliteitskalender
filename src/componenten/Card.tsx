@@ -25,6 +25,8 @@ export interface CardProps {
   bodyClassName?: string;
   style?: CSSProperties;
   id?: string;
+  /** Anker voor de rondleiding (`data-rondleiding`). */
+  rondleiding?: string;
 }
 
 const PAD = { none: '', sm: 'p-3', md: 'p-5', lg: 'p-6' } as const;
@@ -44,11 +46,13 @@ export function Card({
   bodyClassName,
   style,
   id,
+  rondleiding,
 }: CardProps) {
   const heeftKop = title !== undefined || action !== undefined;
   return (
     <Tag
       id={id}
+      data-rondleiding={rondleiding}
       style={style}
       className={cx(
         'min-w-0 rounded-lg border border-line-subtle bg-surface-card',

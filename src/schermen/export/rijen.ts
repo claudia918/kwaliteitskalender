@@ -139,7 +139,7 @@ export function excelTabbladen(invoer: ExcelInvoer): Tabblad[] {
   ];
   if (opties.compliance) {
     bladen.push({
-      naam: 'Compliance',
+      naam: 'Dekking standaarden',
       kolommen: COMPLIANCE_KOLOMMEN,
       rijen: complianceRijen(items, standaarden),
       breedtes: [10, 44, 16, 15, 12, 8, 10],

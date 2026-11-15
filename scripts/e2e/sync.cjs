@@ -20,6 +20,9 @@ const NEP = `
   const fouten = [], verzoeken = [];
   // ---- 1. Handmatig (browser zonder FSA) ----
   const ctxH = await b.newContext({ viewport: { width: 1280, height: 900 }, acceptDownloads: true });
+  // De rondleiding is in deze test al aangeboden (zie e2e-rondleiding.mjs). Bewust geen init-script:
+  // localStorage aanraken bij het begin van elk document laat Chromium soms latere schrijfacties vergeten.
+  await (async () => { const p = await ctxH.newPage(); await p.goto(URL); await p.evaluate(() => localStorage.setItem('kwaliteitskalender:rondleiding:v1', JSON.stringify({ aangeboden: true }))); await p.waitForTimeout(150); await p.close(); })();
   await ctxH.addInitScript(() => { delete Window.prototype.showOpenFilePicker; delete Window.prototype.showSaveFilePicker; delete window.showOpenFilePicker; delete window.showSaveFilePicker; });
   const h = await ctxH.newPage();
   h.on('pageerror', e => fouten.push(e.message)); h.on('console', m => m.type()==='error' && fouten.push(m.text()));
@@ -59,6 +62,9 @@ const NEP = `
 
   // ---- 2. Automatisch (nep-FSA) ----
   const ctx = await b.newContext({ viewport: { width: 1280, height: 900 } });
+  // De rondleiding is in deze test al aangeboden (zie e2e-rondleiding.mjs). Bewust geen init-script:
+  // localStorage aanraken bij het begin van elk document laat Chromium soms latere schrijfacties vergeten.
+  await (async () => { const p = await ctx.newPage(); await p.goto(URL); await p.evaluate(() => localStorage.setItem('kwaliteitskalender:rondleiding:v1', JSON.stringify({ aangeboden: true }))); await p.waitForTimeout(150); await p.close(); })();
   await ctx.addInitScript(NEP);
   const p = await ctx.newPage();
   p.on('pageerror', e => fouten.push(e.message)); p.on('console', m => m.type()==='error' && fouten.push(m.text()));
@@ -106,4 +112,5 @@ const NEP = `
   ok('CSP blokkeert fetch', csp === 'geblokkeerd');
   await b.close();
   console.log(res.join('\n'));
+  if (res.some((r) => r.startsWith('FOUT'))) process.exit(1);
 })().catch(e => { console.error(e); console.log(res.join('\n')); process.exit(1); });

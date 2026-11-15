@@ -225,7 +225,7 @@ export default function Export() {
         />
 
         {/* Gespreksdossier */}
-        <Card padding="lg" className="border-niveau-border">
+        <Card rondleiding="export-dossier" padding="lg" className="border-niveau-border">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
             <IconTile icon={FileText} tone="niveau" />
             <div className="min-w-0 flex-1">
@@ -283,7 +283,7 @@ export default function Export() {
         </Card>
 
         {/* Kalender: Excel en print */}
-        <Card
+        <Card rondleiding="export-kalender"
           padding="lg"
           title="Kalender exporteren"
           subtitle={
@@ -299,7 +299,7 @@ export default function Export() {
               <Checkbox
                 checked={metCompliance}
                 onChange={setMetCompliance}
-                label="Compliance-overzicht"
+                label="Dekking standaarden"
                 beschrijving="Dekking per standaard en de vaste standaarden"
               />
               <Checkbox
@@ -313,7 +313,7 @@ export default function Export() {
           {leeg && (
             <InfoBalk tone="neutral" className="mt-5">
               Op deze kalender staan nog geen activiteiten. De export bevat dan alleen de kolomkoppen
-              {metCompliance ? ' en het compliance-overzicht' : ''}.
+              {metCompliance ? ' en de dekking per standaard' : ''}.
             </InfoBalk>
           )}
           <div className="mt-5 grid gap-4 md:grid-cols-2">
@@ -327,7 +327,7 @@ export default function Export() {
                 </Button>
               }
             >
-              Werkmap met de tabbladen Kalender{metCompliance ? ', Compliance' : ''}
+              Werkmap met de tabbladen Kalender{metCompliance ? ', Dekking standaarden' : ''}
               {metAfwijkingen ? ' en Afwijkingen' : ''}, inclusief eigenaar, deadline, bewijs en notities.
               {niveau === 'cluster' ? ' Met een kolom School.' : ''}
             </Actie>
@@ -349,7 +349,7 @@ export default function Export() {
         </Card>
 
         {/* Back-up */}
-        <Card padding="lg">
+        <Card rondleiding="export-backup" padding="lg">
           <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
               <IconTile icon={ArchiveRestore} tone="info" />

@@ -51,10 +51,10 @@ export {
   type SegmentOptie,
   type SegmentedControlProps,
 } from './Formulier';
-export { NiveauSwitcher, type NiveauSwitcherProps } from './NiveauSwitcher';
 export { Dialog, BevestigProvider, useBevestig, type DialogProps, type BevestigOpties } from './Dialog';
-export { Toast, ToastProvider, useToast, type ToastToon } from './Toast';
+export { Toast, ToastProvider, ToastDock, useToast, useOngedaan, useWisToasts, type ToastToon, type ToastActie, type ToastOpties, type ToonToast } from './Toast';
 export { ActivityChip, type ActivityChipProps } from './ActivityChip';
 export { AppLogo, LvLogo, LvMonogram } from './Logo';
 export * from './stijlen';
 export { Begrip, type BegripProps } from './Begrip';
+export { meldSignaal, luisterNaarSignalen, type Signaal } from './signaal';

@@ -237,5 +237,7 @@
 :root {
   --font-sans: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --scrim: rgba(24, 24, 21, .45);
+  /* Rondleiding: dimlaag rond het uitgelichte onderdeel (iets lichter dan scrim: je ziet het scherm nog) */
+  --rondleiding-dim: rgba(24, 24, 21, .38);
   --surface-subtle: var(--gray-25);
 }

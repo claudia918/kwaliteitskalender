@@ -17,6 +17,9 @@ async function kies(page, naam) {
 (async () => {
   const browser = await chromium.launch();
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, acceptDownloads: true });
+  // De rondleiding is in deze test al aangeboden (zie e2e-rondleiding.mjs). Bewust geen init-script:
+  // localStorage aanraken bij het begin van elk document laat Chromium soms latere schrijfacties vergeten.
+  await (async () => { const p = await ctx.newPage(); await p.goto(URL); await p.evaluate(() => localStorage.setItem('kwaliteitskalender:rondleiding:v1', JSON.stringify({ aangeboden: true }))); await p.waitForTimeout(150); await p.close(); })();
   const page = await ctx.newPage();
   const verzoeken = [], fouten = [];
   page.on('request', (r) => { if (!r.url().startsWith('data:') && r.url() !== URL && !r.url().startsWith(URL + '#')) verzoeken.push(r.url()); });
@@ -66,9 +69,9 @@ async function kies(page, naam) {
   await page.screenshot({ path: `${SHOTS}/04-gegevens.png`, fullPage: true });
 
   // help
-  await page.click('button[aria-label="Uitleg bij dit scherm"]');
+  await page.click('button[aria-label="Hulp bij dit scherm"]');
   await page.waitForSelector('[role=dialog]');
-  ok('helpdialoog', (await page.textContent('[role=dialog]')).includes('Uitleg: Gegevens & delen'));
+  ok('helpdialoog', (await page.textContent('[role=dialog]')).includes("Hulp: Gegevens & delen"));
   await page.screenshot({ path: `${SHOTS}/05-help.png` });
   await page.keyboard.press('Escape');
 
@@ -88,4 +91,5 @@ async function kies(page, naam) {
   ok('geen console-fouten', fouten.length === 0, fouten.join(' | '));
   await browser.close();
   console.log(resultaten.join('\n'));
+  if (resultaten.some((r) => r.startsWith('FOUT'))) process.exit(1);
 })().catch((e) => { console.error(e); console.log(resultaten.join('\n')); process.exit(1); });

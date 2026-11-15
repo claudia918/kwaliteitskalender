@@ -12,7 +12,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CalendarSearch, LayoutGrid, List, Plus } from 'lucide-react';
-import { Button, Dialog, EmptyState, InfoBalk, PageHeader, STATUS_STIJL, SegmentedControl } from '../componenten';
+import { Begrip, Button, Dialog, EmptyState, InfoBalk, PageHeader, STATUS_STIJL, SegmentedControl, ToastDock, useOngedaan } from '../componenten';
 import { clusterNaamVan, schoolIdsVoorNiveau, vindSchool } from '../domein/berekeningen';
 import { effectieveNaam, maandUitPeriode } from '../domein/hulp';
 import type { Activiteit, KalenderItem, Maand, Status } from '../domein/types';
@@ -38,7 +38,6 @@ import {
 import { LegeStart } from './kalender/LegeStart';
 import { Lijst } from './kalender/Lijst';
 import { Matrix } from './kalender/Matrix';
-import { Dock, OngedaanMelding, useOngedaan } from './kalender/Ongedaan';
 import { Legenda, Overzicht } from './kalender/Overzicht';
 import { ToevoegPaneel, type ToevoegBegin } from './kalender/ToevoegPaneel';
 import { useVoorkeur, type Weergave } from './kalender/voorkeuren';
@@ -276,14 +275,19 @@ export default function Kalender() {
 
   const leeg = scope.items.length === 0;
   const zichtbareItems = useMemo(() => scope.items.filter(zichtbaar), [scope.items, zichtbaar]);
-  const dockZichtbaar = !!ongedaan.melding || (!!geselecteerdItem && editable && weergave === 'matrix');
+  const dockZichtbaar = !!geselecteerdItem && editable && weergave === 'matrix';
 
   return (
     <div className={dockZichtbaar ? 'space-y-5 pb-28' : 'space-y-5'}>
       <PageHeader
-        eyebrow="Kalender"
-        title="Kalender-editor"
-        subtitle={`${scopeLabel} · schooljaar ${state.schooljaar}`}
+        eyebrow="Plannen"
+        title="Kalender"
+        subtitle={
+          <>
+            De <Begrip term={niveau === 'bestuur' ? 'bestuurskalender' : 'schoolkalender'}>kalender</Begrip> van {scopeLabel}
+            {' '}per maand en <Begrip term="standaard" /> · schooljaar {state.schooljaar}
+          </>
+        }
         actions={
           <>
             {editable && !leeg && (
@@ -292,7 +296,7 @@ export default function Kalender() {
               </Button>
             )}
             {!leeg && (
-              <span data-rondleiding="weergave">
+              <span data-rondleiding="kalender-weergave">
                 <SegmentedControl<Weergave>
                   label="Weergave"
                   value={weergave}
@@ -403,8 +407,7 @@ export default function Kalender() {
         {melding}
       </p>
 
-      <Dock>
-        <OngedaanMelding {...ongedaan} />
+      <ToastDock>
         {geselecteerdItem && editable && weergave === 'matrix' && !itemParam && (
           <Actiebalk
             item={geselecteerdItem}
@@ -415,7 +418,7 @@ export default function Kalender() {
             onSluit={() => setGeselecteerd(null)}
           />
         )}
-      </Dock>
+      </ToastDock>
 
       {editScope && (
         <>

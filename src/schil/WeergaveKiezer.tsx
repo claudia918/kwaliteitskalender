@@ -223,6 +223,7 @@ export function WeergaveKiezer() {
             ref={paneel}
             role="dialog"
             aria-label="Wat wil je bekijken?"
+            data-rondleiding="weergave-lijst"
             onKeyDown={opToets}
             className="no-print fixed z-[900] flex max-h-[min(70vh,560px)] animate-rise flex-col overflow-hidden rounded-xl border border-line-subtle bg-surface-card shadow-pop"
             style={{ left: plek.left, top: plek.top, width: plek.breedte }}

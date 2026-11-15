@@ -195,7 +195,7 @@ export default function Compliance() {
       </div>
 
       {vaste.length > 0 && (
-        <Card padding="lg">
+        <Card rondleiding="dekking-vast" padding="lg">
           <SectionHeader
             title="Vaste standaarden"
             subtitle={
@@ -213,7 +213,7 @@ export default function Compliance() {
         </Card>
       )}
 
-      <Card padding="lg">
+      <Card rondleiding="dekking-alle" padding="lg">
         <SectionHeader
           title="Alle standaarden"
           subtitle={
@@ -336,7 +336,7 @@ export default function Compliance() {
       )}
 
       {aantalGetoond > 0 && (
-        <Card padding="lg">
+        <Card rondleiding="dekking-afwijkingen" padding="lg">
           <SectionHeader
             title="Afwijkingen"
             subtitle={

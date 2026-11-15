@@ -20,6 +20,7 @@ import { Foutgrens } from './Foutgrens';
 import GegevensDelen from './GegevensDelen';
 import { Layout } from './Layout';
 import Stijlgids from './Stijlgids';
+import { OefenOmgeving, RondleidingProvider, useRondleiding } from './rondleiding/RondleidingProvider';
 
 /** Zolang de setup niet voltooid is: welkom of wizard (buiten de router-layout). */
 function Opstart() {
@@ -32,9 +33,7 @@ function Opstart() {
   );
 }
 
-function Poort() {
-  const { state } = useStore();
-  if (!state.setupVoltooid) return <Opstart />;
+function AppRoutes() {
   return (
     <Routes>
       <Route element={<Layout />}>
@@ -58,18 +57,40 @@ function Poort() {
   );
 }
 
-/** Wrapperketen: Foutgrens → Store → Toasts → Bevestigen → Sync → HashRouter → Poort. */
+function Poort() {
+  const { state } = useStore();
+  const { oefenen } = useRondleiding();
+  // Tijdens een rondleiding: dezelfde schermen, maar op de oefenkalender.
+  if (oefenen)
+    return (
+      <OefenOmgeving>
+        <AppRoutes />
+      </OefenOmgeving>
+    );
+  if (!state.setupVoltooid) return <Opstart />;
+  return <AppRoutes />;
+}
+
+/** De echte synchronisatie ligt stil zolang er geoefend wordt. */
+function Sync({ children }: { children: React.ReactNode }) {
+  const { oefenen } = useRondleiding();
+  return <SyncProvider gepauzeerd={oefenen}>{children}</SyncProvider>;
+}
+
+/** Wrapperketen: Foutgrens → Store → Toasts → Bevestigen → HashRouter → Rondleiding → Sync → Poort. */
 export default function App() {
   return (
     <Foutgrens>
       <StoreProvider>
         <ToastProvider>
           <BevestigProvider>
-            <SyncProvider>
-              <HashRouter>
-                <Poort />
-              </HashRouter>
-            </SyncProvider>
+            <HashRouter>
+              <RondleidingProvider>
+                <Sync>
+                  <Poort />
+                </Sync>
+              </RondleidingProvider>
+            </HashRouter>
           </BevestigProvider>
         </ToastProvider>
       </StoreProvider>

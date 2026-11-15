@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { X } from 'lucide-react';
+import { GraduationCap, X } from 'lucide-react';
 import { AppLogo, IconButton, cx } from '../componenten';
 import { useStore } from '../store';
 import { MENU, isActief, type MenuItem } from './navigatie';
 import { DemoVerlatenKnop, SyncStatus } from './Topbar';
+import { useOefenen, useRondleiding } from './rondleiding/RondleidingProvider';
 
 function MenuLink({ item, pad, onKlik }: { item: MenuItem; pad: string; onKlik?: () => void }) {
   const actief = isActief(item, pad);
@@ -28,6 +29,29 @@ function MenuLink({ item, pad, onKlik }: { item: MenuItem; pad: string; onKlik?:
   );
 }
 
+/** Hulp > Rondleiding: opent de keuze (deze pagina, de eerste rondleiding, per scherm). */
+function RondleidingKnop({ onKlik }: { onKlik?: () => void }) {
+  const r = useRondleiding();
+  return (
+    <button
+      type="button"
+      data-rondleiding="menu-rondleiding"
+      onClick={() => {
+        onKlik?.();
+        r.openKeuze();
+      }}
+      title="Oefen met de app op een oefenkalender"
+      className="flex h-9 items-center gap-3 rounded-md border-l-2 border-transparent px-3 text-left text-sm font-medium text-ink-body transition-colors duration-fast hover:bg-surface-hover hover:text-ink-strong"
+    >
+      <GraduationCap className="h-4 w-4 shrink-0 text-ink-subtle" aria-hidden />
+      <span className="truncate">Rondleiding</span>
+      {r.voortgang.lopend && !r.oefenen && (
+        <span className="ml-auto rounded-pill bg-brand-yellow px-1.5 text-2xs font-bold text-ink-on-brand">verder</span>
+      )}
+    </button>
+  );
+}
+
 /** Menu in groepen: overzicht, plannen, voorbereiden, controleren; beheer en hulp onderaan. */
 function Menu({ onKlik }: { onKlik?: () => void }) {
   const { pathname } = useLocation();
@@ -44,6 +68,7 @@ function Menu({ onKlik }: { onKlik?: () => void }) {
         {g.items.map((item) => (
           <MenuLink key={item.to} item={item} pad={pathname} onKlik={onKlik} />
         ))}
+        {g.id === 'hulp' && <RondleidingKnop onKlik={onKlik} />}
       </div>
     </div>
   );
@@ -71,7 +96,8 @@ export function Sidebar() {
 export function Lade({ open, onSluit }: { open: boolean; onSluit: () => void }) {
   const { pathname } = useLocation();
   const { state } = useStore();
-  const isDemo = state.modus === 'demo';
+  const oefenen = useOefenen();
+  const isDemo = state.modus === 'demo' && !oefenen;
   useEffect(() => {
     onSluit(); // sluiten bij navigeren
   }, [pathname, onSluit]);

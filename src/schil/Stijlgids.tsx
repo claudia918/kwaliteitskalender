@@ -241,6 +241,14 @@ export default function Stijlgids() {
             <Button size="sm" onClick={() => toast('Activiteit verwijderd', 'danger')}>
               Toast verwijderd
             </Button>
+            <Button
+              size="sm"
+              onClick={() =>
+                toast('Toets staat nu in oktober', 'success', { actie: { label: 'Ongedaan maken', onClick: () => toast('Teruggezet', 'info') } })
+              }
+            >
+              Toast met ongedaan maken
+            </Button>
             <Button size="sm" onClick={() => setDialoog(true)}>
               Dialoog
             </Button>

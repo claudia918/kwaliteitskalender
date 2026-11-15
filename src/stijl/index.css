@@ -172,3 +172,70 @@ svg.lucide {
   stroke-width: 1.75;
   flex-shrink: 0;
 }
+
+/* ============================================================
+   Rondleiding: spotlight, kaart, voortgangslijn en afsluiting.
+   Beweging met betekenis: het licht glijdt naar het volgende onderdeel,
+   de lijn trekt zich met je voortgang, het jaar tekent zich in de afsluiting.
+   Bij prefers-reduced-motion staat alles meteen stil (zie @layer base).
+   ============================================================ */
+.kk-gat {
+  transition: x var(--dur-slow) var(--ease-out), y var(--dur-slow) var(--ease-out),
+    width var(--dur-slow) var(--ease-out), height var(--dur-slow) var(--ease-out);
+}
+.kk-ring {
+  box-shadow: 0 0 0 2px var(--lv-yellow), 0 0 0 6px rgba(238, 194, 27, .28);
+  transition: left var(--dur-slow) var(--ease-out), top var(--dur-slow) var(--ease-out),
+    width var(--dur-slow) var(--ease-out), height var(--dur-slow) var(--ease-out), box-shadow var(--dur-base);
+  animation: kk-ring-in 900ms var(--ease-out) 1;
+}
+.kk-ring-gelukt {
+  box-shadow: 0 0 0 3px var(--lv-yellow), 0 0 0 10px rgba(238, 194, 27, .22);
+}
+@keyframes kk-ring-in {
+  0% { box-shadow: 0 0 0 2px var(--lv-yellow), 0 0 0 0 rgba(238, 194, 27, .55); }
+  70% { box-shadow: 0 0 0 2px var(--lv-yellow), 0 0 0 14px rgba(238, 194, 27, 0); }
+  100% { box-shadow: 0 0 0 2px var(--lv-yellow), 0 0 0 6px rgba(238, 194, 27, .28); }
+}
+.kk-kaart {
+  transition: left var(--dur-slow) var(--ease-out), top var(--dur-slow) var(--ease-out);
+}
+.kk-lijn {
+  transition: stroke-dashoffset 600ms var(--ease-out);
+}
+.kk-vinkje {
+  animation: kk-pop 420ms var(--ease-out) 1;
+}
+@keyframes kk-pop {
+  0% { transform: scale(.4); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+/* Afsluiting: de lijn door het jaar tekent zich, de maanden komen er een voor een bij */
+.kk-teken {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: kk-teken 1600ms var(--ease-inout) 700ms forwards;
+}
+@keyframes kk-teken {
+  to { stroke-dashoffset: 0; }
+}
+.kk-verschijn {
+  opacity: 0;
+  animation: kk-verschijn 420ms var(--ease-out) forwards;
+}
+@keyframes kk-verschijn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kk-teken { stroke-dashoffset: 0; animation: none; }
+  .kk-verschijn { opacity: 1; animation: none; }
+  .kk-gat, .kk-ring, .kk-kaart, .kk-lijn { transition: none; animation: none; }
+}
+/* Poster afdrukken vanuit de afsluiting: alleen de poster */
+.kk-poster { display: none; }
+@media print {
+  html.kk-poster-print #root { display: none !important; }
+  html.kk-poster-print .kk-poster { display: block !important; }
+}

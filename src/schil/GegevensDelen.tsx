@@ -168,7 +168,7 @@ export default function GegevensDelen() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <div className="space-y-6">
-          <Card title="Waar staan je gegevens?">
+          <Card rondleiding="gegevens-waar" title="Waar staan je gegevens?">
             <StatusBlok />
             <ul className="mt-5 space-y-3 text-sm text-ink-body">
               <li className="flex gap-2.5">
@@ -195,7 +195,7 @@ export default function GegevensDelen() {
             </ul>
           </Card>
 
-          <Card
+          <Card rondleiding="gegevens-samenwerken"
             title="Samenwerken met collega’s"
             subtitle={
               <>
@@ -284,7 +284,7 @@ export default function GegevensDelen() {
         </div>
 
         <div className="space-y-6">
-          <Card padding="lg" className="border-brand-yellow">
+          <Card rondleiding="gegevens-privacy" padding="lg" className="border-brand-yellow">
             <div className="flex items-start gap-3">
               <IconTile icon={ShieldCheck} tone="brand" />
               <div className="min-w-0">
@@ -320,7 +320,7 @@ export default function GegevensDelen() {
               je ook importeren.
             </p>
             <ButtonLink to="/export" size="sm" icon={Download} className="mt-4">
-              Naar Export
+              Naar Dossier en export
             </ButtonLink>
           </Card>
         </div>

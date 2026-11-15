@@ -28,7 +28,7 @@ import type {
   Status,
   WizardInvoer,
 } from '../domein/types';
-import { STATE_SLEUTEL, bewaarState, bewaarUi, laadState, laadUi } from './opslag';
+import { STATE_SLEUTEL, bewaarState, bewaarUi, laadState, laadUi, type UiVoorkeur } from './opslag';
 
 export interface Store {
   state: State;
@@ -121,16 +121,18 @@ export interface StoreProviderProps {
   children: ReactNode;
   /** Alleen voor tests: begintoestand in plaats van localStorage. */
   initieel?: State;
-  /** Alleen voor tests: niet naar localStorage schrijven. */
+  /** Niet naar localStorage schrijven en geen andere tabbladen volgen (tests en de oefenkalender). */
   zonderOpslag?: boolean;
+  /** Begin-keuze van niveau, school en cluster in plaats van de bewaarde (oefenkalender). */
+  initieelUi?: UiVoorkeur;
 }
 
-export function StoreProvider({ children, initieel, zonderOpslag }: StoreProviderProps) {
+export function StoreProvider({ children, initieel, zonderOpslag, initieelUi }: StoreProviderProps) {
   const [state, setState] = useState<State>(() => initieel ?? laadState());
   const stateRef = useRef(state);
   stateRef.current = state;
 
-  const ui = useMemo(() => laadUi(), []);
+  const ui = useMemo(() => initieelUi ?? laadUi(), []); // eslint-disable-line react-hooks/exhaustive-deps
   const [niveau, setNiveauRuw] = useState<Niveau>(ui.niveau ?? 'school');
   const [clusterId, setClusterId] = useState<string>(ui.clusterId ?? '');
   const [schoolId, setSchoolId] = useState<SchoolId>(ui.schoolId ?? '');

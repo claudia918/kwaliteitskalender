@@ -83,7 +83,7 @@ function BestuurKaart() {
   const { state, setBestuurNaam, setSchooljaar } = useStore();
   const toast = useToast();
   return (
-    <Card title="Bestuur" subtitle="Wijzigingen worden bewaard zodra je het veld verlaat.">
+    <Card rondleiding="org-bestuur" title="Bestuur" subtitle="Wijzigingen worden bewaard zodra je het veld verlaat.">
       <div className="grid gap-4 sm:grid-cols-[1fr_12rem]">
         <Veld label="Naam bestuur" hint={PRIVACY_REGEL}>
           {(id) => (
@@ -227,7 +227,7 @@ function ScholenKaart() {
   };
 
   return (
-    <Card
+    <Card rondleiding="org-scholen"
       id="scholen"
       title="Scholen"
       subtitle={aantal(scholen.length, 'school', 'scholen')}
@@ -355,7 +355,7 @@ function SjabloonKaart() {
   const toast = useToast();
   const n = VERPLICHTE_SCHOOLACTIVITEITEN.length;
   return (
-    <Card
+    <Card rondleiding="org-aanbevolen"
       title="Aanbevolen activiteiten"
       subtitle={
         <>
@@ -399,7 +399,7 @@ function GegevensKaart() {
     sync.status === 'gekoppeld' ? ' De koppeling met het gedeelde kalenderbestand wordt verbroken; het bestand zelf blijft ongewijzigd.' : '';
   return (
     <Card title="Demo of opnieuw beginnen" subtitle="Voorbeeldgegevens laden of alles leegmaken">
-      <p className="text-xs text-ink-muted">Tip: maak eerst een back-up via Export als je je huidige kalender wilt bewaren.</p>
+      <p className="text-xs text-ink-muted">Tip: maak eerst een back-up via Dossier en export als je je huidige kalender wilt bewaren.</p>
       <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
         <Button
           icon={Database}

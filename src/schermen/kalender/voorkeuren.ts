@@ -3,6 +3,7 @@
  * Ze horen niet in de state, want die gaat naar het gedeelde kalenderbestand.
  */
 import { useCallback, useState } from 'react';
+import { leesVoorkeurOpslag, schrijfVoorkeurOpslag } from '../../store/oefenopslag';
 import type { KalenderFilter, Periode } from './hulp';
 
 export type Weergave = 'matrix' | 'lijst';
@@ -13,11 +14,12 @@ export interface KalenderVoorkeur {
   filter?: KalenderFilter;
 }
 
-const SLEUTEL = 'kwaliteitskalender:kalender-weergave:v1';
+export const KALENDER_VOORKEUR_SLEUTEL = 'kwaliteitskalender:kalender-weergave:v1';
+const SLEUTEL = KALENDER_VOORKEUR_SLEUTEL;
 
 function lees(): KalenderVoorkeur {
   try {
-    const t = localStorage.getItem(SLEUTEL);
+    const t = leesVoorkeurOpslag(SLEUTEL);
     return t ? (JSON.parse(t) as KalenderVoorkeur) : {};
   } catch {
     return {};
@@ -25,11 +27,7 @@ function lees(): KalenderVoorkeur {
 }
 
 function schrijf(v: KalenderVoorkeur) {
-  try {
-    localStorage.setItem(SLEUTEL, JSON.stringify(v));
-  } catch {
-    /* niet erg: dan geldt de standaard */
-  }
+  schrijfVoorkeurOpslag(SLEUTEL, JSON.stringify(v));
 }
 
 /** Eén voorkeur lezen en bijwerken; `begin` geldt als er niets bewaard is. */

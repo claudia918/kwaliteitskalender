@@ -8,10 +8,13 @@ inventaris; vormgeving uit het design system; alle code-afspraken staan hier.
 
 ```
 main.tsx → schil/App.tsx
-  Foutgrens → StoreProvider → ToastProvider → BevestigProvider → SyncProvider → HashRouter → Poort
-  Poort: setupVoltooid === false → Opstart (schermen/Welkom.tsx of schermen/Wizard.tsx)
-         anders → Layout (ZoekProvider, Topbar met WeergaveKiezer en ZoekKnop, Sidebar/Lade, <Outlet/>,
-                  Footer, ConflictDialoog)
+  Foutgrens → StoreProvider → ToastProvider → BevestigProvider → HashRouter → RondleidingProvider
+            → SyncProvider (gepauzeerd tijdens oefenen) → Poort
+  Poort: oefenen → OefenOmgeving (tweede StoreProvider op de oefenkalender + OefenSyncProvider) → routes
+         setupVoltooid === false → Opstart (schermen/Welkom.tsx of schermen/Wizard.tsx)
+         anders → Layout (OefenBand, ZoekProvider, Topbar met WeergaveKiezer en ZoekKnop, Sidebar/Lade,
+                  <Outlet/>, Footer, ConflictDialoog, Spotlight, RondleidingAanbod, RondleidingKeuze,
+                  AfsluitingVenster)
 ```
 
 | Laag | Map | Afhankelijk van |
@@ -19,7 +22,7 @@ main.tsx → schil/App.tsx
 | Domein (puur, getest) | `src/domein` | niets |
 | Store | `src/store` | domein |
 | Sync | `src/sync` | domein, store, componenten (toast) |
-| Componenten | `src/componenten` | domein (types/seed), geen store |
+| Componenten | `src/componenten` | domein (types/seed), geen store (alleen `store/oefenopslag` voor de duur van "Ongedaan maken" tijdens het oefenen) |
 | Schil | `src/schil` | alles |
 | Schermen | `src/schermen` | componenten, store, domein, (sync) |
 
@@ -118,6 +121,7 @@ Alle acties werken direct (autosave, tijdstempels, tombstones). `EditScope = { k
 | `addActiviteit` | `(scope, activiteitId) => string \| null` | nieuw item (uuid), maand uit periode, standaardgesprek, gepland; geeft uid |
 | `addEigenActiviteit` | `(scope, { naam, standaard, gesprek, periode?, omschrijving? }) => string` | id `EIGEN-xxxxxxxx`, `custom` in het item |
 | `removeItem` | `(scope, uid) => void` | tombstone |
+| `herstelItem` | `(scope, item: KalenderItem) => void` | **ongedaan maken**: zet een eerder bewaarde versie van het item terug (ook na verwijderen: tombstone weg), met een nieuwe tijdstempel |
 | `setKoppeling` | `(scope, uid, gesprek, reden) => void` | afwijking als gesprek ≠ standaardgesprek; lege reden → "Aangepast door school" |
 | `setNotitie` / `setEigenNaam` / `setEigenaar` | `(scope, uid, tekst) => void` | trim; leeg wist |
 | `setDeadline` | `(scope, uid, 'JJJJ-MM-DD' \| '') => void` | |
@@ -273,7 +277,7 @@ Voor dynamische kleuren altijd de tabellen in `stijlen.ts` gebruiken (Tailwind z
 | `GesprekIcoonView` | `icoon`, `kleur` |
 | `KwaliteitsgebiedTag` | `gebied`, `showName`, `size` (kleurvlak + code op wit) |
 | `GebiedDot` | `gebied` |
-| `Card` | `title`, `subtitle`, `action`, `padding: none\|sm\|md\|lg`, `elevated`, `divider`, `as`, `className`, `bodyClassName` |
+| `Card` | `title`, `subtitle`, `action`, `padding: none\|sm\|md\|lg`, `elevated`, `divider`, `as`, `className`, `bodyClassName`, `rondleiding` (anker) |
 | `KpiTile` | `label`, `value`, `unit`, `icon`, `tone: neutral\|success\|warning\|danger\|niveau`, `hint` |
 | `ProgressBar` | `value` (0-100), `color` (CSS, bv. `seizoenKlassen(k).var`; standaard niveau), `size`, `label`, `showValue` |
 | `IconTile` | `icon`, `tone: niveau\|brand\|success\|info\|danger\|warning\|neutral`, `size` |
@@ -289,11 +293,14 @@ Voor dynamische kleuren altijd de tabellen in `stijlen.ts` gebruiken (Tailwind z
 | `Checkbox` | `checked`, `onChange(bool)`, `label`, `beschrijving` |
 | `FilterChip` | `active`, `onClick`, `dotClassName` (bv. `gebiedKlassen('OP').dot`), `icon`, `count` |
 | `SegmentedControl` | `value`, `onChange`, `options: { value, label, icon?, compact? }[]`, `accent: 'niveau' \| 'neutraal'` |
-| `NiveauSwitcher` | `value`, `onChange`, `toonCluster` (niet meer in de schil; zie WeergaveKiezer) |
 | `Begrip` | `term: BegripSleutel`, `children?` (eigen tekst). Stippellijn; uitleg bij hover, focus en tik; Esc sluit. Het is een knop: niet binnen een link of knop zetten |
 | `Dialog` | `open`, `onClose`, `title`, `subtitle`, `footer`, `width: sm\|md\|lg\|xl`, `blokkeerAchtergrond` (Esc, focus-trap, focus terug) |
 | `useBevestig()` | `await bevestig({ titel, tekst, bevestigLabel, annuleerLabel, gevaarlijk }) → boolean` |
-| `useToast()` | `toast(tekst, 'success' \| 'info' \| 'danger' \| 'warning', duurMs?)`; max 3, 2400 ms |
+| `useToast()` | `toast(tekst, toon?, duurMs \| { duur?, actie?: { label, onClick } })`; max 3, 2400 ms; met actie 8 s, pauzeert bij muis/focus, Ctrl/Cmd+Z voert de nieuwste actie uit. Geeft een functie die de toast weghaalt |
+| `useOngedaan()` | `{ toon(tekst, herstel), sluit() }`: toast met "Ongedaan maken" (kalender, bibliotheek, werklijst op Start). Het enige mechanisme voor ongedaan maken |
+| `ToastDock` | zet iets (de actiebalk van de kalender) onder de toasts in dezelfde kolom onderaan |
+| `useWisToasts()` | alle toasts weg (begin/einde van het oefenen) |
+| `meldSignaal(naam)` | `'ongedaan' \| 'zoek-gekozen'`: kleine gebeurtenissen voor de rondleiding (window-event) |
 | `ActivityChip` | `gebied`, `code`, `naam`, `status`, `verplicht`, `afwijking`, `selected`, `compact`, + button-props |
 | `AppLogo`, `LvLogo`, `LvMonogram` | logo's |
 | `stijlen.ts` | `GEBIED_KLASSEN`/`gebiedKlassen()`, `SEIZOEN_KLASSEN`/`seizoenKlassen()` (`{ ink, surface, border, dot, var }`), `STATUS_STIJL` (+ `label`, `icoon`), `GESPREK_ICONEN`/`gesprekIcoon()`, `NIVEAU_ICONEN`, `NIVEAU_LABELS`, `icoonOpNaam('lucide:Gauge')` |
@@ -327,16 +334,55 @@ Voorbeelden van alles: `src/schil/Stijlgids.tsx` (`#/stijlgids`).
   volgende stap (één zin, één knop) naast het komende gesprek; "Aan de slag" (eigen kalender, verbergbaar);
   werklijst "Deze maand" / "Voor <gesprek>" met statusknoppen Bezig en Gereed (nog eens klikken = gepland);
   "Hoe staat het ervoor" (inklapbaar, onthouden per browser); "Sinds je vorige bezoek" alleen met een gekoppeld bestand.
-- **`data-rondleiding`** (voor de rondleiding): `weergave`, `zoeken`, `volgende-stap`, `deze-maand`,
-  `aan-de-slag`, `sinds-vorig-bezoek`, `menu-overzicht`, `menu-plannen`, `menu-voorbereiden`,
-  `menu-controleren`, `menu-beheer`, `menu-hulp`.
+- **`data-rondleiding`** (ankers voor de rondleiding): schil `weergave`, `weergave-lijst`, `zoeken`, `delen`
+  (sync-status), `hulp`, `menu-knop`, `menu-<groep>`, `menu-rondleiding`; Start `volgende-stap`, `deze-maand`,
+  `aan-de-slag`, `hoe-staat-het`, `sinds-vorig-bezoek`; Kalender `toevoegen`, `kalender-weergave`, `periode`,
+  `filter`, `voortgang`, `matrix`, `eerste-rij` (matrixrij of lijstregel met de eerste zichtbare activiteit),
+  `chip`, `actiebalk`, `ongedaan` (toast met actie), `toevoegpaneel`, `detailvenster`; Bibliotheek
+  `bibliotheek-stand`, `bibliotheek-zoek`, `bibliotheek-filter`, `eigen-activiteit`; Gesprekken `gesprek-keuze`,
+  `gesprek-info`, `gesprek-voorbereiding`, `gesprek-scholen`; Export `export-dossier|kalender|backup`; Dekking
+  `dekking-vast|alle|afwijkingen`; Organisatie `org-bestuur|scholen|cyclus|aanbevolen`; Gegevens
+  `gegevens-waar|samenwerken|privacy`. Hernoem een anker niet zonder `schil/rondleiding/tours.ts` mee te nemen.
+
+## 7b. Rondleiding (`src/schil/rondleiding/`)
+
+- **Wat**: de eerste rondleiding (8 stappen: wat bekijk ik, wat moet ik nu doen, plannen, ongedaan maken,
+  toevoegen, zoeken, voorbereiden, delen en privacy) en per scherm een korte (`tours.ts`). Een stap licht het
+  echte onderdeel uit (`doel`, `ook`) en gaat verder zodra `klaar(context)` waar is (meting van de oefenkalender,
+  pad, signalen); zonder `klaar` is het een kijkstap met Volgende. Sla over en Vorige zijn er altijd.
+- **Oefenen zonder risico** (`RondleidingProvider.tsx`): tijdens een rondleiding rendert `Poort` de routes binnen
+  `OefenOmgeving`: een tweede `StoreProvider` met `oefenState()` (`domein/oefenen.ts`), `zonderOpslag`,
+  `initieelUi`, en `OefenSyncProvider` (geen bestand, koppelen kan niet). De echte store blijft erboven
+  gemonteerd en onaangeroerd; de echte `SyncProvider` is `gepauzeerd`. Voorkeur-hooks schrijven tijdens het
+  oefenen naar een tijdelijk geheugen (`store/oefenopslag.ts`); de filters van de bibliotheek worden bewaard en
+  teruggezet; toasts worden gewist. Na afloop navigeert de rondleiding terug naar het pad van voor de start.
+- **Onthouden**: `localStorage['kwaliteitskalender:rondleiding:v1']` = `{ aangeboden, eersteAf, schermen[], lopend }`
+  (per browser, nooit in de state of het bestand). De oefenkalender zelf staat in
+  `sessionStorage['kwaliteitskalender:oefen:v1']`: herladen gaat verder op de oefenkalender; een nieuw bezoek
+  biedt "Verder met de rondleiding?" aan.
+- **Eerste gebruik**: zodra de setup voltooid is en er nog niets is aangeboden. Na demo of wizard
+  (`rondleidingNa('demo' | 'eigen')`) een introductie in het midden; na een kalenderbestand (of als bestaande
+  gebruiker) een rustig aanbod in de hoek, zodat je meteen kunt werken.
+- **Oproepen**: helpknop (verder / dit scherm / de rondleiding), menu Hulp > Rondleiding (`RondleidingKeuze`),
+  zoekvenster (groep Rondleidingen).
+- **Spotlight** (`Spotlight.tsx`): SVG-dimlaag met gaten (vangt geen klikken), gele ring, kaart via
+  `plaatsKaart()` (nooit over het onderdeel; past het nergens, dan een blad en licht alleen het vrije deel op).
+  Staat er een venster open, dan licht dat op; zonder plek ernaast wordt de kaart een balk bovenaan. Toetsenbord:
+  focus op de kaarttitel, "Naar het onderdeel" (zichtbaar bij focus) zet de focus op het onderdeel, Esc onderbreekt.
+- **Afsluiting** (`Afsluiting.tsx`): terug in de eigen kalender, die als jaarlint (`domein/jaarlint.ts`) met wat je
+  oefende; "Print als poster" (A3, alleen de poster via `html.kk-poster-print`).
 
 ## 8. Tests
-- `npm test`: domein (berekeningen, migratie, mutaties, samenvoegen, startscherm, zoeken, begrippen).
+- `npm test`: domein (berekeningen, migratie, mutaties, samenvoegen, startscherm, zoeken, begrippen, oefenkalender,
+  plaatsing van de kaart, jaarlint).
 - `npm run test:e2e` (na `npm run build`): opent `dist/kwaliteitskalender.html` via `file://` in headless
   Chromium; controleert routes, niveaukleur, herladen, netwerkstilte, console, CSP, handmatige
   bestandsflow en de automatische sync met een nagebootste File System Access API.
   `scripts/e2e-navigatie.mjs` test weergavekeuze, menu-groepen, zoekvenster en begrippen met het toetsenbord.
+  `scripts/e2e-rondleiding.mjs` test de rondleiding: automatisch aanbieden (demo, wizard, bestand), niet bij een
+  tweede bezoek, oproepen, elke stap, overslaan, herladen, 390 breed, alleen toetsenbord, en dat localStorage en
+  een gekoppeld bestand byte voor byte gelijk blijven. De andere e2e-scripts zetten de rondleiding op
+  "aangeboden" (init-script), zodat de introductie hun schermen niet bedekt.
   Wisselen van weergave in een test: klik `[data-rondleiding="weergave"]` en dan
   `[role=listbox] [role=option]:has-text("<naam>")`, of zet `kwaliteitskalender:ui:v1` en herlaad.
   Pas de e2e-scripts aan als je schermen echte koppen (h1) geven die anders heten; ze controleren nu

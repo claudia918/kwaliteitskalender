@@ -114,6 +114,11 @@ export function Matrix(p: MatrixProps) {
     setBoven(null);
   }
 
+  // Anker voor de rondleiding: de eerste rij met een zichtbare activiteit.
+  const eersteRij = p.groepen
+    .flatMap((g) => g.rijen)
+    .find((r) => p.maanden.some((m) => r.cellen[m].some(p.zichtbaar)))?.code;
+
   return (
     <div
       className="overflow-hidden rounded-lg border border-line-subtle bg-surface-card shadow-xs [--kk-rijkop:132px] md:[--kk-rijkop:200px] xl:[--kk-rijkop:224px]"
@@ -193,7 +198,7 @@ export function Matrix(p: MatrixProps) {
                     </th>
                   </tr>
                   {groep.rijen.map((rij) => (
-                    <tr key={rij.code} className="group/rij">
+                    <tr key={rij.code} className="group/rij" data-rondleiding={rij.code === eersteRij ? 'eerste-rij' : undefined}>
                       <th
                         scope="row"
                         className={cx(

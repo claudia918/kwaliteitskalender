@@ -39,7 +39,7 @@ export function Gesprekscyclus() {
   const jaar = startjaar(state.schooljaar, new Date().getFullYear());
 
   return (
-    <Card
+    <Card rondleiding="org-cyclus"
       id="gesprekscyclus"
       title="Gesprekscyclus"
       subtitle="Aantal gesprekken, namen, maanden, kleur en icoon. Een verwijderd gesprek zet gekoppelde activiteiten op 'Doorlopend'."

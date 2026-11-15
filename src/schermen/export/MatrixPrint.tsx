@@ -163,7 +163,7 @@ export function MatrixPrint(p: MatrixPrintProps) {
 
       {p.opties.compliance && (
         <div style={{ breakInside: 'avoid' }}>
-          <h2>Compliance: dekking per standaard</h2>
+          <h2>Dekking standaarden</h2>
           <table>
             <thead>
               <tr>

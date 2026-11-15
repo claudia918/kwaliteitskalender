@@ -5,9 +5,10 @@
  * Toevoegen kan ook rechtstreeks in de kalender; dit is de plek om te bladeren. Onderdelen in ./bibliotheek/.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { CalendarDays, ChevronRight, CircleCheck, KeyRound, ListPlus, Plus, SearchX } from 'lucide-react';
 import {
+  Begrip,
   Button,
   Card,
   EmptyState,
@@ -19,6 +20,7 @@ import {
   cx,
   gebiedKlassen,
   gesprekIcoon,
+  useOngedaan,
 } from '../componenten';
 import { filterActiviteiten, schoolIdsVoorNiveau } from '../domein/berekeningen';
 import { aantal, effectieveNaam, formatDatumLang, maandUitPeriode, vindGesprek } from '../domein/hulp';
@@ -28,12 +30,18 @@ import { useKomendGesprek, useScope, useStore } from '../store';
 import { ActiviteitKaart } from './bibliotheek/ActiviteitKaart';
 import { EigenActiviteitDialoog } from './bibliotheek/EigenActiviteitDialoog';
 import { maandVoluit, ontbrekendeVerplichte } from './kalender/hulp';
-import { Dock, OngedaanMelding, useOngedaan } from './kalender/Ongedaan';
 
 type Toon = 'alles' | 'niet-op-kalender' | 'verplicht' | 'ontbreekt';
 
 /** Filters blijven bewaard zolang de app open is. */
 const onthouden: { zoek: string; gesprek: string; gebied: string; toon: Toon } = { zoek: '', gesprek: 'Alle', gebied: 'Alle', toon: 'alles' };
+
+/** Voor de rondleiding: filters leeg voor het oefenen; geeft een functie die de eigen filters terugzet. */
+export function bewaarBibliotheekFilters(): () => void {
+  const kopie = { ...onthouden };
+  Object.assign(onthouden, { zoek: '', gesprek: 'Alle', gebied: 'Alle', toon: 'alles' });
+  return () => Object.assign(onthouden, kopie);
+}
 
 export default function Bibliotheek() {
   const { state, niveau, clusterId, addActiviteit, removeItem } = useStore();
@@ -53,6 +61,21 @@ export default function Bibliotheek() {
   const setGesprek = (v: string) => zetGesprek((onthouden.gesprek = v));
   const setGebied = (v: string) => zetGebied((onthouden.gebied = v));
   const setToon = (v: Toon) => zetToon((onthouden.toon = v));
+
+  // /bibliotheek?zoek=<tekst> (vanuit start en het zoekvenster): als zoekterm invullen, andere filters los.
+  const [params, setParams] = useSearchParams();
+  const zoekParam = params.get('zoek');
+  useEffect(() => {
+    if (zoekParam === null) return;
+    setZoek(zoekParam);
+    setGesprek('Alle');
+    setGebied('Alle');
+    setToon('alles');
+    const p = new URLSearchParams(params);
+    p.delete('zoek');
+    setParams(p, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [zoekParam]);
 
   useEffect(() => {
     if (!markeer) return;
@@ -142,16 +165,23 @@ export default function Bibliotheek() {
   }
 
   return (
-    <div className={cx('space-y-6', ongedaan.melding && 'pb-20')}>
+    <div className="space-y-6">
       <PageHeader
-        eyebrow="Bibliotheek"
-        title="Activiteiten"
-        subtitle={`${library.length} activiteiten voor het ${isBestuur ? 'bestuur' : 'schoolniveau'}${editable ? ` · kalender van ${scopeLabel}` : ''}`}
+        eyebrow="Plannen"
+        title="Bibliotheek"
+        subtitle={
+          <>
+            {library.length} activiteiten in de <Begrip term="bibliotheek" /> voor het {isBestuur ? 'bestuur' : 'schoolniveau'}, elk bij een{' '}
+            <Begrip term="standaard" />
+            {editable ? ` · kalender van ${scopeLabel}` : ''}
+          </>
+        }
         actions={
           <Button
             variant="secondary"
             icon={Plus}
             onClick={() => setDialoog(true)}
+            data-rondleiding="eigen-activiteit"
             disabled={!editable}
             title={editable ? undefined : 'Kies een school of bestuur'}
           >
@@ -233,7 +263,9 @@ export default function Bibliotheek() {
 
       <Card padding="md">
         <div className="space-y-3">
-          <SearchField value={zoek} onChange={setZoek} placeholder="Zoek op naam, code of standaard…" />
+          <div data-rondleiding="bibliotheek-zoek">
+            <SearchField value={zoek} onChange={setZoek} placeholder="Zoek op naam, code of standaard…" />
+          </div>
           <FilterRij label="Toon">
             <span data-rondleiding="bibliotheek-filter" className="contents">
               {(editable
@@ -347,8 +379,9 @@ export default function Bibliotheek() {
                     <span className={k.ink}>{code}</span>
                     <span>{std?.naam ?? ''}</span>
                     {std?.kern && (
-                      <span title="Vaste standaard" className="text-ink-subtle">
-                        <KeyRound className="h-3.5 w-3.5" aria-label="vaste standaard" />
+                      <span className="inline-flex items-center gap-1 text-xs font-medium text-ink-muted">
+                        <KeyRound className="h-3.5 w-3.5 text-ink-subtle" aria-hidden />
+                        <Begrip term="vaste-standaard" />
                       </span>
                     )}
                   </h2>
@@ -386,10 +419,6 @@ export default function Bibliotheek() {
           scopeLabel={scopeLabel}
         />
       )}
-
-      <Dock>
-        <OngedaanMelding {...ongedaan} />
-      </Dock>
     </div>
   );
 }

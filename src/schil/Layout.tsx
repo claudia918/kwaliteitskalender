@@ -7,6 +7,9 @@ import { Foutgrens } from './Foutgrens';
 import { Lade, Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 import { ZoekProvider } from './Zoekvenster';
+import { OefenBand, RondleidingAanbod, RondleidingKeuze } from './rondleiding/Aanbod';
+import { AfsluitingVenster } from './rondleiding/Afsluiting';
+import { Spotlight } from './rondleiding/Spotlight';
 
 /** Topbar (met weergavekeuze en zoeken), zijbalk (of lade), pagina-inhoud (max 1440px) en footer. */
 export function Layout() {
@@ -23,6 +26,7 @@ export function Layout() {
       >
         Naar de inhoud
       </a>
+      <OefenBand />
       <Topbar onMenu={() => setLade(true)} />
       <Lade open={lade} onSluit={sluit} />
       <div className="flex flex-1">
@@ -37,6 +41,10 @@ export function Layout() {
         </main>
       </div>
       <ConflictDialoog />
+      <Spotlight />
+      <RondleidingAanbod />
+      <RondleidingKeuze />
+      <AfsluitingVenster />
     </div>
     </ZoekProvider>
   );

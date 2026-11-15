@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Check, CircleHelp, FolderSync, HardDrive, LogOut, Menu, RefreshCw, TriangleAlert } from 'lucide-react';
+import { Check, CircleHelp, FolderSync, GraduationCap, HardDrive, LogOut, Menu, PlayCircle, RefreshCw, TriangleAlert } from 'lucide-react';
 import { AppLogo, Badge, Button, ButtonLink, Dialog, IconButton, cx } from '../componenten';
 import { helpVoorPad } from '../domein/inhoud';
 import { formatTijdstip } from '../domein/hulp';
 import { useStore } from '../store';
 import { useSync } from '../sync/SyncProvider';
 import { WeergaveKiezer } from './WeergaveKiezer';
+import { useOefenen, useRondleiding } from './rondleiding/RondleidingProvider';
+import { EERSTE_RONDLEIDING, tourVoorPad, vindTour } from './rondleiding/tours';
 import { SNELTOETS, ZoekKnop } from './Zoekvenster';
 
 /** "Opgeslagen" verschijnt 1,6 s na elke wijziging. */
@@ -23,7 +25,7 @@ function OpgeslagenIndicator() {
     return (
       <span
         className="hidden items-center gap-1 text-xs font-semibold text-status-danger md:inline-flex"
-        title="De browser weigert op te slaan (privévenster of opslag vol). Maak een back-up via Export."
+        title="De browser weigert op te slaan (privévenster of opslag vol). Maak een back-up via Dossier en export."
       >
         <TriangleAlert className="h-3.5 w-3.5" aria-hidden />
         Niet opgeslagen
@@ -95,6 +97,7 @@ export function SyncStatus({ compact }: { compact?: boolean }) {
       type="button"
       onClick={actie}
       title={uitleg}
+      data-rondleiding="delen"
       className={cx(
         'inline-flex h-9 min-w-0 max-w-[15rem] items-center gap-2 rounded-md border border-transparent px-2 text-left transition-colors duration-fast hover:border-line-subtle hover:bg-surface-hover',
         toon,
@@ -160,15 +163,23 @@ export function DemoVerlatenKnop({ volledig }: { volledig?: boolean } = {}) {
 export function HelpKnop() {
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
+  const r = useRondleiding();
   const help = helpVoorPad(pathname);
+  const tour = tourVoorPad(pathname);
+  const l = r.voortgang.lopend;
+  const lopendeTour = l ? vindTour(l.tour) : undefined;
+  const start = (fn: () => void) => () => {
+    setOpen(false);
+    fn();
+  };
   return (
     <>
-      <IconButton icon={CircleHelp} label="Uitleg bij dit scherm" onClick={() => setOpen(true)} />
+      <IconButton icon={CircleHelp} label="Hulp bij dit scherm" onClick={() => setOpen(true)} data-rondleiding="hulp" />
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
         width="sm"
-        title={`Uitleg: ${help.titel}`}
+        title={`Hulp: ${help.titel}`}
         footer={
           <>
             <ButtonLink to="/begrippen" variant="ghost" size="sm" className="mr-auto" onClick={() => setOpen(false)}>
@@ -180,10 +191,28 @@ export function HelpKnop() {
           </>
         }
       >
+        <div className="mb-4 grid gap-2">
+          {l && lopendeTour && !r.oefenen && (
+            <Button variant="primary" icon={PlayCircle} onClick={start(r.hervat)} className="justify-start">
+              Verder met de rondleiding (stap {l.stap + 1} van {lopendeTour.stappen.length})
+            </Button>
+          )}
+          {tour && (
+            <Button variant={l && !r.oefenen ? 'secondary' : 'primary'} icon={GraduationCap} onClick={start(() => r.start(tour.id))} className="justify-start">
+              Laat zien hoe dit scherm werkt
+            </Button>
+          )}
+          <Button variant="secondary" icon={PlayCircle} onClick={start(() => r.start(EERSTE_RONDLEIDING.id))} className="justify-start">
+            {r.voortgang.eersteAf ? 'De rondleiding opnieuw' : 'De rondleiding'} ({EERSTE_RONDLEIDING.duur})
+          </Button>
+        </div>
         <p className="text-sm leading-relaxed text-ink-body">{help.tekst}</p>
         <p className="mt-4 text-xs text-ink-muted">
           Iets zoeken? Druk op <kbd className="font-semibold text-ink-body">{SNELTOETS}</kbd> of gebruik de zoekknop bovenin.
-          Woorden met een stippellijn kun je aanwijzen of aantikken voor uitleg.
+          Woorden met een stippellijn kun je aanwijzen of aantikken voor uitleg.{' '}
+          <button type="button" className="font-semibold text-niveau-strong underline" onClick={start(r.openKeuze)}>
+            Alle rondleidingen
+          </button>
         </p>
       </Dialog>
     </>
@@ -192,11 +221,13 @@ export function HelpKnop() {
 
 export function Topbar({ onMenu }: { onMenu: () => void }) {
   const { state } = useStore();
-  const isDemo = state.modus === 'demo';
+  const oefenen = useOefenen();
+  // Op de oefenkalender geen demo-knoppen: de gele band zegt al dat je oefent.
+  const isDemo = state.modus === 'demo' && !oefenen;
   return (
     <header className="no-print sticky top-0 z-40 border-t-[3px] border-niveau bg-surface-card">
       <div className="flex h-14 items-center gap-2 border-b border-line-subtle pl-2 pr-3 sm:gap-3 md:pl-0 md:pr-4">
-        <IconButton icon={Menu} label="Menu openen" onClick={onMenu} className="shrink-0 md:hidden" />
+        <IconButton icon={Menu} label="Menu openen" onClick={onMenu} className="shrink-0 md:hidden" data-rondleiding="menu-knop" />
         <div className="hidden shrink-0 items-center gap-2 md:flex md:w-sidebar md:px-4">
           <Link to="/" aria-label="Kwaliteitskalender, naar start" className="rounded-md">
             <AppLogo />
@@ -211,7 +242,7 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
               </Badge>
             </span>
           )}
-          {!isDemo && (
+          {!isDemo && !oefenen && (
             <span className="hidden xl:inline-flex">
               <Badge tone="neutral" size="sm" title="Alle gegevens blijven op je eigen computer">
                 Lokaal

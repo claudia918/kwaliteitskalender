@@ -6,7 +6,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CalendarCheck, CircleCheck, CircleDashed } from 'lucide-react';
-import { EmptyState, SegmentedControl, StatusBadge, STATUS_STIJL, cx, useToast } from '../../componenten';
+import { EmptyState, SegmentedControl, StatusBadge, STATUS_STIJL, cx, useOngedaan } from '../../componenten';
 import { itemsVoorGesprek, type KomendGesprek } from '../../domein/berekeningen';
 import { activiteitVan, effectieveNaam, formatDatumKort, vindGesprek } from '../../domein/hulp';
 import { itemsInMaand, maandVan, maandVoluit, werklijstVolgorde } from '../../domein/thuis';
@@ -16,7 +16,7 @@ import { useScope, useStore, useVoorkeur } from '../../store';
 const MAX = 8;
 
 export function Werklijst({ komend }: { komend: KomendGesprek | null }) {
-  const { state, niveau, setItemStatus } = useStore();
+  const { state, niveau, setItemStatus, herstelItem } = useStore();
   const { scope, editScope } = useScope();
   // Cluster: bij elke regel de school, want dezelfde activiteit staat bij meerdere scholen.
   const schoolVan = useMemo(() => {
@@ -25,7 +25,7 @@ export function Werklijst({ komend }: { komend: KomendGesprek | null }) {
     for (const s of state.organisatie.scholen) for (const i of state.schoolKalenders[s.id] ?? []) m.set(i.uid, s.naam);
     return m;
   }, [state, niveau]);
-  const toast = useToast();
+  const ongedaan = useOngedaan();
   const maand = maandVan();
   const maandNaam = maandVoluit(maand);
 
@@ -47,7 +47,7 @@ export function Werklijst({ komend }: { komend: KomendGesprek | null }) {
     if (!editScope) return;
     const nieuw = item.status === status ? 'gepland' : status;
     setItemStatus(editScope, item.uid, nieuw);
-    toast(`${effectieveNaam(item)}: ${STATUS_STIJL[nieuw].label.toLowerCase()}`, nieuw === 'gereed' ? 'success' : 'info');
+    ongedaan.toon(`${effectieveNaam(item)}: ${STATUS_STIJL[nieuw].label.toLowerCase()}`, () => herstelItem(editScope, item));
   };
 
   const opties = [

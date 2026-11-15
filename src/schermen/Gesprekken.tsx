@@ -68,7 +68,7 @@ function GesprekInfo({ gesprek, toonBestuursinput, schooljaar }: { gesprek: Gesp
   const inhoud = GESPREKKEN_INHOUD.find((g) => g.key === gesprek.id);
   const deadline = deadlineVanGesprek(gesprek, startjaar(schooljaar, new Date().getFullYear()));
   return (
-    <Card className={cx('lg:col-span-1', k.border)} padding="lg">
+    <Card className={cx('lg:col-span-1', k.border)} padding="lg" rondleiding="gesprek-info">
       <div className="flex items-start gap-3">
         <span className={cx('grid h-10 w-10 shrink-0 place-items-center rounded-md border', k.surface, k.border)}>
           <Icoon className={cx('h-5 w-5', k.ink)} aria-hidden />
@@ -135,7 +135,7 @@ function Voorbereiding({ titel, items, gesprekId }: { titel: string; items: Kale
   const lijst = sorteerOpNaam(itemsVoorGesprek(items, gesprekId));
   const v = voortgang(lijst);
   return (
-    <Card padding="lg">
+    <Card padding="lg" rondleiding="gesprek-voorbereiding">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h2 className="text-h3 text-ink-strong">{titel}</h2>
         {lijst.length > 0 && (
@@ -212,7 +212,7 @@ function StatusPerSchool({ gesprek, schoolIds }: { gesprek: Gesprek; schoolIds: 
   const { state } = useStore();
   const standaarden = GESPREKKEN_INHOUD.find((g) => g.key === gesprek.id)?.standaarden ?? [];
   return (
-    <Card padding="lg">
+    <Card padding="lg" rondleiding="gesprek-scholen">
       <h2 className="text-h3 text-ink-strong">Status per school</h2>
       <p className="mt-0.5 text-sm text-ink-muted">
         {standaarden.length > 0
@@ -331,7 +331,7 @@ export default function Gesprekken() {
         }
       />
 
-      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Gesprek">
+      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Gesprek" data-rondleiding="gesprek-keuze">
         {cyclus.map((g) => {
           const k = seizoenKlassen(g.kleur);
           const Icoon = gesprekIcoon(g.icoon);

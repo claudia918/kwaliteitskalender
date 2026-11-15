@@ -41,8 +41,16 @@ export const HELPTEKSTEN: Record<string, { titel: string; tekst: string }> = {
     tekst:
       'Per seizoensgesprek zie je wat er klaar moet zijn: de vereiste input, de standaarden en de activiteiten met hun status. Bekijk je het bestuur of een cluster, dan zie je ook de stand per school.',
   },
-  '/bibliotheek': { ...SEED.helpteksten_per_scherm['/bibliotheek'] },
-  '/kalender': { ...SEED.helpteksten_per_scherm['/kalender'] },
+  '/bibliotheek': {
+    titel: 'Bibliotheek',
+    tekst:
+      'Alle activiteiten die je op de kalender kunt zetten, per standaard. Bovenaan zie je wat er al op staat en welke verplichte activiteiten nog ontbreken. Zoek en filter op gesprek en kwaliteitsgebied, en zet een activiteit met Toevoegen op de kalender. Staat iets er niet bij, maak dan een eigen activiteit.',
+  },
+  '/kalender': {
+    titel: 'Kalender',
+    tekst:
+      'Elke rij is een standaard, elke kolom een maand. Sleep een activiteit naar een andere maand, of klik haar aan en kies een maand of status in de balk onderaan. Met de plus in een cel voeg je daar iets toe. Klik twee keer (of op Details) voor alles over de activiteit. Alles wat je doet, kun je meteen ongedaan maken.',
+  },
   '/compliance': {
     titel: 'Dekking standaarden',
     tekst:
@@ -89,7 +97,7 @@ export function helpVoorPad(pad: string): { titel: string; tekst: string } {
 /* ------------------------------------------------------------------ */
 
 export const WELKOM_BOUWSTENEN: { icon: string; titel: string; tekst: string }[] = [
-  { icon: 'Users', titel: 'Drie niveaus', tekst: 'Bestuur, cluster en school, met doorlopende aggregatie naar boven.' },
+  { icon: 'Users', titel: 'Drie niveaus', tekst: 'Bestuur, cluster en school. Wat scholen doen, telt vanzelf mee bij cluster en bestuur.' },
   { icon: 'Calendar', titel: 'Seizoensgesprekken', tekst: 'Herfst, Winter, Lente en Zomer geven het ritme door het schooljaar.' },
   {
     icon: 'GitBranch',
@@ -119,6 +127,19 @@ const origineel = (titel: string) => SEED.faq.find((c) => c.titel === titel)?.vr
 const vraag = (titel: string, v: string) => origineel(titel).find((q) => q.v === v)!;
 
 export const FAQ: FaqCategorie[] = [
+  {
+    titel: 'Aan de slag',
+    vragen: [
+      {
+        v: 'Hoe start ik de rondleiding opnieuw?',
+        a: 'Klik bovenin op het vraagteken en kies De rondleiding opnieuw, of Laat zien hoe dit scherm werkt voor een korte rondleiding door het scherm waar je bent. Je vindt alle rondleidingen ook in het menu onder Hulp, bij Rondleiding, en via zoeken (typ rondleiding). Heb je er een onderbroken, dan ga je op dezelfde plekken verder waar je was.',
+      },
+      {
+        v: 'Verandert de rondleiding mijn kalender?',
+        a: 'Nee. Tijdens een rondleiding werk je op een oefenkalender met voorbeeldgegevens; de gele band bovenin laat zien dat je oefent. Er wordt dan niets opgeslagen in je eigen kalender en er wordt niet gesynchroniseerd met het gedeelde kalenderbestand. Stop je of ben je klaar, dan sta je weer waar je was, met je eigen gegevens precies zoals ze waren.',
+      },
+    ],
+  },
   {
     titel: 'Gegevens en samenwerken',
     vragen: [
@@ -170,7 +191,10 @@ export const FAQ: FaqCategorie[] = [
         v: 'Hoe werk ik een activiteit bij?',
         a: 'Klik in de Kalender een activiteit aan (in de matrix: twee keer) en pas in het venster de status, eigenaar, deadline, notitie of bewijsstukken aan. Wat je bewaart, staat meteen in deze browser en, als je een bestand gekoppeld hebt, even later ook in het gedeelde kalenderbestand.',
       },
-      vraag('Voor scholen', 'Hoe verplaats ik een activiteit naar een andere maand?'),
+      {
+        v: 'Hoe verplaats ik een activiteit naar een andere maand?',
+        a: 'Sleep de activiteit in de Kalender naar een andere maand in dezelfde rij. Of klik haar aan en kies onderaan Eerder of Later, of klik een gemarkeerde maand. In de lijst en in het detailvenster kies je de maand in het veld Maand. Vergist? Klik op Ongedaan maken in de melding onderaan, of druk Ctrl+Z.',
+      },
       {
         v: 'Wat betekent "bewijs" bij een activiteit?',
         a: 'Een verwijzing naar het document dat aantoont dat de activiteit is uitgevoerd, bijvoorbeeld een verslag of analyse. Handig richting bestuur en inspectie. Je koppelt een documentnaam en eventueel een link naar je eigen omgeving (SharePoint, Drive); het document zelf wordt niet opgeslagen in de kalender.',
@@ -183,7 +207,7 @@ export const FAQ: FaqCategorie[] = [
     vragen: [
       {
         v: 'Hoe maak ik een gespreksdossier?',
-        a: 'Ga naar Export en kies bij Gespreksdossier de school en het gesprek. Je krijgt een printklaar A4-document met alle activiteiten, statussen, bewijzen en afwijkingen: de voorbereiding voor het gesprek tussen bestuur en school.',
+        a: 'Ga naar Dossier en export en kies bij Gespreksdossier de school en het gesprek. Je krijgt een printklaar A4-document met alle activiteiten, statussen, bewijzen en afwijkingen: de voorbereiding voor het gesprek tussen bestuur en school.',
       },
       {
         v: 'Mag ik leerling- of persoonsgegevens in de kalender zetten?',
@@ -191,11 +215,11 @@ export const FAQ: FaqCategorie[] = [
       },
       {
         v: 'Kan ik een back-up maken?',
-        a: 'Ja, via Export en dan Back-up (JSON) download je alle gegevens in één leesbaar bestand. Datzelfde bestand kun je ook weer importeren. Back-ups uit de vorige (online) versie van de Kwaliteitskalender kun je ook importeren.',
+        a: 'Ja, via Dossier en export en dan Back-up (JSON) download je alle gegevens in één leesbaar bestand. Datzelfde bestand kun je ook weer importeren. Back-ups uit de vorige (online) versie van de Kwaliteitskalender kun je ook importeren.',
       },
       {
         v: 'Wat is het verschil tussen een back-up en het gedeelde kalenderbestand?',
-        a: 'Een back-up is een momentopname voor jezelf: hij verandert niet meer, en importeren vervangt alles wat in de kalender staat. Het gedeelde kalenderbestand is het bestand waarin je met collega’s samenwerkt: het wordt steeds bijgewerkt en wijzigingen worden samengevoegd. Een back-up maak je bij Export, het gedeelde bestand beheer je bij Gegevens & delen.',
+        a: 'Een back-up is een momentopname voor jezelf: hij verandert niet meer, en importeren vervangt alles wat in de kalender staat. Het gedeelde kalenderbestand is het bestand waarin je met collega’s samenwerkt: het wordt steeds bijgewerkt en wijzigingen worden samengevoegd. Een back-up maak je bij Dossier en export, het gedeelde bestand beheer je bij Gegevens & delen.',
       },
       {
         v: 'Wat staat er in het gedeelde kalenderbestand en wie kan het lezen?',
