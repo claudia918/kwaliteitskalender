@@ -24,6 +24,7 @@ import { BESTAND_EXTENSIE } from '../domein/state';
 import { useStore } from '../store';
 import { kiesBestandHandmatig } from '../sync/bestandstoegang';
 import { useSync } from '../sync/SyncProvider';
+import { useOefenen } from './rondleiding/RondleidingProvider';
 import { useBestandKeuze } from './BestandKeuze';
 
 function Stap({ nummer, titel, children }: { nummer: number; titel: string; children: ReactNode }) {
@@ -148,7 +149,9 @@ export default function GegevensDelen() {
   const sync = useSync();
   const { state } = useStore();
   const [vraag, keuzeDialoog] = useBestandKeuze();
-  const isDemo = state.modus === 'demo';
+  const oefenen = useOefenen();
+  // Op de oefenkalender wordt koppelen nagespeeld; daar mag het dus, ook al zijn het voorbeeldgegevens.
+  const isDemo = state.modus === 'demo' && !oefenen;
   const gekoppeld = sync.status === 'gekoppeld' || sync.status === 'toestemming-nodig';
 
   const openHandmatig = async () => {

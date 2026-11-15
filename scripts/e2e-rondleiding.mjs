@@ -90,7 +90,7 @@ async function foto(page, naam) {
 
 /** Wacht tot de kaart een bepaalde stap toont. */
 let foutTeller = 0;
-async function wachtOpStap(page, n, totaal = 8) {
+async function wachtOpStap(page, n, totaal = 11) {
   try {
     await page.waitForFunction(
       ([n, t]) => document.querySelector('[data-rondleiding-kaart] .tnum')?.textContent?.includes(`stap ${n} van ${t}`),
@@ -104,6 +104,9 @@ async function wachtOpStap(page, n, totaal = 8) {
   }
   await wacht(page, 250);
 }
+
+/** Aantal stappen van de eerste rondleiding. */
+const LAATSTE = 11;
 
 /** De handeling van elke stap, met de muis. */
 async function doeStap(page, n, breed) {
@@ -156,26 +159,45 @@ async function doeStap(page, n, breed) {
       if (!breed) await page.click('[data-rondleiding="menu-knop"]');
       await page.locator('[data-rondleiding="delen"]').locator('visible=true').first().click();
       break;
+    case 9:
+      // kijkstap: waar staat je kalender
+      await page.click(`${KAART} button:has-text("Volgende")`);
+      break;
+    case 10:
+      await page.locator('button:has-text("Nieuw gedeeld bestand maken")').locator('visible=true').first().click();
+      break;
+    case 11:
+      await page.locator('[data-rondleiding="gegevens-alleen-bestand"] button:has-text("Alleen in het kalenderbestand bewaren")').click();
+      break;
   }
 }
 
 /** Hele eerste rondleiding met de muis; screenshot en controle per stap. */
 async function looprondleiding(page, tag, breed, { vanaf = 1 } = {}) {
-  for (let n = vanaf; n <= 8; n++) {
+  for (let n = vanaf; n <= LAATSTE; n++) {
     await wachtOpStap(page, n);
+    // Op Gegevens & delen schuift de pagina naar het onderdeel; meet pas als dat klaar is.
+    if (n >= 9) await wacht(page, 700);
     const o = await overlap(page);
     if (n !== 4 || o.ring) ok(`${tag} stap ${n}: kaart naast het onderdeel, binnen beeld`, o.ring && o.overlap === 0 && o.binnen, JSON.stringify(o));
     await foto(page, `${tag}-${String(n).padStart(2, '0')}-${(await kaartTitel(page)).toLowerCase().replace(/[^a-z]+/g, '-')}`);
     await doeStap(page, n, breed);
-    if (n < 8) {
-      await page.waitForSelector(`${KAART} :text("Gelukt"), ${KAART} .kk-vinkje`, { timeout: 5000 }).catch(() => {});
+    if (n === 10) {
+      ok(`${tag} oefenbestand: status toont de gekoppelde naam`, (await page.textContent('main')).includes('Gekoppeld aan oefenkalender.kwaliteitskalender.json'));
+    }
+    if (n === 11) {
+      await page.waitForSelector('text=Dit staat aan in deze browser', { timeout: 4000 }).then(() => ok(`${tag} alleen in het bestand: het scherm laat zien dat het aan staat`, true)).catch(() => ok(`${tag} alleen in het bestand: het scherm laat zien dat het aan staat`, false));
+      await foto(page, `${tag}-11b-alleen-in-bestand`);
+    }
+    if (n < LAATSTE) {
+      if (n !== 9) await page.waitForSelector(`${KAART} :text("Gelukt"), ${KAART} .kk-vinkje`, { timeout: 5000 }).catch(() => {});
       if (n === 1) await foto(page, `${tag}-01b-gelukt`);
       await wachtOpStap(page, n + 1);
       ok(`${tag} stap ${n} gaat verder na de handeling`, true);
     }
   }
   await page.waitForSelector('text=Dit is jouw schooljaar.', { timeout: 8000 });
-  ok(`${tag} stap 8 gaat door naar de afsluiting`, true);
+  ok(`${tag} stap ${LAATSTE} gaat door naar de afsluiting`, true);
 }
 
 try {
@@ -200,7 +222,7 @@ try {
 
     // Oproepen vanuit de helpknop
     await page.click('[data-rondleiding="hulp"]');
-    await page.click('[role=dialog] >> text=De rondleiding (3 minuten)');
+    await page.click('[role=dialog] >> text=De rondleiding (4 minuten)');
     await wachtOpStap(page, 1);
     ok('helpknop start de rondleiding', true);
     ok('oefenen: gele band zichtbaar', await page.isVisible('text=Oefenkalender.'));
@@ -303,9 +325,10 @@ try {
     await page.click(`${KAART} button:has-text("Vorige")`);
     await wachtOpStap(page, 3);
     ok('vorige: terug naar stap 3', true);
-    for (let n = 3; n <= 8; n++) {
+    for (let n = 3; n <= LAATSTE; n++) {
       await wachtOpStap(page, n);
-      await page.click(`${KAART} button:has-text("Sla over")`);
+      // stap 9 is een kijkstap: daar heet de knop Volgende
+      await page.click(`${KAART} button:has-text("Sla over"), ${KAART} button:has-text("Volgende")`);
     }
     await page.waitForSelector('text=Dit is jouw schooljaar.');
     ok('overslaan tot het eind: afsluiting', true);
@@ -328,7 +351,7 @@ try {
     await page.evaluate(() => sessionStorage.clear());
     await page.reload();
     await page.waitForSelector('[data-rondleiding-aanbod]');
-    ok('nieuw bezoek na onderbreken: "Verder met de rondleiding?"', (await page.textContent('[data-rondleiding-aanbod]')).includes('stap 2 van 8'));
+    ok('nieuw bezoek na onderbreken: "Verder met de rondleiding?"', (await page.textContent('[data-rondleiding-aanbod]')).includes(`stap 2 van ${LAATSTE}`));
     await page.click('[data-rondleiding-aanbod] button:has-text("Verder")');
     await wachtOpStap(page, 2);
     ok('verder: bij stap 2', true);
@@ -398,14 +421,22 @@ try {
     await wachtOpStap(page, 6);
     await foto(page, 'desktop-14-oefenen-geen-bestand');
     ok('oefenen: sync-status toont geen gekoppeld bestand', (await page.textContent('[data-rondleiding="delen"]')).includes('Alleen op dit apparaat'));
-    for (let n = 6; n <= 8; n++) {
+    // Stap 6 tot en met 9 overslaan (stap 8, delen, is al gedaan: je staat op Gegevens & delen).
+    for (let n = 6; n <= 9; n++) {
       await wachtOpStap(page, n);
-      // stap 8 (delen) is al gedaan: je staat op Gegevens & delen
-      await page.click(`${KAART} button:has-text("Sla over"), ${KAART} button:has-text("Afronden")`);
+      await page.click(`${KAART} button:has-text("Sla over"), ${KAART} button:has-text("Volgende"), ${KAART} button:has-text("Verder")`);
     }
-    await page.waitForSelector('text=Dit is jouw schooljaar.');
+    // Stap 10 en 11 echt doen: het oefenbestand koppelen en "alleen in het kalenderbestand" aanzetten.
+    // Het echte gekoppelde bestand en de echte instelling mogen daar niets van merken.
+    for (let n = 10; n <= LAATSTE; n++) {
+      await wachtOpStap(page, n);
+      await doeStap(page, n, true);
+    }
+    await page.waitForSelector('text=Dit is jouw schooljaar.', { timeout: 8000 });
     await page.click('text=Aan de slag');
     await wacht(page, 2500);
+    ok('oefenen met "alleen in het bestand": de echte instelling staat niet aan', (await page.evaluate(() => localStorage.getItem('kwaliteitskalender:alleen-bestand:v1'))) === null);
+    ok('oefenen met "alleen in het bestand": de echte kalender staat nog in de browser', !!(await page.evaluate(() => localStorage.getItem('kwaliteitskalender:state:v5'))));
     const bestandNa = await page.evaluate(() => window.__bestand.tekst);
     ok('kalenderbestand: byte voor byte gelijk na afloop', bestandNa === bestandVoor, `${bestandVoor.length} vs ${bestandNa.length}`);
     ok('kalenderbestand: niet herschreven', (await page.evaluate(() => window.__schrijfteller)) === schrijfVoor);
@@ -505,7 +536,27 @@ try {
     ok('toetsenbord: naar stap 8', true);
     await naarOnderdeel();
     await page.keyboard.press('Enter');
-    await page.waitForSelector('text=Dit is jouw schooljaar.');
+    await wachtOpStap(page, 9);
+    ok('toetsenbord: naar stap 9', true);
+    // 9 kijkstap: Volgende op de kaart
+    await page.focus(`${KAART} h2`);
+    await tab(async () => (await actiefTekst(page)) === 'Volgende', 8);
+    await page.keyboard.press('Enter');
+    await wachtOpStap(page, 10);
+    ok('toetsenbord: naar stap 10', true);
+    // 10 oefenbestand koppelen
+    await naarOnderdeel();
+    // de focus moet echt op de knop staan (niet op de pagina, waarvan de tekst de knoptekst ook bevat)
+    const opKnop = (tekst) => page.evaluate((t) => document.activeElement?.tagName === 'BUTTON' && document.activeElement.textContent.includes(t), tekst);
+    ok('toetsenbord: knop "Nieuw gedeeld bestand maken" bereikbaar', await tab(() => opKnop('Nieuw gedeeld bestand maken')));
+    await page.keyboard.press('Enter');
+    await wachtOpStap(page, 11);
+    ok('toetsenbord: naar stap 11', true);
+    // 11 alleen in het kalenderbestand
+    await naarOnderdeel();
+    ok('toetsenbord: knop "Alleen in het kalenderbestand bewaren" bereikbaar', await tab(() => opKnop('Alleen in het kalenderbestand bewaren')));
+    await page.keyboard.press('Enter');
+    await page.waitForSelector('text=Dit is jouw schooljaar.', { timeout: 8000 });
     ok('toetsenbord: hele rondleiding zonder muis', true);
     ok('toetsenbord: focus in de afsluiting', (await actiefTekst(page)).includes('Aan de slag'));
     await foto(page, 'toetsenbord-afsluiting');

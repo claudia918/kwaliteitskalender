@@ -73,7 +73,7 @@ export default function Welkom({ onStartWizard }: WelkomProps) {
         <p className="mt-3 flex items-start gap-2 text-sm text-ink-muted">
           <GraduationCap className="mt-0.5 h-4 w-4 shrink-0 text-ink-muted" aria-hidden />
           <span>
-            Daarna kun je drie minuten oefenen: een rondleiding op een oefenkalender, waarin je alles één keer zelf doet.
+            Daarna kun je vier minuten oefenen: een rondleiding op een oefenkalender, waarin je alles één keer zelf doet.
           </span>
         </p>
 

@@ -364,8 +364,12 @@ Doel: de app moet aanvoelen als papier en niet als een gegenereerd dashboard. Re
 
 ## 7b. Rondleiding (`src/schil/rondleiding/`)
 
-- **Wat**: de eerste rondleiding (8 stappen: wat bekijk ik, wat moet ik nu doen, plannen, ongedaan maken,
-  toevoegen, zoeken, voorbereiden, delen en privacy) en per scherm een korte (`tours.ts`). Een stap licht het
+- **Wat**: de eerste rondleiding (11 stappen: wat bekijk ik, wat moet ik nu doen, plannen, ongedaan maken,
+  toevoegen, zoeken, voorbereiden, delen en privacy, waar staat je kalender, samen in één bestand, alleen in
+  het bestand). In de laatste twee koppel je een oefenbestand en zet je "alleen in het kalenderbestand" aan:
+  `OefenSyncProvider` speelt dat na in het werkgeheugen en meldt de signalen `oefen-gekoppeld` en
+  `oefen-alleen-bestand`; er wordt geen bestand gelezen of geschreven en de echte instelling blijft ongemoeid.
+  Daarnaast en per scherm een korte (`tours.ts`). Een stap licht het
   echte onderdeel uit (`doel`, `ook`) en gaat verder zodra `klaar(context)` waar is (meting van de oefenkalender,
   pad, signalen); zonder `klaar` is het een kijkstap met Volgende. Sla over en Vorige zijn er altijd.
 - **Oefenen zonder risico** (`RondleidingProvider.tsx`): tijdens een rondleiding rendert `Poort` de routes binnen

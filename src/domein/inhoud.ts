@@ -136,7 +136,7 @@ export const FAQ: FaqCategorie[] = [
       },
       {
         v: 'Verandert de rondleiding mijn kalender?',
-        a: 'Nee. Tijdens een rondleiding werk je op een oefenkalender met voorbeeldgegevens; de gele band bovenin laat zien dat je oefent. Er wordt dan niets opgeslagen in je eigen kalender en er wordt niet gesynchroniseerd met het gedeelde kalenderbestand. Stop je of ben je klaar, dan sta je weer waar je was, met je eigen gegevens precies zoals ze waren.',
+        a: 'Nee. Tijdens een rondleiding werk je op een oefenkalender met voorbeeldgegevens; de gele band bovenin laat zien dat je oefent. Er wordt dan niets opgeslagen in je eigen kalender en er wordt niet gesynchroniseerd met het gedeelde kalenderbestand. Stop je of ben je klaar, dan sta je weer waar je was, met je eigen gegevens precies zoals ze waren. Ook het bestand dat je in de rondleiding koppelt is een oefenbestand: er wordt geen echt bestand gemaakt of gewijzigd.',
       },
     ],
   },

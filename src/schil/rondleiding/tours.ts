@@ -1,5 +1,6 @@
 /**
- * De rondleidingen: de eerste (acht stappen die het werk volgen) en een korte per scherm.
+ * De rondleidingen: de eerste (elf stappen die het werk volgen, waarvan vier over waar je gegevens
+ * staan) en een korte per scherm.
  *
  * Een stap licht het echte onderdeel uit (`doel`: selectors, de eerste die zichtbaar is wint; `ook`:
  * extra uitgelichte onderdelen zoals een open keuzelijst). Met `klaar` gaat de stap verder zodra de
@@ -67,7 +68,7 @@ export const EERSTE_RIJ = '[data-rondleiding="eerste-rij"]';
 export const EERSTE_RONDLEIDING: Tour = {
   id: 'eerste',
   titel: 'De rondleiding',
-  duur: '3 minuten',
+  duur: '4 minuten',
   stappen: [
     {
       id: 'weergave',
@@ -155,11 +156,39 @@ export const EERSTE_RONDLEIDING: Tour = {
     {
       id: 'delen',
       titel: 'Delen en privacy',
-      wat: 'Je kalender staat alleen in deze browser, tot je een gedeeld kalenderbestand koppelt. Er gaat niets via internet.',
-      doe: 'Kijk hier waar je gegevens staan.',
-      gelukt: 'Jij bepaalt waar je kalender staat.',
+      wat: 'Er is geen server en geen account. Jij bepaalt waar je kalender staat, en dat zie je hier altijd.',
+      doe: 'Open Gegevens & delen.',
+      gelukt: 'Hier regel je waar de kalender staat en met wie je hem deelt.',
       doel: (breed) => (breed ? ['[data-rondleiding="delen"]'] : lade('delen')),
       klaar: (c) => c.pad === '/gegevens',
+    },
+    {
+      id: 'waar',
+      titel: 'Waar staat je kalender',
+      wat: 'Standaard op één plek: in deze browser, op deze computer. Een collega ziet hem dan niet.',
+      doel: ['[data-rondleiding="gegevens-waar"]'],
+      pad: '/gegevens',
+    },
+    {
+      id: 'koppelen',
+      titel: 'Samen in één bestand',
+      wat: 'Samenwerken gaat via één kalenderbestand in een gedeelde map, bijvoorbeeld in Teams. Iedereen koppelt hetzelfde bestand.',
+      doe: 'Klik op Nieuw gedeeld bestand maken. Hier is het een oefenbestand; straks kies je zelf de map.',
+      gelukt: 'Gekoppeld. Elke wijziging gaat nu ook naar het bestand, en die van collega’s komen binnen.',
+      doel: ['[data-rondleiding="gegevens-samenwerken"]'],
+      pad: '/gegevens',
+      klaar: (c) => (c.signalen['oefen-gekoppeld'] ?? 0) > 0,
+    },
+    {
+      id: 'alleen-bestand',
+      titel: 'Alleen in het bestand',
+      wat: 'Ook met een bestand houdt de browser een werkkopie. Wil je de kalender alleen in jullie eigen omgeving? Zet dat hier aan.',
+      doe: 'Klik op Alleen in het kalenderbestand bewaren.',
+      zonderDoel: 'Koppel eerst het oefenbestand bij Samenwerken met collega’s. Daarna kun je dit aanzetten.',
+      gelukt: 'De browser bevat nu geen kalender meer. Bij elke start open je het bestand; zonder bestand wordt er niets bewaard.',
+      doel: ['[data-rondleiding="gegevens-alleen-bestand"]'],
+      pad: '/gegevens',
+      klaar: (c) => (c.signalen['oefen-alleen-bestand'] ?? 0) > 0,
     },
   ],
 };
@@ -279,7 +308,8 @@ const SCHERMEN: Tour[] = [
     duur: '1 minuut',
     stappen: [
       kijk('waar', 'Waar staan je gegevens', 'In deze browser, en als je dat wilt in één gedeeld kalenderbestand. Nergens anders.', ['[data-rondleiding="gegevens-waar"]']),
-      kijk('samen', 'Samenwerken', 'Koppel één kalenderbestand in een gedeelde map; collega’s koppelen hetzelfde bestand.', ['[data-rondleiding="gegevens-samenwerken"]']),
+      kijk('samen', 'Samenwerken', 'Koppel één kalenderbestand in een gedeelde map, bijvoorbeeld in Teams of OneDrive; collega’s koppelen hetzelfde bestand.', ['[data-rondleiding="gegevens-samenwerken"]']),
+      kijk('alleen', 'Alleen in het bestand', 'Standaard houdt de browser een werkkopie. Hier kies je dat de kalender alleen in het kalenderbestand staat.', ['[data-rondleiding="gegevens-alleen-bestand"]']),
       kijk('privacy', 'Privacy', 'Zet geen leerling- of persoonsgegevens in de kalender. Gebruik rollen en verwijs naar documenten.', ['[data-rondleiding="gegevens-privacy"]']),
     ],
   },

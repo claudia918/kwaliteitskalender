@@ -2,7 +2,7 @@
  * Signalen voor de rondleiding: kleine gebeurtenissen die je niet aan de gegevens kunt zien,
  * zoals "ongedaan gemaakt" of "zoekresultaat gekozen". Alleen binnen deze pagina (window-event).
  */
-export type Signaal = 'ongedaan' | 'zoek-gekozen' | 'zoek-open';
+export type Signaal = 'ongedaan' | 'zoek-gekozen' | 'zoek-open' | 'oefen-gekoppeld' | 'oefen-alleen-bestand';
 
 const EVENT = 'kk-rondleiding';
 

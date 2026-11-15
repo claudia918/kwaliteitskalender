@@ -10,6 +10,7 @@
  * Andere browsers: handmatig openen, opslaan als bestand en samenvoegen met een bestand.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { meldSignaal } from '../componenten/signaal';
 import { useToast } from '../componenten/Toast';
 import {
   maakBasis,
@@ -719,39 +720,65 @@ export function SyncProvider({ children, gepauzeerd = false }: { children: React
   return <SyncContext.Provider value={waarde}>{children}</SyncContext.Provider>;
 }
 
+/** Naam van het oefenbestand in de rondleiding. Het bestaat niet: er wordt niets gelezen of geschreven. */
+export const OEFENBESTAND = 'oefenkalender.kwaliteitskalender.json';
+
 /**
- * Synchronisatie op de oefenkalender: er is geen bestand, en koppelen of opslaan kan niet. Zo kan
- * oefenen nooit het gedeelde kalenderbestand raken.
+ * Synchronisatie op de oefenkalender. Er is geen bestand: koppelen en "alleen in het kalenderbestand
+ * bewaren" worden nagespeeld in het werkgeheugen, zodat je in de rondleiding de handeling zelf kunt
+ * doen. Er wordt niets gelezen of geschreven, dus oefenen kan nooit een echt kalenderbestand raken.
  */
 export function OefenSyncProvider({ children }: { children: ReactNode }) {
   const toast = useToast();
+  const [gekoppeld, setGekoppeld] = useState(false);
+  const [alleenInBestand, setAlleenInBestand] = useState(false);
+  const [laatsteSync, setLaatsteSync] = useState<number | null>(null);
   const waarde = useMemo<SyncInfo>(() => {
     const nee = async () => {
-      toast('Tijdens het oefenen koppel je geen bestand. Dat doe je straks in je eigen kalender.', 'info', 4000);
+      toast('Dit onderdeel oefen je niet. Het werkt straks in je eigen kalender.', 'info', 4000);
       return false;
     };
+    const koppel = async () => {
+      setGekoppeld(true);
+      setLaatsteSync(Date.now());
+      meldSignaal('oefen-gekoppeld');
+      toast('Oefenbestand gekoppeld. In je eigen kalender kies je hier de map en het bestand.', 'success', 4500);
+      return true;
+    };
     return {
-      ondersteund: ondersteuntKoppelen(),
-      status: 'geen',
-      bestandsnaam: null,
-      laatsteSync: null,
+      ondersteund: true,
+      status: gekoppeld ? 'gekoppeld' : 'geen',
+      bestandsnaam: gekoppeld ? OEFENBESTAND : null,
+      laatsteSync,
       bezig: false,
       fout: null,
       conflicten: [],
-      alleenInBestand: false,
+      alleenInBestand,
       bestandGeladen: true,
       onopgeslagen: false,
-      zetAlleenInBestand: nee,
-      koppelBestaand: nee,
-      maakGedeeldBestand: nee,
+      zetAlleenInBestand: async (aan: boolean) => {
+        if (aan && !gekoppeld) {
+          toast('Koppel eerst een kalenderbestand. Dan kan de kalender daar alleen in bewaard worden.', 'warning', 4500);
+          return false;
+        }
+        setAlleenInBestand(aan);
+        if (aan) meldSignaal('oefen-alleen-bestand');
+        toast(aan ? 'De oefenkalender staat nu alleen in het oefenbestand.' : 'De oefenkalender wordt weer in de browser bewaard.', 'success', 3500);
+        return true;
+      },
+      koppelBestaand: koppel,
+      maakGedeeldBestand: koppel,
       herstelToestemming: nee,
-      synchroniseerNu: async () => undefined,
-      ontkoppel: async () => undefined,
+      synchroniseerNu: async () => setLaatsteSync(Date.now()),
+      ontkoppel: async () => {
+        setGekoppeld(false);
+        setLaatsteSync(null);
+      },
       openBestand: nee,
       samenvoegenMetBestand: nee,
       opslaanAlsBestand: () => void nee(),
       sluitConflicten: () => undefined,
     };
-  }, [toast]);
+  }, [toast, gekoppeld, alleenInBestand, laatsteSync]);
   return <SyncContext.Provider value={waarde}>{children}</SyncContext.Provider>;
 }

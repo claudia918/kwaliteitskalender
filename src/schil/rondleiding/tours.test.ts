@@ -3,10 +3,12 @@ import { ROUTES } from '../navigatie';
 import { ALLE_RONDLEIDINGEN, EERSTE_RONDLEIDING, SCHERM_RONDLEIDINGEN, doeTekst, doelSelectors } from './tours';
 
 describe('rondleidingen', () => {
-  it('eerste rondleiding: acht stappen die het werk volgen', () => {
-    expect(EERSTE_RONDLEIDING.stappen.map((s) => s.id)).toEqual(['weergave', 'nu', 'plannen', 'ongedaan', 'toevoegen', 'zoeken', 'voorbereiden', 'delen']);
-    // elke stap is een handeling (gaat verder na het doen)
-    expect(EERSTE_RONDLEIDING.stappen.every((s) => !!s.klaar && !!s.doe && !!s.gelukt)).toBe(true);
+  it('eerste rondleiding: elf stappen die het werk volgen, de laatste vier over waar je gegevens staan', () => {
+    expect(EERSTE_RONDLEIDING.stappen.map((s) => s.id)).toEqual([
+      'weergave', 'nu', 'plannen', 'ongedaan', 'toevoegen', 'zoeken', 'voorbereiden', 'delen', 'waar', 'koppelen', 'alleen-bestand',
+    ]);
+    // elke stap is een handeling (gaat verder na het doen), behalve de ene kijkstap over de browseropslag
+    expect(EERSTE_RONDLEIDING.stappen.filter((s) => s.id !== 'waar').every((s) => !!s.klaar && !!s.doe && !!s.gelukt)).toBe(true);
   });
 
   it('per scherm een korte rondleiding op een bestaande route', () => {
