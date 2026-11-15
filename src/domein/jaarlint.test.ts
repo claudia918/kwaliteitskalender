@@ -25,6 +25,21 @@ describe('jaarlint', () => {
     }
   });
 
+  it('elk blokje kent gebied, status en naam; de maandlijst is compleet', () => {
+    for (const m of lint.maanden) {
+      expect(m.lijst.length).toBe(m.aantal);
+      for (const b of m.blokken) {
+        expect(b.naam.length).toBeGreaterThan(0);
+        expect(['BKA', 'SKA', 'OP', 'VS', 'OR']).toContain(b.gebied);
+        expect(b.gereed).toBe(b.status === 'gereed');
+      }
+      // gereed staat onderaan in de stapel
+      const eersteOpen = m.blokken.findIndex((b) => !b.gereed);
+      if (eersteOpen >= 0) expect(m.blokken.slice(eersteOpen).every((b) => !b.gereed)).toBe(true);
+    }
+    expect(lint.gebieden.length).toBeGreaterThan(0);
+  });
+
   it('gesprekken in hun maand en een punt bij nu', () => {
     expect(lint.maanden.find((m) => m.maand === 'Feb')?.gesprekken.map((g) => g.id)).toContain('Winter');
     expect(lint.nu?.x).toBe(lint.maanden[3].x);

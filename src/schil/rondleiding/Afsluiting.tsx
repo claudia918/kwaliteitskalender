@@ -8,14 +8,51 @@ import { createPortal } from 'react-dom';
 import { ArrowRight, Printer } from 'lucide-react';
 import { LvMonogram, cx } from '../../componenten';
 import { aantal } from '../../domein/hulp';
-import { LINT, duurTekst, maakJaarlint, type Jaarlint } from '../../domein/jaarlint';
+import { LINT, STATUS_NAAM, duurTekst, maakJaarlint, type Jaarlint } from '../../domein/jaarlint';
+import { GEBIEDEN } from '../../domein/seed';
 import { maandVan, maandVoluit } from '../../domein/thuis';
-import type { KalenderItem } from '../../domein/types';
+import type { GebiedCode, Status } from '../../domein/types';
 import { useKomendGesprek, useScope, useStore } from '../../store';
 import { useRondleiding, type Afsluiting as AfsluitingData } from './RondleidingProvider';
 import { Venster } from './Venster';
 
 const KORT = ['aug', 'sep', 'okt', 'nov', 'dec', 'jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul'];
+
+const gebiedKleur = (g: GebiedCode) => `var(--kg-${g.toLowerCase()}-ink)`;
+
+/**
+ * Eén blokje: de kleur is het kwaliteitsgebied, de vulling is de status.
+ * Gepland is open, bezig is half gevuld, gereed is dicht, risico is open met een uitroepteken.
+ */
+function Blokje({ x, y, gebied, status, titel }: { x: number; y: number; gebied: GebiedCode; status: Status; titel?: string }) {
+  const kleur = gebiedKleur(gebied);
+  const b = LINT.blok;
+  return (
+    <g>
+      {titel && <title>{titel}</title>}
+      {status === 'gereed' ? (
+        <rect x={x} y={y} width={b} height={b} rx="1.5" fill={kleur} />
+      ) : (
+        <rect x={x + 0.9} y={y + 0.9} width={b - 1.8} height={b - 1.8} rx="1" fill="var(--surface-card)" stroke={kleur} strokeWidth="1.8" />
+      )}
+      {status === 'bezig' && <path d={`M${x} ${y + b} L${x + b} ${y + b} L${x} ${y} Z`} fill={kleur} />}
+      {status === 'risico' && (
+        <text x={x + b / 2} y={y + b - 3} textAnchor="middle" fontSize="11" fontWeight="700" fill={kleur}>
+          !
+        </text>
+      )}
+    </g>
+  );
+}
+
+/** Een los blokje in lopende tekst (legenda en maandlijst): dezelfde tekening als in het jaarlint. */
+function LosBlokje({ gebied, status, className }: { gebied: GebiedCode; status: Status; className?: string }) {
+  return (
+    <svg viewBox={`0 0 ${LINT.blok} ${LINT.blok}`} className={cx('inline-block shrink-0', className)} aria-hidden>
+      <Blokje x={0} y={0} gebied={gebied} status={status} />
+    </svg>
+  );
+}
 
 /** Het jaarlint als SVG. `geanimeerd`: de maanden verschijnen een voor een en de lijn tekent zich. */
 export function JaarlintSvg({ lint, geanimeerd, titel }: { lint: Jaarlint; geanimeerd?: boolean; titel: string }) {
@@ -26,13 +63,16 @@ export function JaarlintSvg({ lint, geanimeerd, titel }: { lint: Jaarlint; geani
       <line x1={LINT.links - 10} x2={LINT.breedte - LINT.links + 10} y1={LINT.basis + 4} y2={LINT.basis + 4} stroke={inkt} strokeWidth="1.5" />
       {lint.maanden.map((m, k) => (
         <g key={m.maand} className={geanimeerd ? 'kk-verschijn' : undefined} style={geanimeerd ? { animationDelay: `${120 + k * 55}ms` } : undefined}>
-          {m.blokken.map((b, n) =>
-            b.gereed ? (
-              <rect key={n} x={b.x} y={b.y} width={LINT.blok} height={LINT.blok} rx="2" fill={inkt} />
-            ) : (
-              <rect key={n} x={b.x + 0.75} y={b.y + 0.75} width={LINT.blok - 1.5} height={LINT.blok - 1.5} rx="2" fill="none" stroke={inkt} strokeWidth="1.5" />
-            ),
-          )}
+          {m.blokken.map((b, n) => (
+            <Blokje
+              key={n}
+              x={b.x}
+              y={b.y}
+              gebied={b.gebied}
+              status={b.status}
+              titel={`${b.naam} (${[b.standaard, STATUS_NAAM[b.status].toLowerCase()].filter(Boolean).join(', ')})`}
+            />
+          ))}
           {m.meer > 0 && (
             <text x={m.x} y={m.top - 4} textAnchor="middle" fontSize="11" fontWeight="600" fill={inkt}>
               +{m.meer}
@@ -40,12 +80,16 @@ export function JaarlintSvg({ lint, geanimeerd, titel }: { lint: Jaarlint; geani
           )}
           <text x={m.x} y={LINT.basis + 26} textAnchor="middle" fontSize="15" fontWeight={m.nu ? 700 : 500} fill={inkt}>
             {KORT[k]}
+            {m.nu ? ' (nu)' : ''}
+          </text>
+          <text x={m.x} y={LINT.basis + 44} textAnchor="middle" fontSize="11.5" fill={inkt}>
+            {m.aantal ? `${m.gereed} van ${m.aantal}` : 'geen'}
           </text>
           {m.gesprekken.map((g, j) => (
             <g key={g.id}>
               <line x1={m.x} x2={m.x} y1={m.top - 35 - j * 22} y2={LINT.basis + 4} stroke={inkt} strokeWidth="1" strokeDasharray="2 4" opacity="0.55" />
-              <rect x={m.x - 36} y={m.top - 56 - j * 22} width="72" height="21" rx="10.5" fill={inkt} />
-              <text x={m.x} y={m.top - 41.5 - j * 22} textAnchor="middle" fontSize="11.5" fontWeight="600" fill="var(--lv-yellow)">
+              <rect x={m.x - 36} y={m.top - 56 - j * 22} width="72" height="21" rx="3" fill={inkt} />
+              <text x={m.x} y={m.top - 41.5 - j * 22} textAnchor="middle" fontSize="11.5" fontWeight="600" fill="var(--text-on-dark)">
                 {g.naam.length > 9 ? `${g.naam.slice(0, 8)}…` : g.naam}
               </text>
             </g>
@@ -58,12 +102,42 @@ export function JaarlintSvg({ lint, geanimeerd, titel }: { lint: Jaarlint; geani
         <g className={geanimeerd ? 'kk-verschijn' : undefined} style={geanimeerd ? { animationDelay: '2100ms' } : undefined}>
           <circle cx={lint.nu.x} cy={lint.nu.y} r="7" fill={inkt} />
           <circle cx={lint.nu.x} cy={lint.nu.y} r="3" fill="var(--lv-yellow)" />
-          <text x={lint.nu.x} y={LINT.basis + 46} textAnchor="middle" fontSize="12" fontWeight="700" fill={inkt}>
-            nu
-          </text>
         </g>
       )}
     </svg>
+  );
+}
+
+/** Uitleg bij het jaarlint: wat de kleur, de vulling, de getallen, de lijn en de labels betekenen. */
+function Legenda({ lint, className }: { lint: Jaarlint; className?: string }) {
+  const voorbeeld = lint.gebieden[0] ?? 'OP';
+  return (
+    <dl className={cx('grid gap-x-8 gap-y-2 sm:grid-cols-[auto_1fr]', className)}>
+      <dt className="font-semibold">Kleur: kwaliteitsgebied</dt>
+      <dd className="flex flex-wrap gap-x-4 gap-y-1">
+        {lint.gebieden.map((g) => (
+          <span key={g} className="inline-flex items-center gap-1.5">
+            <LosBlokje gebied={g} status="gereed" className="h-[0.9em] w-[0.9em]" />
+            {g} · {GEBIEDEN[g].naam}
+          </span>
+        ))}
+      </dd>
+      <dt className="font-semibold">Vulling: status</dt>
+      <dd className="flex flex-wrap gap-x-4 gap-y-1">
+        {(['gepland', 'bezig', 'gereed', 'risico'] as Status[]).map((st) => (
+          <span key={st} className="inline-flex items-center gap-1.5">
+            <LosBlokje gebied={voorbeeld} status={st} className="h-[0.9em] w-[0.9em]" />
+            {STATUS_NAAM[st]}
+          </span>
+        ))}
+      </dd>
+      <dt className="font-semibold">Zo lees je het</dt>
+      <dd>
+        Elk blokje is één activiteit, in de maand waarin ze gepland staat. Onder elke maand staat hoeveel activiteiten gereed zijn. De zwarte lijn
+        volgt de drukte: hoe hoger de lijn, hoe meer activiteiten in die maand. Een zwart label is een seizoensgesprek, met de deadline op de eerste
+        dag van die maand.
+      </dd>
+    </dl>
   );
 }
 
@@ -115,29 +189,25 @@ function Inhoud({ data, onSluit }: { data: AfsluitingData; onSluit: () => void }
 
   return (
     <Venster labelId={titelId} onSluit={onSluit} breedte="max-w-[980px]">
-      <div className="bg-brand-yellow px-5 pb-4 pt-5 text-ink-on-brand sm:px-8 sm:pt-7">
-        <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-md bg-brand-black">
-            <LvMonogram className="h-6 w-6" />
-          </span>
-          <p className="text-xs font-bold uppercase tracking-wide">Rondleiding klaar · terug in je eigen kalender</p>
-        </div>
-        <h2 id={titelId} className="mt-4 text-h1 font-bold sm:text-display">
+      <div className="bg-brand-yellow px-5 py-5 text-ink-on-brand sm:px-8 sm:py-6">
+        <p className="text-sm font-semibold">Rondleiding klaar. Je bent terug in je eigen kalender.</p>
+        <h2 id={titelId} className="mt-2 text-h1 font-bold sm:text-display">
           Dit is jouw schooljaar.
         </h2>
         <p className="mt-1 max-w-2xl text-sm sm:text-base">
           {beschrijving}
           {komend && !komend.verstreken && ` Het volgende gesprek is ${komend.gesprek.naam}, over ${aantal(komend.dagenTot, 'dag', 'dagen')}.`}
         </p>
+      </div>
+      <div className="border-b border-line-subtle px-5 pb-5 pt-4 sm:px-8">
         {/* Op een smal scherm schuift het jaar zijwaarts in plaats van onleesbaar klein te worden. */}
-        <div className="-mx-5 mt-3 overflow-x-auto px-5 sm:mx-0 sm:px-0" role="region" tabIndex={0} aria-label="Jaarlint, schuif zijwaarts">
+        <div className="-mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0" role="region" tabIndex={0} aria-label="Jaarlint, schuif zijwaarts">
           <div className="min-w-[720px] sm:min-w-0">
             <JaarlintSvg lint={lint} geanimeerd titel={`Jaarlint. ${beschrijving}`} />
           </div>
         </div>
-        <p className="mt-1 text-xs">
-          Elk blokje is een activiteit, dicht is gereed. De lijn loopt over je stapels: hoe hoger, hoe drukker die maand.
-        </p>
+        <Legenda lint={lint} className="mt-4 text-xs text-ink-body" />
+        <p className="mt-2 text-xs text-ink-muted">Wijs een blokje aan om te zien welke activiteit het is. Op de poster staan alle activiteiten per maand uitgeschreven.</p>
       </div>
       <div className="flex flex-col gap-4 px-5 py-5 sm:px-8 md:flex-row md:items-center">
         <div className="min-w-0 flex-1 text-sm">
@@ -166,33 +236,67 @@ function Inhoud({ data, onSluit }: { data: AfsluitingData; onSluit: () => void }
           </button>
         </div>
       </div>
-      {createPortal(<Poster items={scope.items} lint={lint} naam={scopeLabel} schooljaar={state.schooljaar} />, document.body)}
+      {createPortal(<Poster lint={lint} naam={scopeLabel} schooljaar={state.schooljaar} />, document.body)}
     </Venster>
   );
 }
 
-/** Printversie (A3 liggend, zoals de andere prints): het jaarlint op een gele band. */
-function Poster({ lint, naam, schooljaar, items }: { lint: Jaarlint; naam: string; schooljaar: string; items: KalenderItem[] }) {
+/** Meer regels per maand passen niet op één vel A3. */
+const MAX_REGELS = 18;
+
+/**
+ * Printversie (A3 liggend, zoals de andere prints): bovenaan het jaarlint met uitleg, daaronder
+ * per maand alle activiteiten bij naam, met hetzelfde blokje ervoor.
+ */
+function Poster({ lint, naam, schooljaar }: { lint: Jaarlint; naam: string; schooljaar: string }) {
   return (
-    <div className="kk-poster" aria-hidden>
-      <div className={cx('rounded-xl bg-brand-yellow p-10 text-ink-on-brand')} style={{ printColorAdjust: 'exact', WebkitPrintColorAdjust: 'exact' }}>
-        <div className="flex items-center gap-4">
-          <span className="grid h-14 w-14 place-items-center rounded-lg bg-brand-black">
-            <LvMonogram className="h-9 w-9" />
+    <div className="kk-poster text-ink-strong" aria-hidden style={{ printColorAdjust: 'exact', WebkitPrintColorAdjust: 'exact' }}>
+      <div className="flex items-end justify-between gap-8 border-b-[3pt] border-brand-yellow pb-4">
+        <div>
+          <h1 className="text-[34pt] font-bold leading-tight">Ons kwaliteitsjaar</h1>
+          <p className="text-[14pt]">
+            {naam} · schooljaar {schooljaar} · {aantal(lint.totaal, 'activiteit', 'activiteiten')}, {lint.gereed} gereed
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="grid h-12 w-12 place-items-center rounded-md bg-brand-black">
+            <LvMonogram className="h-8 w-8" />
           </span>
-          <div>
-            <p className="text-sm font-bold uppercase tracking-wide">Kwaliteitskalender VO</p>
-            <p className="text-sm">Schooljaar {schooljaar}</p>
+          <p className="text-[10pt] font-semibold leading-snug">
+            Kwaliteitskalender VO
+            <br />
+            Leren verbeteren
+          </p>
+        </div>
+      </div>
+      <div className="mt-3">
+        <JaarlintSvg lint={lint} titel="Jaarlint" />
+      </div>
+      <Legenda lint={lint} className="mt-3 text-[9.5pt]" />
+      <div className="mt-4 grid grid-cols-12 gap-x-[7pt] border-t border-brand-black pt-3">
+        {lint.maanden.map((m) => (
+          <div key={m.maand} className="min-w-0">
+            <p className="text-[11pt] font-bold capitalize">{maandVoluit(m.maand)}</p>
+            <p className="text-[8pt]">{m.aantal ? `${m.gereed} van ${m.aantal} gereed` : 'Geen activiteiten'}</p>
+            {m.gesprekken.map((g) => (
+              <p key={g.id} className="mt-1 bg-brand-black px-1 py-0.5 text-[8pt] font-semibold text-ink-on-dark">
+                Gesprek {g.naam}
+              </p>
+            ))}
+            <ul className="mt-1.5 space-y-[3pt]">
+              {m.lijst.slice(0, MAX_REGELS).map((r, n) => (
+                <li key={n} className="flex gap-[3pt] text-[8pt] leading-[1.25]">
+                  <LosBlokje gebied={r.gebied} status={r.status} className="mt-[1pt] h-[8pt] w-[8pt]" />
+                  <span className="min-w-0 break-words" lang="nl" style={{ hyphens: 'auto' }}>
+                    {r.standaard && <span className="font-semibold">{r.standaard} </span>}
+                    {r.naam}
+                  </span>
+                </li>
+              ))}
+              {m.lijst.length > MAX_REGELS && <li className="text-[8pt] font-semibold">en nog {m.lijst.length - MAX_REGELS}</li>}
+            </ul>
           </div>
-        </div>
-        <h1 className="mt-8 text-[44pt] font-bold leading-tight">Ons kwaliteitsjaar</h1>
-        <p className="mt-1 text-[16pt]">
-          {naam}: {aantal(items.length, 'activiteit', 'activiteiten')}, {lint.gereed} gereed
-        </p>
-        <div className="mt-8">
-          <JaarlintSvg lint={lint} titel="Jaarlint" />
-        </div>
-        <p className="mt-4 text-[11pt]">Elk blokje is een activiteit, dicht is gereed. De zwarte labels zijn de seizoensgesprekken.</p>
+        ))}
       </div>
     </div>
   );

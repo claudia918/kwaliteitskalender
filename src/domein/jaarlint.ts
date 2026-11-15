@@ -3,15 +3,40 @@
  * Per maand een stapel blokjes (één per activiteit, gereed eerst), de seizoensgesprekken in hun
  * maand, en een lijn die over de stapels heen loopt: de vorm van je jaar. Puur, met tests.
  */
-import { MAANDEN } from './seed';
-import type { Gesprek, KalenderItem, Maand } from './types';
+import { activiteitVan, effectieveNaam, gebiedUitStandaard } from './hulp';
+import { GEBIED_CODES, MAANDEN } from './seed';
+import type { GebiedCode, Gesprek, KalenderItem, Maand, Status } from './types';
 
-export const LINT = { breedte: 1200, hoogte: 360, links: 30, basis: 296, blok: 14, tussen: 4, perRij: 4, maxRijen: 12 } as const;
+export const LINT = { breedte: 1200, hoogte: 356, links: 30, basis: 296, blok: 14, tussen: 4, perRij: 4, maxRijen: 12 } as const;
 
 export interface LintBlok {
   x: number;
   y: number;
   gereed: boolean;
+  status: Status;
+  gebied: GebiedCode;
+  /** Code van de standaard, bv. "OP2". */
+  standaard: string;
+  naam: string;
+}
+
+/** Eén regel in de maandlijst van de poster. */
+export interface LintRegel {
+  naam: string;
+  standaard: string;
+  gebied: GebiedCode;
+  status: Status;
+}
+
+export const STATUS_NAAM: Record<Status, string> = { gepland: 'Gepland', bezig: 'Bezig', gereed: 'Gereed', risico: 'Risico' };
+
+/** In de stapel: gereed onderaan, dan bezig, risico, gepland. */
+const STATUS_VOLGORDE: Record<Status, number> = { gereed: 0, bezig: 1, risico: 2, gepland: 3 };
+
+function regelVan(item: KalenderItem): LintRegel {
+  const a = activiteitVan(item);
+  const standaard = a?.standaard ?? '';
+  return { naam: effectieveNaam(item), standaard, gebied: a?.gebied ?? gebiedUitStandaard(standaard), status: item.status };
 }
 
 export interface LintMaand {
@@ -26,6 +51,8 @@ export interface LintMaand {
   top: number;
   gesprekken: Gesprek[];
   nu: boolean;
+  /** Alle activiteiten van de maand, op kwaliteitsgebied en standaard, voor de lijst op de poster. */
+  lijst: LintRegel[];
 }
 
 export interface Jaarlint {
@@ -39,14 +66,20 @@ export interface Jaarlint {
   totaal: number;
   gereed: number;
   drukste: Maand | null;
+  /** Kwaliteitsgebieden die voorkomen, in vaste volgorde (voor de legenda). */
+  gebieden: GebiedCode[];
 }
 
 export function maakJaarlint(items: KalenderItem[], cyclus: Gesprek[], huidig: Maand): Jaarlint {
   const kolom = (LINT.breedte - 2 * LINT.links) / 12;
   const stap = LINT.blok + LINT.tussen;
   const maanden: LintMaand[] = MAANDEN.map((maand, k) => {
-    const hier = items.filter((i) => i.maand === maand);
+    const hier = items.filter((i) => i.maand === maand).map(regelVan);
     const gereed = hier.filter((i) => i.status === 'gereed').length;
+    const opGebied = (a: LintRegel, b: LintRegel) =>
+      GEBIED_CODES.indexOf(a.gebied) - GEBIED_CODES.indexOf(b.gebied) || a.standaard.localeCompare(b.standaard) || a.naam.localeCompare(b.naam);
+    const lijst = [...hier].sort(opGebied);
+    const stapel = [...hier].sort((a, b) => STATUS_VOLGORDE[a.status] - STATUS_VOLGORDE[b.status] || opGebied(a, b));
     const x = LINT.links + kolom * (k + 0.5);
     const max = LINT.perRij * LINT.maxRijen;
     const getekend = Math.min(hier.length, max);
@@ -58,7 +91,8 @@ export function maakJaarlint(items: KalenderItem[], cyclus: Gesprek[], huidig: M
       blokken.push({
         x: x - breedte / 2 + pos * stap,
         y: LINT.basis - (rij + 1) * stap,
-        gereed: n < gereed,
+        gereed: stapel[n].status === 'gereed',
+        ...stapel[n],
       });
     }
     const rijen = Math.ceil(getekend / LINT.perRij);
@@ -72,6 +106,7 @@ export function maakJaarlint(items: KalenderItem[], cyclus: Gesprek[], huidig: M
       top: LINT.basis - rijen * stap,
       gesprekken: cyclus.filter((g) => g.maand === maand),
       nu: maand === huidig,
+      lijst,
     };
   });
   // De lijn loopt 18px boven elke stapel; vloeiend via Catmull-Rom naar Bézier.
@@ -98,6 +133,7 @@ export function maakJaarlint(items: KalenderItem[], cyclus: Gesprek[], huidig: M
     totaal: items.length,
     gereed: items.filter((i) => i.status === 'gereed').length,
     drukste: drukste?.maand ?? null,
+    gebieden: GEBIED_CODES.filter((g) => maanden.some((m) => m.lijst.some((r) => r.gebied === g))),
   };
 }
 
