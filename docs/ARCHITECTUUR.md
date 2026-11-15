@@ -414,3 +414,14 @@ Het magenta van het merk (`--lv-magenta`, de tweede kleur op projectlerenverbete
 ### Vormkenmerk: hoek rechtsonder
 
 Net als op projectlerenverbeteren.nl zijn knoppen, kaarten en dialogen recht, met alleen de hoek rechtsonder afgerond. Gebruik de klassen `kk-hoek-knop`, `kk-hoek-knop-klein` en `kk-hoek-vlak` (maten in `tokens.css`: `--hoek-knop`, `--hoek-knop-klein`, `--hoek-vlak`). `Button`, `Card`, `KpiTile`, `EmptyState` en `Dialog` doen dit al. Kleine onderdelen (chips, invoervelden, badges, menu's) blijven recht.
+
+### Alleen in het kalenderbestand bewaren
+
+Instelling per browser (`src/store/opslagmodus.ts`, sleutel `kwaliteitskalender:alleen-bestand:v1`), te kiezen op Gegevens & delen als er een bestand gekoppeld is (alleen Edge en Chrome).
+
+- **Store:** de autosave schrijft niet naar localStorage en verwijdert de state-sleutels. `laadState()` geeft een lege state; de kalender komt uit het bestand.
+- **Sync:** bij de eerste synchronisatie van een sessie wordt het bestand ingelezen en overgenomen (`neemGedeeldOver`), zonder te schrijven. Een lege browser kan het bestand dus nooit overschrijven. De sync-meta in localStorage bevat dan alleen de bestandsnaam: `basis` en `vingerafdruk` bevatten kalenderinhoud en blijven in het werkgeheugen. Wijzigingen gaan na 400 ms naar het bestand (in plaats van 1,5 s).
+- **SyncInfo:** `alleenInBestand`, `bestandGeladen`, `onopgeslagen` en `zetAlleenInBestand(aan)`. Aanzetten synchroniseert eerst en controleert dat alles in het bestand staat.
+- **Schil:** `BestandOpenen` is het openingsscherm zolang het bestand nog niet is ingelezen (de browser vraagt na herladen soms opnieuw toestemming, en dat kan alleen na een klik). `BestandWaarschuwing` toont een balk als er geen bestand gekoppeld is: dan wordt er niets bewaard. Bij niet-opgeslagen wijzigingen vraagt de browser om bevestiging voor het sluiten (`beforeunload`).
+- **Wat de browser dan nog onthoudt:** de instelling zelf, de weergavekeuze (`ui:v1`, met een school-id), voorkeuren, de voortgang van de rondleiding, het tijdstip van het laatste bezoek, de bestandsnaam en (in IndexedDB) de koppeling met het bestand. Geen kalenderinhoud.
+- **Test:** `scripts/e2e-alleen-bestand.mjs`.

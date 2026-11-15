@@ -44,6 +44,13 @@ Binnen één organisatie werk je samen in één **kalenderbestand** (`<naam>.kwa
 Na het opnieuw openen vraagt de browser soms of de kalender het bestand weer mag bijwerken. Klik dan
 bovenin op **Opnieuw verbinden**.
 
+**Alleen in het kalenderbestand bewaren (Edge en Chrome).** Standaard bewaart de browser een werkkopie
+van de kalender. Wil je dat de kalender alleen in jullie eigen omgeving staat, kies dan op **Gegevens &
+delen** voor **Alleen in het kalenderbestand bewaren** (eerst een bestand koppelen). De kalender verdwijnt
+dan uit de browseropslag; de browser onthoudt alleen instellingen en de naam van het bestand. Bij elke
+start leest de kalender het bestand in en kan de browser opnieuw om toestemming vragen. Is er geen bestand
+gekoppeld, dan wordt er niets bewaard en zie je een waarschuwing. De instelling geldt per browser.
+
 **In andere browsers** gebruik je op **Gegevens & delen** de knoppen **Bestand openen**, **Opslaan als
 bestand** en **Samenvoegen met bestand**.
 

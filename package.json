@@ -11,7 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -b --pretty",
-    "test:e2e": "node scripts/e2e/basis.cjs && node scripts/e2e/sync.cjs && node scripts/e2e-start.mjs && node scripts/e2e-navigatie.mjs && node scripts/e2e-kalender.mjs && node scripts/e2e-export.mjs && node scripts/e2e-rondleiding.mjs",
+    "test:e2e": "node scripts/e2e/basis.cjs && node scripts/e2e/sync.cjs && node scripts/e2e-alleen-bestand.mjs && node scripts/e2e-start.mjs && node scripts/e2e-navigatie.mjs && node scripts/e2e-kalender.mjs && node scripts/e2e-export.mjs && node scripts/e2e-rondleiding.mjs",
     "release": "npm run build && node -e \"require('fs').mkdirSync('release',{recursive:true});require('fs').copyFileSync('dist/kwaliteitskalender.html','release/kwaliteitskalender.html')\""
   },
   "dependencies": {

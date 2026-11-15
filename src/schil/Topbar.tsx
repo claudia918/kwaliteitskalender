@@ -14,13 +14,27 @@ import { SNELTOETS, ZoekKnop } from './Zoekvenster';
 /** "Opgeslagen" verschijnt 1,6 s na elke wijziging. */
 function OpgeslagenIndicator() {
   const { laatstOpgeslagen, opslagWerkt } = useStore();
+  const sync = useSync();
   const [zichtbaar, setZichtbaar] = useState(false);
+  // Alleen in het kalenderbestand: "Opgeslagen" betekent dat het in het bestand staat.
+  const signaal = sync.alleenInBestand ? (sync.onopgeslagen ? null : sync.laatsteSync) : laatstOpgeslagen;
   useEffect(() => {
-    if (!laatstOpgeslagen) return;
+    if (!signaal) return;
     setZichtbaar(true);
     const t = window.setTimeout(() => setZichtbaar(false), 1600);
     return () => window.clearTimeout(t);
-  }, [laatstOpgeslagen]);
+  }, [signaal]);
+  if (sync.alleenInBestand && sync.onopgeslagen) {
+    return (
+      <span
+        className="hidden items-center gap-1 text-xs font-semibold text-status-warning md:inline-flex"
+        title="Deze wijziging staat nog niet in het kalenderbestand."
+      >
+        <TriangleAlert className="h-3.5 w-3.5" aria-hidden />
+        Nog niet in bestand
+      </span>
+    );
+  }
   if (!opslagWerkt) {
     return (
       <span
@@ -57,7 +71,7 @@ export function SyncStatus({ compact }: { compact?: boolean }) {
   }, []);
 
   let icoon = HardDrive;
-  let titel = 'Alleen op dit apparaat';
+  let titel = sync.alleenInBestand ? 'Geen kalenderbestand' : 'Alleen op dit apparaat';
   let sub: string | null = null;
   let toon = 'text-ink-muted';
   let actie = () => navigate('/gegevens');
@@ -89,7 +103,9 @@ export function SyncStatus({ compact }: { compact?: boolean }) {
   const Icoon = icoon;
   const uitleg =
     sync.status === 'geen'
-      ? 'Je gegevens staan alleen in deze browser. Klik om een gedeeld bestand te koppelen.'
+      ? sync.alleenInBestand
+        ? 'Er is geen kalenderbestand gekoppeld en de kalender wordt niet in deze browser bewaard. Klik om een bestand te koppelen.'
+        : 'Je gegevens staan alleen in deze browser. Klik om een gedeeld bestand te koppelen.'
       : (sync.fout ?? `${titel}${sub ? `, ${sub}` : ''}`);
 
   return (

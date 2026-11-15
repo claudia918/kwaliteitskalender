@@ -3,6 +3,7 @@
  */
 import { legeState, migreer } from '../domein/state';
 import type { Niveau, SchoolId, State } from '../domein/types';
+import { alleenBestand } from './opslagmodus';
 
 export const STATE_SLEUTEL = 'kwaliteitskalender:state:v5';
 /** Sleutel van de oude lokale modus; wordt eenmalig gemigreerd als die bestaat. */
@@ -10,6 +11,11 @@ export const OUDE_STATE_SLEUTEL = 'kwaliteitskalender:state:v1';
 export const UI_SLEUTEL = 'kwaliteitskalender:ui:v1';
 
 export function laadState(): State {
+  // Alleen in het kalenderbestand: de browser bevat geen kalender. Begin leeg; het bestand volgt.
+  if (alleenBestand()) {
+    verwijderState();
+    return legeState();
+  }
   try {
     const nieuw = localStorage.getItem(STATE_SLEUTEL);
     if (nieuw) {
@@ -34,6 +40,16 @@ export function bewaarState(s: State): boolean {
     return true;
   } catch {
     return false;
+  }
+}
+
+/** Haalt de kalenderinhoud uit de browseropslag (bij "alleen in het kalenderbestand"). */
+export function verwijderState(): void {
+  try {
+    localStorage.removeItem(STATE_SLEUTEL);
+    localStorage.removeItem(OUDE_STATE_SLEUTEL);
+  } catch {
+    /* niets te verwijderen */
   }
 }
 

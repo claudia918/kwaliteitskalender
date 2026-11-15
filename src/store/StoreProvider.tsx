@@ -28,7 +28,8 @@ import type {
   Status,
   WizardInvoer,
 } from '../domein/types';
-import { STATE_SLEUTEL, bewaarState, bewaarUi, laadState, laadUi, type UiVoorkeur } from './opslag';
+import { STATE_SLEUTEL, bewaarState, bewaarUi, laadState, laadUi, verwijderState, type UiVoorkeur } from './opslag';
+import { useAlleenBestand } from './opslagmodus';
 
 export interface Store {
   state: State;
@@ -143,9 +144,18 @@ export function StoreProvider({ children, initieel, zonderOpslag, initieelUi }: 
 
   const setNiveau = useCallback((n: Niveau) => setNiveauRuw(n), []);
 
-  // Autosave
+  // Autosave. Bij "alleen in het kalenderbestand" staat er niets in de browser: de sync-laag schrijft naar het bestand.
+  const alleenInBestand = useAlleenBestand();
+  const alleenBestandRef = useRef(alleenInBestand);
+  alleenBestandRef.current = alleenInBestand;
   useEffect(() => {
     if (zonderOpslag) return;
+    if (alleenInBestand) {
+      verwijderState();
+      setOpslagWerkt(true);
+      eersteRender.current = false;
+      return;
+    }
     const ok = bewaarState(state);
     setOpslagWerkt(ok);
     if (eersteRender.current) {
@@ -153,7 +163,7 @@ export function StoreProvider({ children, initieel, zonderOpslag, initieelUi }: 
       return;
     }
     if (ok) setLaatstOpgeslagen(Date.now());
-  }, [state, zonderOpslag]);
+  }, [state, zonderOpslag, alleenInBestand]);
 
   useEffect(() => {
     if (!zonderOpslag) bewaarUi({ niveau, clusterId, schoolId });
@@ -163,7 +173,7 @@ export function StoreProvider({ children, initieel, zonderOpslag, initieelUi }: 
   useEffect(() => {
     if (zonderOpslag) return;
     const opWijziging = (e: StorageEvent) => {
-      if (e.key !== STATE_SLEUTEL || !e.newValue) return;
+      if (e.key !== STATE_SLEUTEL || !e.newValue || alleenBestandRef.current) return;
       try {
         const ander = JSON.parse(e.newValue) as State;
         setState((cur) => {

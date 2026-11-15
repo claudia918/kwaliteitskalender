@@ -14,7 +14,8 @@ import Start from '../schermen/Start';
 import Welkom from '../schermen/Welkom';
 import Wizard from '../schermen/Wizard';
 import { StoreProvider, useStore } from '../store';
-import { SyncProvider } from '../sync/SyncProvider';
+import { SyncProvider, useSync } from '../sync/SyncProvider';
+import { BestandOpenen } from './BestandOpenen';
 import { ConflictDialoog } from './ConflictDialoog';
 import { Foutgrens } from './Foutgrens';
 import GegevensDelen from './GegevensDelen';
@@ -60,6 +61,8 @@ function AppRoutes() {
 function Poort() {
   const { state } = useStore();
   const { oefenen } = useRondleiding();
+  const sync = useSync();
+  const [zonderBestand, setZonderBestand] = useState(false);
   // Tijdens een rondleiding: dezelfde schermen, maar op de oefenkalender.
   if (oefenen)
     return (
@@ -67,6 +70,8 @@ function Poort() {
         <AppRoutes />
       </OefenOmgeving>
     );
+  // Alleen in het kalenderbestand: de browser is leeg, dus eerst het bestand openen.
+  if (!state.setupVoltooid && sync.alleenInBestand && !zonderBestand) return <BestandOpenen onNieuw={() => setZonderBestand(true)} />;
   if (!state.setupVoltooid) return <Opstart />;
   return <AppRoutes />;
 }

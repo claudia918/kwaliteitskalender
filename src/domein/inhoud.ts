@@ -148,6 +148,10 @@ export const FAQ: FaqCategorie[] = [
         a: 'Op je eigen computer: in deze browser, en als je een kalenderbestand koppelt ook in dat bestand (bijvoorbeeld in een SharePoint- of OneDrive-map van je organisatie). De Kwaliteitskalender stuurt niets over internet en er is geen server of account. Project Leren Verbeteren kan je gegevens niet inzien.',
       },
       {
+        v: 'Kan de kalender alleen in onze eigen omgeving staan, en niet in de browser?',
+        a: 'Ja, in Microsoft Edge en Google Chrome. Koppel een kalenderbestand en kies op Gegevens & delen voor Alleen in het kalenderbestand bewaren. De kalender staat dan alleen in dat bestand, bijvoorbeeld in een SharePoint- of OneDrive-map van je organisatie. De browser onthoudt alleen instellingen, zoals je weergave en de naam van het bestand. Bij elke start leest de Kwaliteitskalender het bestand in; de browser kan dan opnieuw om toestemming vragen. De instelling geldt per browser, dus elke collega zet haar zelf aan.',
+      },
+      {
         v: 'Hoe werk ik samen met collega’s?',
         a: 'Zet één kalenderbestand (.kwaliteitskalender.json) in een gedeelde map van je organisatie, bijvoorbeeld op SharePoint, OneDrive of een netwerkschijf. Iedereen opent de Kwaliteitskalender en koppelt via Gegevens & delen hetzelfde bestand. Wijzigingen worden automatisch samengevoegd: per activiteit wint de nieuwste wijziging en een verwijderde activiteit komt niet terug.',
       },

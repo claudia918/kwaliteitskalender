@@ -28,6 +28,7 @@ import {
   voorgesteldeBestandsnaam,
 } from '../domein/state';
 import type { GedeeldeGegevens, State } from '../domein/types';
+import { alleenBestand, useAlleenBestand, zetAlleenBestand } from '../store/opslagmodus';
 import { useStore } from '../store/StoreProvider';
 import {
   bestandGewijzigdOp,
@@ -45,6 +46,8 @@ import {
 
 /** Wachttijd na een wijziging voordat er gesynchroniseerd wordt. */
 export const SYNC_VERTRAGING_MS = 1500;
+/** Bij "alleen in het kalenderbestand" is het bestand de enige opslag: sneller wegschrijven. */
+export const SYNC_VERTRAGING_ALLEEN_BESTAND_MS = 400;
 /** Interval voor controle op wijzigingen van collega's. */
 export const SYNC_INTERVAL_MS = 30_000;
 
@@ -68,6 +71,19 @@ export interface SyncInfo {
   fout: string | null;
   /** Conflicten die nog gemeld moeten worden (dialoog in de schil). */
   conflicten: Conflict[];
+
+  /** Instelling: de kalender staat alleen in het kalenderbestand, niet in de browser. */
+  alleenInBestand: boolean;
+  /** Bij "alleen in het kalenderbestand": is het bestand deze sessie al ingelezen (of net gekoppeld)? */
+  bestandGeladen: boolean;
+  /** Bij "alleen in het kalenderbestand": er zijn wijzigingen die nog niet in het bestand staan. */
+  onopgeslagen: boolean;
+  /**
+   * Zet "alleen in het kalenderbestand" aan of uit. Aanzetten kan alleen met een gekoppeld bestand dat
+   * zojuist is bijgewerkt; daarna verdwijnt de kalender uit de browseropslag. Uitzetten bewaart de
+   * kalender weer in de browser.
+   */
+  zetAlleenInBestand: (aan: boolean) => Promise<boolean>;
 
   /** Bestaand bestand kiezen en koppelen. `kies` wordt gevraagd als er lokaal al eigen gegevens zijn. */
   koppelBestaand: (kies?: KeuzeVrager) => Promise<boolean>;
@@ -109,7 +125,10 @@ function laadMeta(): SyncMeta {
 
 function bewaarMeta(m: SyncMeta) {
   try {
-    localStorage.setItem(META_SLEUTEL, JSON.stringify(m));
+    // Basis en vingerafdruk bevatten kalenderinhoud. Bij "alleen in het kalenderbestand" onthoudt de
+    // browser alleen de bestandsnaam; de rest blijft in het werkgeheugen.
+    const bewaren = alleenBestand() ? { ...LEGE_META, bestandsnaam: m.bestandsnaam } : m;
+    localStorage.setItem(META_SLEUTEL, JSON.stringify(bewaren));
   } catch {
     /* niet erg */
   }
@@ -168,6 +187,24 @@ export function SyncProvider({ children, gepauzeerd = false }: { children: React
   const [fout, setFout] = useState<string | null>(null);
   const [conflicten, setConflicten] = useState<Conflict[]>([]);
 
+  const alleenInBestand = useAlleenBestand();
+  const geladenRef = useRef(false);
+  const [bestandGeladen, setBestandGeladenRuw] = useState(false);
+  const zetGeladen = useCallback(() => {
+    geladenRef.current = true;
+    setBestandGeladenRuw(true);
+  }, []);
+  const [onopgeslagen, setOnopgeslagenRuw] = useState(false);
+  const onopgeslagenRef = useRef(false);
+  /** Staat alles wat in het werkgeheugen zit ook in het bestand? Alleen van belang zonder browseropslag. */
+  const herbereken = useCallback(() => {
+    const st = storeRef.current.haalState();
+    const open =
+      alleenBestand() && st.setupVoltooid && st.modus === 'eigen' && vingerafdruk(st) !== metaRef.current.vingerafdruk;
+    onopgeslagenRef.current = open;
+    setOnopgeslagenRuw(open);
+  }, []);
+
   const zetMeta = useCallback((m: Partial<SyncMeta>) => {
     metaRef.current = { ...metaRef.current, ...m };
     bewaarMeta(metaRef.current);
@@ -201,6 +238,19 @@ export function SyncProvider({ children, gepauzeerd = false }: { children: React
       const lokaal = storeRef.current.haalState();
       const { tekst, gewijzigd } = await leesBestand(h);
       const meta = metaRef.current;
+      // Alleen in het kalenderbestand, eerste keer deze sessie: de browser is leeg, dus het bestand
+      // wordt ingelezen en overgenomen. Er wordt niets geschreven.
+      if (alleenBestand() && !geladenRef.current) {
+        if (!tekst.trim()) throw new SyncFout('Het gekoppelde kalenderbestand is leeg. Kies een ander bestand of begin een nieuwe kalender.');
+        const gelezen = leesKalenderJson(tekst);
+        if (!gelezen.ok) throw new SyncFout('Het gekoppelde bestand is geen leesbaar kalenderbestand. Er is niets overschreven.');
+        const g = gedeeldDeel(gelezen.state);
+        storeRef.current.neemGedeeldOver(g);
+        zetGeladen();
+        zetMeta({ basis: maakBasis(g), bestandTijd: gewijzigd, vingerafdruk: vingerafdruk(g), laatsteSync: Date.now() });
+        setFout(null);
+        return;
+      }
       const afdrukLokaal = vingerafdruk(lokaal);
       if (gewijzigd === meta.bestandTijd && afdrukLokaal === meta.vingerafdruk) {
         zetMeta({ laatsteSync: Date.now() });
@@ -237,12 +287,13 @@ export function SyncProvider({ children, gepauzeerd = false }: { children: React
     } finally {
       bezigRef.current = false;
       setBezig(false);
+      herbereken();
       if (opnieuwRef.current) {
         opnieuwRef.current = false;
         void synchroniseer();
       }
     }
-  }, [meld, setStatus, zetMeta]);
+  }, [herbereken, meld, setStatus, zetGeladen, zetMeta]);
 
   /** Voer bestands-IO uit terwijl de automatische synchronisatie wacht. */
   const metSlot = useCallback(
@@ -255,13 +306,14 @@ export function SyncProvider({ children, gepauzeerd = false }: { children: React
       } finally {
         bezigRef.current = false;
         setBezig(false);
+        herbereken();
         if (opnieuwRef.current) {
           opnieuwRef.current = false;
           void synchroniseer();
         }
       }
     },
-    [synchroniseer],
+    [herbereken, synchroniseer],
   );
 
   /** Koppeling activeren met een handle waarvoor toestemming is gegeven. */
@@ -275,8 +327,10 @@ export function SyncProvider({ children, gepauzeerd = false }: { children: React
       zetMeta({ bestandsnaam: h.name });
       setStatus('gekoppeld');
       setFout(null);
+      // vanaf nu staat wat in het werkgeheugen zit ook in dit bestand (of het wordt er zo in gezet)
+      zetGeladen();
     },
-    [setStatus, zetMeta],
+    [setStatus, zetGeladen, zetMeta],
   );
 
   /** Combineer een gelezen bestand met de lokale gegevens: overnemen of samenvoegen. */
@@ -529,9 +583,58 @@ export function SyncProvider({ children, gepauzeerd = false }: { children: React
   const { state, generatie } = store;
   useEffect(() => {
     if (statusRef.current !== 'gekoppeld') return;
-    const t = window.setTimeout(() => void synchroniseer(), SYNC_VERTRAGING_MS);
+    const t = window.setTimeout(
+      () => void synchroniseer(),
+      alleenBestand() ? SYNC_VERTRAGING_ALLEEN_BESTAND_MS : SYNC_VERTRAGING_MS,
+    );
     return () => window.clearTimeout(t);
   }, [state, synchroniseer]);
+
+  // Alleen in het kalenderbestand: bijhouden of alles in het bestand staat, en waarschuwen bij sluiten
+  useEffect(() => {
+    herbereken();
+  }, [state, alleenInBestand, status, herbereken]);
+  useEffect(() => {
+    const opSluiten = (e: BeforeUnloadEvent) => {
+      if (!onopgeslagenRef.current) return;
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', opSluiten);
+    return () => window.removeEventListener('beforeunload', opSluiten);
+  }, []);
+
+  const zetAlleenInBestand = useCallback(
+    async (aan: boolean): Promise<boolean> => {
+      if (!aan) {
+        zetAlleenBestand(false);
+        bewaarMeta(metaRef.current);
+        toastRef.current('De kalender wordt weer in deze browser bewaard.', 'success', 3500);
+        return true;
+      }
+      if (!ondersteund || statusRef.current !== 'gekoppeld' || !handleRef.current) {
+        toastRef.current('Koppel eerst een kalenderbestand. Dan kan de kalender daar alleen in bewaard worden.', 'warning', 4500);
+        return false;
+      }
+      // eerst zeker weten dat alles in het bestand staat
+      await synchroniseer();
+      while (bezigRef.current) await new Promise((r) => setTimeout(r, 50));
+      const st = storeRef.current.haalState();
+      if (vingerafdruk(st) !== metaRef.current.vingerafdruk) {
+        toastRef.current('Het kalenderbestand kon niet worden bijgewerkt. De instelling is niet gewijzigd.', 'danger', 4500);
+        return false;
+      }
+      zetGeladen();
+      if (!zetAlleenBestand(true)) {
+        toastRef.current('De browser kan deze instelling niet onthouden.', 'danger', 4000);
+        return false;
+      }
+      bewaarMeta(metaRef.current);
+      toastRef.current('De kalender staat nu alleen in het kalenderbestand.', 'success', 3500);
+      return true;
+    },
+    [ondersteund, synchroniseer, zetGeladen],
+  );
 
   // Bij terugkeer naar het venster en elke 30 s
   useEffect(() => {
@@ -576,6 +679,10 @@ export function SyncProvider({ children, gepauzeerd = false }: { children: React
       bezig,
       fout,
       conflicten,
+      alleenInBestand,
+      bestandGeladen,
+      onopgeslagen,
+      zetAlleenInBestand,
       koppelBestaand,
       maakGedeeldBestand,
       herstelToestemming,
@@ -594,6 +701,10 @@ export function SyncProvider({ children, gepauzeerd = false }: { children: React
       bezig,
       fout,
       conflicten,
+      alleenInBestand,
+      bestandGeladen,
+      onopgeslagen,
+      zetAlleenInBestand,
       koppelBestaand,
       maakGedeeldBestand,
       herstelToestemming,
@@ -627,6 +738,10 @@ export function OefenSyncProvider({ children }: { children: ReactNode }) {
       bezig: false,
       fout: null,
       conflicten: [],
+      alleenInBestand: false,
+      bestandGeladen: true,
+      onopgeslagen: false,
+      zetAlleenInBestand: nee,
       koppelBestaand: nee,
       maakGedeeldBestand: nee,
       herstelToestemming: nee,

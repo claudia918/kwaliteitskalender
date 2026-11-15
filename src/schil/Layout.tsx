@@ -6,6 +6,7 @@ import { Footer } from './Footer';
 import { Foutgrens } from './Foutgrens';
 import { Lade, Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
+import { BestandWaarschuwing } from './BestandWaarschuwing';
 import { ZoekProvider } from './Zoekvenster';
 import { OefenBand, RondleidingAanbod, RondleidingKeuze } from './rondleiding/Aanbod';
 import { AfsluitingVenster } from './rondleiding/Afsluiting';
@@ -28,6 +29,7 @@ export function Layout() {
       </a>
       <OefenBand />
       <Topbar onMenu={() => setLade(true)} />
+      <BestandWaarschuwing />
       <Lade open={lade} onSluit={sluit} />
       <div className="flex flex-1">
         <Sidebar />

@@ -60,8 +60,10 @@ function StatusBlok() {
 
   let icoon: LucideIcon = HardDrive;
   let toon: 'neutral' | 'niveau' | 'warning' = 'neutral';
-  let titel = 'Alleen op dit apparaat';
-  let tekst = 'Je kalender staat in deze browser op deze computer. Collega’s zien je wijzigingen niet.';
+  let titel = sync.alleenInBestand ? 'Geen kalenderbestand gekoppeld' : 'Alleen op dit apparaat';
+  let tekst = sync.alleenInBestand
+    ? 'De kalender wordt niet in deze browser bewaard. Koppel een kalenderbestand, anders gaan je wijzigingen verloren.'
+    : 'Je kalender staat in deze browser op deze computer. Collega’s zien je wijzigingen niet.';
   if (gekoppeld) {
     icoon = FolderSync;
     toon = 'niveau';
@@ -170,20 +172,43 @@ export default function GegevensDelen() {
           <Card rondleiding="gegevens-waar" title="Waar staan je gegevens?">
             <StatusBlok />
             <ul className="mt-5 space-y-3 text-sm text-ink-body">
-              <li className="flex gap-2.5">
-                <CircleCheckBig className="mt-0.5 h-4 w-4 shrink-0 text-status-success" aria-hidden />
-                <span>
-                  <strong className="text-ink-strong">In deze browser</strong>, op deze computer. Elke wijziging wordt meteen
-                  bewaard. Wis je je browsergegevens, dan is de kalender hier weg.
-                </span>
-              </li>
-              <li className="flex gap-2.5">
-                <CircleCheckBig className="mt-0.5 h-4 w-4 shrink-0 text-status-success" aria-hidden />
-                <span>
-                  <strong className="text-ink-strong">In het gedeelde kalenderbestand</strong>, als je dat koppelt. Dat bestand
-                  staat waar jij het neerzet, bijvoorbeeld in een SharePoint-, OneDrive- of netwerkmap van je organisatie.
-                </span>
-              </li>
+              {sync.alleenInBestand ? (
+                <li className="flex gap-2.5">
+                  <CircleCheckBig className="mt-0.5 h-4 w-4 shrink-0 text-status-success" aria-hidden />
+                  <span>
+                    <strong className="text-ink-strong">Alleen in het kalenderbestand.</strong> Dat bestand staat waar jullie
+                    het hebben neergezet, bijvoorbeeld in een SharePoint-, OneDrive- of netwerkmap van je organisatie. Zolang
+                    dit tabblad open is, staat de kalender ook in het werkgeheugen van de computer.
+                  </span>
+                </li>
+              ) : (
+                <>
+                  <li className="flex gap-2.5">
+                    <CircleCheckBig className="mt-0.5 h-4 w-4 shrink-0 text-status-success" aria-hidden />
+                    <span>
+                      <strong className="text-ink-strong">In deze browser</strong>, op deze computer. Elke wijziging wordt
+                      meteen bewaard. Wis je je browsergegevens, dan is de kalender hier weg.
+                    </span>
+                  </li>
+                  <li className="flex gap-2.5">
+                    <CircleCheckBig className="mt-0.5 h-4 w-4 shrink-0 text-status-success" aria-hidden />
+                    <span>
+                      <strong className="text-ink-strong">In het gedeelde kalenderbestand</strong>, als je dat koppelt. Dat
+                      bestand staat waar jij het neerzet, bijvoorbeeld in een SharePoint-, OneDrive- of netwerkmap van je
+                      organisatie.
+                    </span>
+                  </li>
+                </>
+              )}
+              {sync.alleenInBestand && (
+                <li className="flex gap-2.5">
+                  <CircleCheckBig className="mt-0.5 h-4 w-4 shrink-0 text-status-success" aria-hidden />
+                  <span>
+                    <strong className="text-ink-strong">Niet in deze browser.</strong> De browser onthoudt alleen instellingen:
+                    je weergave, of je de rondleiding hebt gezien en welk bestand gekoppeld is.
+                  </span>
+                </li>
+              )}
               <li className="flex gap-2.5">
                 <CircleCheckBig className="mt-0.5 h-4 w-4 shrink-0 text-status-success" aria-hidden />
                 <span>
@@ -238,6 +263,54 @@ export default function GegevensDelen() {
                   Bestaand bestand koppelen
                 </Button>
               </div>
+            )}
+          </Card>
+
+          <Card
+            rondleiding="gegevens-alleen-bestand"
+            title="Alleen in het kalenderbestand bewaren"
+            subtitle="Dan staat er geen kalender meer in de browser."
+          >
+            {sync.alleenInBestand ? (
+              <>
+                <p className="text-sm text-ink-body">
+                  <strong className="text-ink-strong">Dit staat aan in deze browser.</strong> De kalender staat alleen in het
+                  kalenderbestand. Bij elke start leest de Kwaliteitskalender dat bestand in; de browser kan dan opnieuw om
+                  toestemming vragen.
+                </p>
+                <Button size="sm" className="mt-4" onClick={() => void sync.zetAlleenInBestand(false)}>
+                  Weer in deze browser bewaren
+                </Button>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-ink-body">
+                  Standaard bewaart de browser een werkkopie van de kalender, ook als je een kalenderbestand koppelt. Zet je
+                  dit aan, dan staat de kalender alleen in het kalenderbestand in jullie eigen omgeving.
+                </p>
+                <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-ink-body">
+                  <li>Bij elke start opent de Kwaliteitskalender het bestand. De browser kan dan om toestemming vragen.</li>
+                  <li>Zonder bestand wordt er niets bewaard. Je krijgt dan een waarschuwing.</li>
+                  <li>De instelling geldt voor deze browser. Elke collega zet haar zelf aan.</li>
+                </ul>
+                {!sync.ondersteund ? (
+                  <p className="mt-4 text-sm text-ink-muted">Dit werkt alleen in Microsoft Edge en Google Chrome.</p>
+                ) : (
+                  <>
+                    <Button
+                      size="sm"
+                      className="mt-4"
+                      disabled={sync.status !== 'gekoppeld' || isDemo}
+                      onClick={() => void sync.zetAlleenInBestand(true)}
+                    >
+                      Alleen in het kalenderbestand bewaren
+                    </Button>
+                    {sync.status !== 'gekoppeld' && (
+                      <p className="mt-2 text-sm text-ink-muted">Koppel eerst een kalenderbestand; daarna kun je dit aanzetten.</p>
+                    )}
+                  </>
+                )}
+              </>
             )}
           </Card>
 
