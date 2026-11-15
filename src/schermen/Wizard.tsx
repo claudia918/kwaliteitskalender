@@ -67,7 +67,7 @@ export default function Wizard({ onTerug }: WizardProps) {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-4 py-10">
-      <section className="rounded-md border border-line-subtle bg-surface-card p-5 sm:p-8">
+      <section className="kk-hoek-vlak border border-line-subtle bg-surface-card p-5 sm:p-8">
         <div className="flex items-center justify-between gap-4">
           <AppLogo />
           <Button variant="ghost" size="sm" icon={ArrowLeft} onClick={onTerug}>

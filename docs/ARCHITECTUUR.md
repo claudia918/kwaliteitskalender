@@ -410,3 +410,7 @@ Doel: de app moet aanvoelen als papier en niet als een gegenereerd dashboard. Re
 ### Steunkleur magenta
 
 Het magenta van het merk (`--lv-magenta`, de tweede kleur op projectlerenverbeteren.nl) is de kleur voor links (`.kk-link`), de actieve keuze in filters en tabs, voortgangsbalken, de knopvariant `niveau` en één uitgelicht vlak per scherm ("Volgende stap" op Start, met de gele knop erop). Het bestuursniveau gebruikt hetzelfde magenta. Geselecteerde chips en "nu"-labels blijven zwart.
+
+### Vormkenmerk: hoek rechtsonder
+
+Net als op projectlerenverbeteren.nl zijn knoppen, kaarten en dialogen recht, met alleen de hoek rechtsonder afgerond. Gebruik de klassen `kk-hoek-knop`, `kk-hoek-knop-klein` en `kk-hoek-vlak` (maten in `tokens.css`: `--hoek-knop`, `--hoek-knop-klein`, `--hoek-vlak`). `Button`, `Card`, `KpiTile`, `EmptyState` en `Dialog` doen dit al. Kleine onderdelen (chips, invoervelden, badges, menu's) blijven recht.

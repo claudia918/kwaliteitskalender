@@ -446,7 +446,7 @@ function StapKaart({ tour, index }: { tour: Tour; index: number }) {
             <button
               type="button"
               onClick={volgende}
-              className="inline-flex h-9 items-center gap-1.5 rounded-md bg-brand-yellow px-3.5 text-sm font-semibold text-ink-on-brand hover:bg-brand-yellow-600"
+              className="inline-flex h-9 items-center gap-1.5 kk-hoek-knop bg-brand-yellow px-3.5 text-sm font-semibold text-ink-on-brand hover:bg-brand-yellow-600"
             >
               {laatste ? 'Klaar' : 'Volgende'}
               {!laatste && <ArrowRight className="h-4 w-4" aria-hidden />}

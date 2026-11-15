@@ -108,7 +108,7 @@ export function Dialog({
         aria-labelledby={titelId}
         tabIndex={-1}
         className={cx(
-          'flex max-h-[90vh] w-full animate-rise flex-col overflow-hidden rounded-xl border border-line bg-surface-card shadow-pop outline-none',
+          'flex max-h-[90vh] w-full animate-rise flex-col overflow-hidden kk-hoek-vlak border border-line bg-surface-card shadow-pop outline-none',
           BREEDTE[width],
           className,
         )}

@@ -75,6 +75,7 @@ export default function Stijlgids() {
           <li>Twee kleuren: geel en zwart, op warm wit en warmgrijs. Eén lettertype: Poppins.</li>
           <li>Geel is schaars: de primaire knop, de focusring en één swoosh per scherm (de voettekst).</li>
           <li>Magenta is de steunkleur (zoals op de website): links, de actieve keuze, voortgangsbalken en één uitgelicht vlak per scherm.</li>
+          <li>Vormkenmerk (zoals op de website): knoppen, kaarten en dialogen zijn recht, met alleen de hoek rechtsonder afgerond.</li>
           <li>Vlakken zijn wit met een 1px haarlijn en een kleine radius. Geen schaduw, behalve voor wat zweeft.</li>
           <li>Geen getinte vlakken, gekleurde linkerranden of iconen in tegeltjes als versiering.</li>
           <li>Labels in gewone tekst (sentence case). Kleine hoofdletters alleen voor groepskoppen in menu en tabel.</li>

@@ -186,6 +186,10 @@
   --radius-lg:  4px;
   --radius-xl:  6px;
   --radius-pill:999px;
+  /* Vormkenmerk van de website: recht, met alleen de hoek rechtsonder afgerond. */
+  --hoek-knop:       16px;
+  --hoek-knop-klein: 12px;
+  --hoek-vlak:       28px;
 
   /* Schaduw alleen voor wat echt zweeft (menu, dialoog, melding, een opgepakte chip).
      Vlakken in de pagina hebben een 1px haarlijn en geen schaduw: xs en sm zijn bewust leeg. */

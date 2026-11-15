@@ -220,7 +220,7 @@ function Inhoud({ data, onSluit }: { data: AfsluitingData; onSluit: () => void }
           <button
             type="button"
             onClick={() => setPoster(true)}
-            className="inline-flex h-10 items-center gap-2 rounded-md border border-line px-4 text-sm font-semibold text-ink-strong hover:bg-surface-hover"
+            className="inline-flex h-10 items-center gap-2 kk-hoek-knop border border-gray-900 px-4 text-sm font-semibold text-ink-strong hover:bg-surface-hover"
           >
             <Printer className="h-4 w-4" aria-hidden />
             Print als poster
@@ -229,7 +229,7 @@ function Inhoud({ data, onSluit }: { data: AfsluitingData; onSluit: () => void }
             type="button"
             data-autofocus
             onClick={onSluit}
-            className="inline-flex h-10 items-center gap-2 rounded-md bg-brand-magenta px-4 text-sm font-semibold text-ink-on-dark hover:bg-brand-magenta-strong"
+            className="inline-flex h-10 items-center gap-2 kk-hoek-knop bg-brand-magenta px-4 text-sm font-semibold text-ink-on-dark hover:bg-brand-magenta-strong"
           >
             Aan de slag
             <ArrowRight className="h-4 w-4" aria-hidden />

@@ -59,7 +59,7 @@ export function Werklijst({ komend }: { komend: KomendGesprek | null }) {
     <section
       data-rondleiding="deze-maand"
       aria-labelledby="werklijst-kop"
-      className="rounded-lg border border-line-subtle bg-surface-card shadow-xs"
+      className="kk-hoek-vlak border border-line-subtle bg-surface-card"
     >
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-b border-line-subtle px-5 py-4">
         <div className="min-w-0">

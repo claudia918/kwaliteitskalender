@@ -138,6 +138,10 @@
     text-decoration-color: currentColor;
     text-decoration-thickness: 2px;
   }
+  /* Vormkenmerk van Leren verbeteren (website): rechte hoeken, alleen rechtsonder afgerond. */
+  .kk-hoek-knop { border-radius: 0 0 var(--hoek-knop) 0; }
+  .kk-hoek-knop-klein { border-radius: 0 0 var(--hoek-knop-klein) 0; }
+  .kk-hoek-vlak { border-radius: 0 0 var(--hoek-vlak) 0; }
   /* Link op een magenta vlak: wit. */
   .kk-link-licht {
     color: var(--text-on-dark);

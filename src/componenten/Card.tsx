@@ -54,7 +54,7 @@ export function Card({
       data-rondleiding={rondleiding}
       style={style}
       className={cx(
-        'min-w-0 rounded-md border border-line-subtle bg-surface-card',
+        'min-w-0 kk-hoek-vlak border border-line-subtle bg-surface-card',
         className,
       )}
     >
@@ -107,7 +107,7 @@ export function KpiTile({ label, value, unit, icon: Icon, tone = 'neutral', hint
   return (
     <div
       className={cx(
-        'flex min-w-0 flex-col gap-2 rounded-md border border-line-subtle bg-surface-card p-4',
+        'flex min-w-0 flex-col gap-2 kk-hoek-vlak border border-line-subtle bg-surface-card p-4',
         className,
       )}
     >
@@ -227,7 +227,7 @@ export function EmptyState({ icon: Icon, title, body, action, watermark, compact
     <div
       className={cx(
         'relative flex flex-col items-center overflow-hidden text-center',
-        compact ? 'gap-2 px-4 py-8' : 'gap-3 rounded-md border border-line-subtle bg-surface-card px-8 py-12',
+        compact ? 'gap-2 px-4 py-8' : 'gap-3 kk-hoek-vlak border border-line-subtle bg-surface-card px-8 py-12',
         className,
       )}
     >

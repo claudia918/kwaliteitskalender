@@ -16,7 +16,7 @@ import { EERSTE_RONDLEIDING, SCHERM_RONDLEIDINGEN, tourVoorPad, vindTour } from 
 import { Venster } from './Venster';
 
 const geelKnop =
-  'inline-flex h-10 items-center justify-center gap-2 rounded-md bg-brand-yellow px-4 text-sm font-semibold text-ink-on-brand hover:bg-brand-yellow-600';
+  'inline-flex h-10 items-center justify-center gap-2 kk-hoek-knop bg-brand-yellow px-4 text-sm font-semibold text-ink-on-brand hover:bg-brand-yellow-600';
 const stilKnop =
   'inline-flex h-10 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold text-ink-muted hover:bg-surface-hover hover:text-ink-strong';
 

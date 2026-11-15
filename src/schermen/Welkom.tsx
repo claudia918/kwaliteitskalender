@@ -31,7 +31,7 @@ export default function Welkom({ onStartWizard }: WelkomProps) {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-4 py-10">
-      <section className="rounded-md border border-line-subtle bg-surface-card p-6 sm:p-10">
+      <section className="kk-hoek-vlak border border-line-subtle bg-surface-card p-6 sm:p-10">
         <AppLogo groot compact={false} />
 
         <h1 className="mt-8 text-h1 text-ink-strong sm:text-display">Welkom bij de Kwaliteitskalender VO</h1>

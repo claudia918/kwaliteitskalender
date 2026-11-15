@@ -237,7 +237,7 @@ function VolgendeStapKaart({
   return (
     <section
       aria-labelledby="volgende-stap"
-      className="grid overflow-hidden rounded-md border border-line-subtle bg-surface-card lg:grid-cols-[minmax(0,1fr)_340px]"
+      className="grid overflow-hidden kk-hoek-vlak border border-line-subtle bg-surface-card lg:grid-cols-[minmax(0,1fr)_340px]"
     >
       {/* Het ene magenta vlak van het scherm, met de gele knop erop: zoals de uitgelichte blokken op de website. */}
       <div data-rondleiding="volgende-stap" className="relative bg-brand-magenta p-5 text-ink-on-dark sm:p-6">
@@ -376,7 +376,7 @@ function AanDeSlag() {
   return (
     <section
       data-rondleiding="aan-de-slag"
-      className="rounded-md border border-line-subtle bg-surface-card p-5"
+      className="kk-hoek-vlak border border-line-subtle bg-surface-card p-5"
       aria-labelledby="aan-de-slag"
     >
       <div className="flex items-start justify-between gap-4">
