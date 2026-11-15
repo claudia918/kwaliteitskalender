@@ -197,7 +197,7 @@ export function FilterChip({ children, active, onClick, dotClassName, icon: Icon
       className={cx(
         'inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-sm border px-2.5 text-xs font-semibold transition-colors duration-fast',
         active
-          ? 'border-gray-900 bg-gray-900 text-white'
+          ? 'border-brand-magenta bg-brand-magenta text-white'
           : 'border-line bg-surface-card text-ink-body hover:border-gray-900',
         className,
       )}
@@ -269,7 +269,7 @@ export function SegmentedControl<T extends string>({
               'inline-flex items-center gap-1.5 whitespace-nowrap rounded-xs border-b-2 font-semibold transition-colors duration-fast',
               size === 'sm' ? 'h-8 px-2 text-xs' : 'h-9 px-2.5 text-sm',
               actief
-                ? 'border-gray-900 text-ink-strong'
+                ? 'border-brand-magenta text-ink-strong'
                 : 'border-transparent font-medium text-ink-muted hover:border-line hover:text-ink-strong',
             )}
           >

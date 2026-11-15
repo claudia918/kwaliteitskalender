@@ -74,7 +74,7 @@ export function Overzicht({ items, filter, onFilter, komend, rechts }: Overzicht
                   className={cx(
                     'inline-flex h-7 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-sm border px-2.5 text-xs font-semibold transition-colors duration-fast',
                     aan
-                      ? 'border-transparent bg-gray-900 text-white'
+                      ? 'border-transparent bg-brand-magenta text-white'
                       : 'border-line-subtle bg-surface-card text-ink-body hover:border-line hover:bg-surface-hover',
                   )}
                 >

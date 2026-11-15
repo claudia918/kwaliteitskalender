@@ -140,7 +140,7 @@ export interface ProgressBarProps {
 }
 
 /** Voortgangsbalk; de waarde staat er als tekst bij als showValue (nooit alleen kleur/lengte). */
-export function ProgressBar({ value, color = 'var(--text-strong)', size = 'md', label, showValue, className }: ProgressBarProps) {
+export function ProgressBar({ value, color = 'var(--lv-magenta)', size = 'md', label, showValue, className }: ProgressBarProps) {
   const pct = Math.max(0, Math.min(100, Math.round(value)));
   const h = size === 'sm' ? 'h-1' : size === 'lg' ? 'h-2' : 'h-1.5';
   return (

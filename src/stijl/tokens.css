@@ -56,9 +56,9 @@
   /* ---------- NIVEAU IDENTITY (chrome only — desaturated on purpose) ---------- */
   /* Warm, muted earth-tones so they sit with the gold+black brand and never
      read as a STATUS colour. */
-  --niveau-bestuur:        #9A3A52;  /* rood-familie → wine/berry (NOT status red) */
-  --niveau-bestuur-strong: #823045;
-  --niveau-bestuur-surface:#F6E9EC;
+  --niveau-bestuur:        var(--lv-magenta);  /* het magenta van het merk (steunkleur van de website) */
+  --niveau-bestuur-strong: var(--lv-magenta-strong);
+  --niveau-bestuur-surface:var(--lv-magenta-soft);
   --niveau-bestuur-border: #E5C6CF;
 
   --niveau-cluster:        #6E4E7A;  /* paars-familie → warm muted plum */

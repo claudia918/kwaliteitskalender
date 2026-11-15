@@ -83,7 +83,7 @@ export default function Wizard({ onTerug }: WizardProps) {
                 aria-hidden
                 className={cx(
                   'grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-bold',
-                  i <= stap ? 'bg-gray-900 text-white' : 'border border-line text-ink-muted',
+                  i <= stap ? 'bg-brand-magenta text-white' : 'border border-line text-ink-muted',
                 )}
               >
                 {i < stap ? <Check className="h-4 w-4" /> : i + 1}
@@ -302,7 +302,7 @@ function Keuzekaart({
         aria-hidden
         className={cx(
           'mt-1 grid h-5 w-5 shrink-0 place-items-center rounded-full border-2',
-          actief ? 'border-gray-900 bg-gray-900 text-white' : 'border-line-strong',
+          actief ? 'border-brand-magenta bg-brand-magenta text-white' : 'border-line-strong',
         )}
       >
         {actief && <Check className="h-3 w-3" />}

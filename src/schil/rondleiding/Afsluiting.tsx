@@ -229,7 +229,7 @@ function Inhoud({ data, onSluit }: { data: AfsluitingData; onSluit: () => void }
             type="button"
             data-autofocus
             onClick={onSluit}
-            className="inline-flex h-10 items-center gap-2 rounded-md bg-surface-inverse px-4 text-sm font-semibold text-ink-on-dark hover:bg-gray-800"
+            className="inline-flex h-10 items-center gap-2 rounded-md bg-brand-magenta px-4 text-sm font-semibold text-ink-on-dark hover:bg-brand-magenta-strong"
           >
             Aan de slag
             <ArrowRight className="h-4 w-4" aria-hidden />

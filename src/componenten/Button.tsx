@@ -15,8 +15,8 @@ const VARIANT: Record<ButtonVariant, string> = {
   danger: 'bg-status-danger text-white border-transparent hover:brightness-95',
   'danger-zacht':
     'bg-surface-card text-status-danger border-status-danger hover:bg-status-danger hover:text-white hover:border-transparent',
-  // Historische naam: was de niveaukleur, is nu zwart (de niveaukleur zit alleen in de schil).
-  niveau: 'bg-gray-900 text-white border-transparent hover:bg-gray-700',
+  // Historische naam: was de niveaukleur, is nu het magenta van het merk (de tweede knopkleur van de website).
+  niveau: 'bg-brand-magenta text-white border-transparent hover:bg-brand-magenta-strong',
 };
 
 const SIZE: Record<ButtonSize, string> = {
@@ -53,7 +53,7 @@ export type ButtonProps = Gedeeld & ButtonHTMLAttributes<HTMLButtonElement>;
 
 /**
  * Knop. Varianten: primary (geel met zwarte tekst), secondary (wit, zwart omlijnd), ghost (alleen tekst),
- * danger (rood), danger-zacht (rood omlijnd, vol rood bij hover), niveau (zwart; de naam is historisch).
+ * danger (rood), danger-zacht (rood omlijnd, vol rood bij hover), niveau (magenta; de naam is historisch).
  */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   { variant = 'secondary', size = 'md', icon: Icon, iconRight: IconRechts, className, children, type = 'button', ...rest },

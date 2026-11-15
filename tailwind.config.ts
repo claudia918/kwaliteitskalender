@@ -29,6 +29,8 @@ export default {
         'yellow-soft': v('lv-yellow-soft'),
         black: v('lv-black'),
         magenta: v('lv-magenta'),
+        'magenta-strong': v('lv-magenta-strong'),
+        'magenta-soft': v('lv-magenta-soft'),
         coral: v('lv-coral'),
       },
       gray: Object.fromEntries(

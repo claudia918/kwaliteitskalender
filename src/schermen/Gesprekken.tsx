@@ -342,7 +342,7 @@ export default function Gesprekken() {
                 // Tab: tekst met een zwarte streep onder de actieve keuze; het seizoen zit in het icoon.
                 '-mb-px inline-flex h-11 items-center gap-2 rounded-t-sm border-b-2 px-3 text-sm transition-colors duration-fast',
                 actief
-                  ? 'border-gray-900 font-semibold text-ink-strong'
+                  ? 'border-brand-magenta font-semibold text-ink-strong'
                   : 'border-transparent font-medium text-ink-muted hover:border-line hover:text-ink-strong',
               )}
             >

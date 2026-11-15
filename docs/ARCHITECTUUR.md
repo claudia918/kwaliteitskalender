@@ -405,3 +405,8 @@ Doel: de app moet aanvoelen als papier en niet als een gegenereerd dashboard. Re
   `[role=listbox] [role=option]:has-text("<naam>")`, of zet `kwaliteitskalender:ui:v1` en herlaad.
   Pas de e2e-scripts aan als je schermen echte koppen (h1) geven die anders heten; ze controleren nu
   alleen dat er een h1 is.
+
+
+### Steunkleur magenta
+
+Het magenta van het merk (`--lv-magenta`, de tweede kleur op projectlerenverbeteren.nl) is de kleur voor links (`.kk-link`), de actieve keuze in filters en tabs, voortgangsbalken, de knopvariant `niveau` en één uitgelicht vlak per scherm ("Volgende stap" op Start, met de gele knop erop). Het bestuursniveau gebruikt hetzelfde magenta. Geselecteerde chips en "nu"-labels blijven zwart.

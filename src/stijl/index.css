@@ -124,19 +124,23 @@
     height: 2.125rem;
     font-size: var(--text-xs);
   }
-  /* Link: zwart en onderstreept (niet in de niveaukleur). Bij hover wordt de lijn dikker. */
+  /* Link: magenta (de steunkleur van Leren verbeteren) en onderstreept. Bij hover wordt de lijn dikker. */
   .kk-link {
-    color: var(--text-strong);
+    color: var(--lv-magenta);
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 3px;
-    text-decoration-color: var(--border-strong);
+    text-decoration-color: currentColor;
     border-radius: var(--radius-xs);
     transition: text-decoration-color var(--dur-fast);
   }
   .kk-link:hover {
     text-decoration-color: currentColor;
     text-decoration-thickness: 2px;
+  }
+  /* Link op een magenta vlak: wit. */
+  .kk-link-licht {
+    color: var(--text-on-dark);
   }
   /* De S-curve van het merk: een stille gele scheidingslijn. Eén keer per scherm. */
   .lv-swoosh {

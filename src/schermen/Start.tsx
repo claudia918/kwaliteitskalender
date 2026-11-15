@@ -239,13 +239,14 @@ function VolgendeStapKaart({
       aria-labelledby="volgende-stap"
       className="grid overflow-hidden rounded-md border border-line-subtle bg-surface-card lg:grid-cols-[minmax(0,1fr)_340px]"
     >
-      <div data-rondleiding="volgende-stap" className="relative p-5 sm:p-6">
-        <p id="volgende-stap" className="eyebrow">
+      {/* Het ene magenta vlak van het scherm, met de gele knop erop: zoals de uitgelichte blokken op de website. */}
+      <div data-rondleiding="volgende-stap" className="relative bg-brand-magenta p-5 text-ink-on-dark sm:p-6">
+        <p id="volgende-stap" className="text-sm font-medium">
           Volgende stap
         </p>
-        <p className="mt-2 max-w-2xl text-h3 font-semibold leading-snug text-ink-strong">{zin}</p>
+        <p className="mt-2 max-w-2xl text-h3 font-semibold leading-snug">{zin}</p>
         {stap.soort === 'kalender-leeg' && (
-          <p className="mt-2 max-w-2xl text-sm text-ink-muted">
+          <p className="mt-2 max-w-2xl text-sm">
             Dat zijn de verplichte activiteiten uit het <Begrip term="startsjabloon" />
             {state.organisatie.scholen.length > 1 ? ', voor elke school en voor het bestuur' : ''}.
           </p>
@@ -255,7 +256,7 @@ function VolgendeStapKaart({
             {knop}
           </Button>
           {tweede && (
-            <Link to={tweede.to} className="text-sm font-semibold kk-link">
+            <Link to={tweede.to} className="text-sm font-semibold kk-link kk-link-licht">
               {tweede.label}
             </Link>
           )}
